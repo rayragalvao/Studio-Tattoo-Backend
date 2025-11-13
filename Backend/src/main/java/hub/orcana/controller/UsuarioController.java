@@ -13,11 +13,13 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+@Slf4j
 @RestController
 @RequestMapping("/usuario")
 @Tag(name = "Usuários", description = "Gerenciamento de usuários")
@@ -39,8 +41,15 @@ public class UsuarioController {
                             content = @Content(schema = @Schema(example = "{\"message\": \"Email de usuário já cadastrado.\", \"status\": 409}")))
             })
     public ResponseEntity<Usuario> criarUsuario(@RequestBody @Valid CadastroUsuario usuario) {
-        var novoUsuario = service.criar(usuario);
-        return ResponseEntity.status(201).body(novoUsuario);
+        log.info("Iniciando criação de novo usuário: {}", usuario);
+        try {
+            var novoUsuario = service.criar(usuario);
+            log.info("Usuário criado com sucesso. ID: {}, Email: {}", novoUsuario.getId(), novoUsuario.getEmail());
+            return ResponseEntity.status(201).body(novoUsuario);
+        } catch (Exception e) {
+            log.error("Erro ao criar usuário: {}", e.getMessage(), e);
+            throw e;
+        }
     }
 
     @PostMapping("/login")
@@ -55,8 +64,15 @@ public class UsuarioController {
                             content = @Content(schema = @Schema(example = "{\"message\": \"Email de usuário não cadastrado\", \"status\": 404}")))
             })
     public ResponseEntity<UsuarioToken> login(@RequestBody @Valid LoginUsuario usuario) {
-        UsuarioToken token = service.autenticar(usuario);
-        return ResponseEntity.ok(token);
+        log.info("Tentativa de login para usuário: {}", usuario);
+        try {
+            UsuarioToken token = service.autenticar(usuario);
+            log.info("Login realizado com sucesso para usuário: {}", usuario);
+            return ResponseEntity.ok(token);
+        } catch (Exception e) {
+            log.warn("Falha na autenticação para usuário: {}", e.getMessage());
+            throw e;
+        }
     }
 
     // Lista os usuários
@@ -72,10 +88,20 @@ public class UsuarioController {
             })
     @SecurityRequirement(name = "Bearer")
     public ResponseEntity<List<ListarUsuarios>> listarUsuarios() {
-        var usuarios = service.listar();
-        return usuarios.isEmpty()
-                ? ResponseEntity.noContent().build()
-                : ResponseEntity.ok(usuarios);
+        log.info("Iniciando busca por todos os usuários");
+        try {
+            var usuarios = service.listar();
+            if (usuarios.isEmpty()) {
+                log.info("Nenhum usuário encontrado");
+                return ResponseEntity.noContent().build();
+            } else {
+                log.info("Retornando {} usuários encontrados", usuarios.size());
+                return ResponseEntity.ok(usuarios);
+            }
+        } catch (Exception e) {
+            log.error("Erro ao listar usuários: {}", e.getMessage(), e);
+            throw e;
+        }
     }
 
     // Busca usuário pelo ID
@@ -92,10 +118,20 @@ public class UsuarioController {
             })
     @SecurityRequirement(name = "Bearer")
     public ResponseEntity<ListarUsuarios> buscarUsuarioById(@PathVariable Long id) {
-        var usuario = service.buscarById(id);
-        return usuario != null
-                ? ResponseEntity.ok(usuario)
-                : ResponseEntity.noContent().build();
+        log.info("Buscando usuário por ID: {}", id);
+        try {
+            var usuario = service.buscarById(id);
+            if (usuario != null) {
+                log.info("Usuário encontrado com sucesso para ID: {}", id);
+                return ResponseEntity.ok(usuario);
+            } else {
+                log.info("Nenhum usuário encontrado para ID: {}", id);
+                return ResponseEntity.noContent().build();
+            }
+        } catch (Exception e) {
+            log.error("Erro ao buscar usuário por ID {}: {}", id, e.getMessage(), e);
+            throw e;
+        }
     }
 
     // Atualiza um usuário pelo ID
@@ -117,8 +153,15 @@ public class UsuarioController {
             @PathVariable Long id,
             @RequestBody @Valid Usuario usuario
     ) {
-        var usuarioAtualizado = service.atualizarById(id, usuario);
-        return ResponseEntity.ok(usuarioAtualizado);
+        log.info("Iniciando atualização do usuário ID: {}", id);
+        try {
+            var usuarioAtualizado = service.atualizarById(id, usuario);
+            log.info("Usuário ID {} atualizado com sucesso", id);
+            return ResponseEntity.ok(usuarioAtualizado);
+        } catch (Exception e) {
+            log.error("Erro ao atualizar usuário ID {}: {}", id, e.getMessage(), e);
+            throw e;
+        }
     }
 
     // Deleta um usuário pelo ID
@@ -133,7 +176,14 @@ public class UsuarioController {
             })
     @SecurityRequirement(name = "Bearer")
     public ResponseEntity<Void> deletarUsuario(@PathVariable Long id) {
-        service.deletarById(id);
-        return ResponseEntity.noContent().build();
+        log.info("Iniciando exclusão do usuário ID: {}", id);
+        try {
+            service.deletarById(id);
+            log.info("Usuário ID {} excluído com sucesso", id);
+            return ResponseEntity.noContent().build();
+        } catch (Exception e) {
+            log.error("Erro ao excluir usuário ID {}: {}", id, e.getMessage(), e);
+            throw e;
+        }
     }
 }

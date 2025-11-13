@@ -7,6 +7,9 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.MediaType;
@@ -21,6 +24,7 @@ import hub.orcana.dto.DadosCadastroOrcamento;
 @CrossOrigin(origins = "http://localhost:5174")
 @RestController
 @RequestMapping("/orcamento")
+@Tag(name = "Orçamentos", description = "API para gerenciamento de orçamentos de tatuagens")
 public class OrcamentoController {
     private final OrcamentoService service;
 
@@ -44,25 +48,49 @@ public class OrcamentoController {
                             content = @Content(schema = @Schema(example = "{\"timestamp\": \"2025-11-13T10:30:00Z\", \"status\": 500, \"error\": \"Internal Server Error\", \"message\": \"Erro interno do servidor\", \"path\": \"/orcamento\"}")))
             })
     public ResponseEntity<?> postOrcamento(@ModelAttribute @Valid DadosCadastroOrcamento dados) {
-        log.info(dados.toString());
-        var novoOrcamento = service.postOrcamento(dados);
-        return ResponseEntity.status(201).body(Map.of(
-                "success", true,
-                "id", novoOrcamento.getCodigoOrcamento(),
-                "message", "Orçamento criado com sucesso"
-        ));
+        log.info("Iniciando criação de novo orçamento: {}", dados);
+        try {
+            var novoOrcamento = service.postOrcamento(dados);
+            log.info("Orçamento criado com sucesso. Código: {}", novoOrcamento.getCodigoOrcamento());
+            return ResponseEntity.status(201).body(Map.of(
+                    "success", true,
+                    "id", novoOrcamento.getCodigoOrcamento(),
+                    "message", "Orçamento criado com sucesso"
+            ));
+        } catch (Exception e) {
+            log.error("Erro ao criar orçamento: {}", e.getMessage(), e);
+            throw e;
+        }
     }
 
     @GetMapping
     @Operation(summary = "Listar todos os orçamentos do sistema",
-            responses = {
-                    @ApiResponse(responseCode = "200", description = "Lista de orçamentos retornada com sucesso"),
-                    @ApiResponse(responseCode = "204", description = "Nenhum orçamento encontrado"),
-                    @ApiResponse(responseCode = "500", description = "Erro interno do servidor",
-                            content = @Content(schema = @Schema(example = "{\"timestamp\": \"2025-11-13T10:30:00Z\", \"status\": 500, \"error\": \"Internal Server Error\", \"message\": \"Erro ao buscar orçamentos\", \"path\": \"/orcamento\"}")))
-            })
+            description = "Retorna uma lista completa de todos os orçamentos cadastrados no sistema")
+    @SecurityRequirement(name = "Bearer")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Lista de orçamentos retornada com sucesso",
+                    content = @Content(schema = @Schema(implementation = Orcamento.class))),
+        @ApiResponse(responseCode = "204", description = "Nenhum orçamento encontrado"),
+        @ApiResponse(responseCode = "401", description = "Token de autenticação inválido ou expirado"),
+        @ApiResponse(responseCode = "403", description = "Acesso negado - permissões insuficientes"),
+        @ApiResponse(responseCode = "500", description = "Erro interno do servidor",
+                    content = @Content(schema = @Schema(example = "{\"timestamp\": \"2025-11-13T10:30:00Z\", \"status\": 500, \"error\": \"Internal Server Error\", \"message\": \"Erro ao buscar orçamentos\", \"path\": \"/orcamento\"}")))
+    })
     public ResponseEntity<List<Orcamento>> getOrcamentos() {
-        return ResponseEntity.ok(service.findAllOrcamentos());
+        log.info("Iniciando busca por todos os orçamentos");
+        try {
+            List<Orcamento> orcamentos = service.findAllOrcamentos();
+            if (orcamentos.isEmpty()) {
+                log.info("Nenhum orçamento encontrado");
+                return ResponseEntity.noContent().build();
+            } else {
+                log.info("Retornando {} orçamentos encontrados", orcamentos.size());
+                return ResponseEntity.ok(orcamentos);
+            }
+        } catch (Exception e) {
+            log.error("Erro ao buscar orçamentos: {}", e.getMessage(), e);
+            throw e;
+        }
     }
 
 }
