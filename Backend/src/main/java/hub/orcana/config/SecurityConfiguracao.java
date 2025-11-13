@@ -50,7 +50,7 @@ public class SecurityConfiguracao {
             "/auth/**",
             "/usuario/cadastro",
             "/usuario/login",
-            "/orcamento"
+            "/orcamento/cadastro",
     };
 
     @Bean

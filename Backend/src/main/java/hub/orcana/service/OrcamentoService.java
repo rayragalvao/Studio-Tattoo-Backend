@@ -1,9 +1,9 @@
 package hub.orcana.service;
 
-import hub.orcana.dto.DadosCadastroOrcamento;
+import hub.orcana.dto.orcamento.CadastroOrcamentoInput;
+import hub.orcana.dto.orcamento.DetalhesOrcamentoOutput;
 import hub.orcana.tables.Orcamento;
 import hub.orcana.tables.repository.OrcamentoRepository;
-import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -51,9 +51,7 @@ public class OrcamentoService implements OrcamentoSubject{
         }
     }
 
-
-
-    public Orcamento postOrcamento(DadosCadastroOrcamento dados) {
+    public Orcamento postOrcamento(CadastroOrcamentoInput dados) {
 
         List<String> urlImagens = new ArrayList<>();
 
@@ -79,6 +77,7 @@ public class OrcamentoService implements OrcamentoSubject{
         Orcamento orcamento = new Orcamento(
                 codigo,
                 proximaLinha,
+                dados.nome(),
                 dados.email(),
                 dados.ideia(),
                 dados.tamanho(),
@@ -101,8 +100,20 @@ public class OrcamentoService implements OrcamentoSubject{
 
     }
 
-    public List<Orcamento> findAllOrcamentos() {
-        return repository.findAll();
+    public List<DetalhesOrcamentoOutput> findAllOrcamentos() {
+        return repository.findAll().stream().map(
+                orcamento -> new DetalhesOrcamentoOutput(
+                        orcamento.getCodigoOrcamento(),
+                        orcamento.getNome(),
+                        orcamento.getEmail(),
+                        orcamento.getIdeia(),
+                        orcamento.getTamanho(),
+                        orcamento.getCores(),
+                        orcamento.getLocalCorpo(),
+                        orcamento.getImagemReferencia()
+                )
+        ).toList(
+        );
     }
 
 }

@@ -1,14 +1,15 @@
-package hub.orcana.dto;
+package hub.orcana.dto.orcamento;
 
-import org.springframework.web.multipart.MultipartFile;
 import java.util.List;
 
-public record DadosCadastroOrcamento(
+public record DetalhesOrcamentoOutput (
         String codigoOrcamento,
+        String nome,
         String email,
         String ideia,
         Double tamanho,
         String cores,
         String localCorpo,
-        List<MultipartFile> imagemReferencia
-) {}
+        List<String> urlsImagensReferencia
+) {
+}
