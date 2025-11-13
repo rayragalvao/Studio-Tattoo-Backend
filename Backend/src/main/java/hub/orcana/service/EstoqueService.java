@@ -1,7 +1,7 @@
 package hub.orcana.service;
 
-import hub.orcana.dto.estoque.DadosCadastroMaterial;
-import hub.orcana.dto.estoque.DetalhesMaterial;
+import hub.orcana.dto.estoque.CadastroMaterialInput;
+import hub.orcana.dto.estoque.DetalhesMaterialOutput;
 import hub.orcana.exception.DependenciaNaoEncontradaException;
 import hub.orcana.tables.Estoque;
 import hub.orcana.tables.repository.EstoqueRepository;
@@ -51,9 +51,9 @@ public class EstoqueService implements EstoqueSubject{
 
 
     // Lista todos os materiais existentes
-    public List<DetalhesMaterial> getEstoque() {
-        List<DetalhesMaterial> materiais = repository.findAll().stream()
-                .map(atual -> new DetalhesMaterial(
+    public List<DetalhesMaterialOutput> getEstoque() {
+        List<DetalhesMaterialOutput> materiais = repository.findAll().stream()
+                .map(atual -> new DetalhesMaterialOutput(
                         atual.getId(),
                         atual.getNome(),
                         atual.getQuantidade(),
@@ -65,11 +65,11 @@ public class EstoqueService implements EstoqueSubject{
     }
 
     // Busca material pelo nome
-    public List<DetalhesMaterial> getEstoqueByNome(String nomeMaterial) {
+    public List<DetalhesMaterialOutput> getEstoqueByNome(String nomeMaterial) {
         var materiais = repository.findAll()
                 .stream()
                 .filter(atual -> nomeMaterial.equals(atual.getNome()))
-                .map(atual -> new DetalhesMaterial(
+                .map(atual -> new DetalhesMaterialOutput(
                         atual.getId(),
                         atual.getNome(),
                         atual.getQuantidade(),
@@ -85,7 +85,7 @@ public class EstoqueService implements EstoqueSubject{
     }
 
     // Cadastra um novo material
-    public DetalhesMaterial postEstoque(DadosCadastroMaterial estoque) {
+    public DetalhesMaterialOutput postEstoque(CadastroMaterialInput estoque) {
         if (repository.existsByNomeIgnoreCase(estoque.nome())) {
             throw new ResponseStatusException(HttpStatusCode.valueOf(409), "Material já cadastrado.");
         }
@@ -97,7 +97,7 @@ public class EstoqueService implements EstoqueSubject{
                 estoque.minAviso()
         );
         repository.save(novoMaterial);
-        DetalhesMaterial detalhes = new DetalhesMaterial(
+        DetalhesMaterialOutput detalhes = new DetalhesMaterialOutput(
                 novoMaterial.getId(),
                 novoMaterial.getNome(),
                 novoMaterial.getQuantidade(),
@@ -108,7 +108,7 @@ public class EstoqueService implements EstoqueSubject{
     }
 
     // Atualiza um material existente pelo ID
-    public DetalhesMaterial putEstoqueById(Long id, DadosCadastroMaterial estoque) {
+    public DetalhesMaterialOutput putEstoqueById(Long id, CadastroMaterialInput estoque) {
         if (!repository.existsById(id)) {
             throw new DependenciaNaoEncontradaException("Material");
         }
@@ -122,7 +122,7 @@ public class EstoqueService implements EstoqueSubject{
         );
         existente.setId(id);
         repository.save(existente);
-        DetalhesMaterial detalhes = new DetalhesMaterial(
+        DetalhesMaterialOutput detalhes = new DetalhesMaterialOutput(
                 existente.getId(),
                 existente.getNome(),
                 existente.getQuantidade(),
@@ -132,7 +132,7 @@ public class EstoqueService implements EstoqueSubject{
         return detalhes;
     }
 
-    public DetalhesMaterial atualizarQuantidadeById(Long id, Double qtd) {
+    public DetalhesMaterialOutput atualizarQuantidadeById(Long id, Double qtd) {
         if (!repository.existsById(id)) {
             throw new DependenciaNaoEncontradaException("Material");
         }
@@ -143,7 +143,7 @@ public class EstoqueService implements EstoqueSubject{
 
         notifyObservers(existente.getNome(), existente.getQuantidade(), existente.getMinAviso());
 
-        DetalhesMaterial detalhes = new DetalhesMaterial(
+        DetalhesMaterialOutput detalhes = new DetalhesMaterialOutput(
                 existente.getId(),
                 existente.getNome(),
                 existente.getQuantidade(),
