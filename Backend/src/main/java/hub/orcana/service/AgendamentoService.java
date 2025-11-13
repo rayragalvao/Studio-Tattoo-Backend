@@ -1,8 +1,8 @@
 package hub.orcana.service;
 
-import hub.orcana.dto.agendamento.AgendamentoDetalhadoDTO;
+import hub.orcana.dto.agendamento.DetalhesAgendamentoOutput;
 import hub.orcana.dto.agendamento.AgendamentoMapper;
-import hub.orcana.dto.agendamento.CadastroAgendamento;
+import hub.orcana.dto.agendamento.CadastroAgendamentoInput;
 import hub.orcana.tables.Agendamento;
 import hub.orcana.tables.Orcamento;
 import hub.orcana.tables.StatusAgendamento;
@@ -31,17 +31,17 @@ public class AgendamentoService {
 
     // ------------------ CRUD BÁSICO ------------------
 
-    public List<AgendamentoDetalhadoDTO> getAgendamentos() {
+    public List<DetalhesAgendamentoOutput> getAgendamentos() {
         return repository.findAll().stream().map(AgendamentoMapper::of).toList();
     }
 
-    public AgendamentoDetalhadoDTO getAgendamentoPorId(Long id) {
+    public DetalhesAgendamentoOutput getAgendamentoPorId(Long id) {
          Agendamento agendamento = repository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Agendamento não encontrado."));
             return AgendamentoMapper.of(agendamento);
     }
 
-    public List<AgendamentoDetalhadoDTO> getAgendamentosByStatus(String status) {
+    public List<DetalhesAgendamentoOutput> getAgendamentosByStatus(String status) {
         return repository.findAll()
                 .stream()
                 .filter(atual -> atual.getStatus().name().equalsIgnoreCase(status))
@@ -49,7 +49,7 @@ public class AgendamentoService {
                 .toList();
     }
 
-    public AgendamentoDetalhadoDTO postAgendamento(CadastroAgendamento agendamento) {
+    public DetalhesAgendamentoOutput postAgendamento(CadastroAgendamentoInput agendamento) {
         Usuario usuario = usuarioRepository.findByEmail(agendamento.emailUsuario())
                 .orElseThrow(() -> new IllegalArgumentException("Usuário é obrigatório."));
 
@@ -63,7 +63,7 @@ public class AgendamentoService {
         return AgendamentoMapper.of(salvo);
     }
 
-    public AgendamentoDetalhadoDTO putAgendamentoById(Long id, CadastroAgendamento agendamento) {
+    public DetalhesAgendamentoOutput putAgendamentoById(Long id, CadastroAgendamentoInput agendamento) {
         Agendamento existente = repository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Agendamento não encontrado."));
 
@@ -95,19 +95,19 @@ public class AgendamentoService {
     // ------------------ RELACIONAMENTOS ------------------
 
     // 🔹 1. Agendamento detalhado com usuário e orçamento
-    public AgendamentoDetalhadoDTO getAgendamentoCompleto(Long id) {
+    public DetalhesAgendamentoOutput getAgendamentoCompleto(Long id) {
         Agendamento agendamento = repository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Agendamento não encontrado."));
         return AgendamentoMapper.of(agendamento);
     }
 
     // 🔹 2. Listar agendamentos por usuário
-    public List<AgendamentoDetalhadoDTO> getAgendamentosPorUsuario(Long usuarioId) {
+    public List<DetalhesAgendamentoOutput> getAgendamentosPorUsuario(Long usuarioId) {
         return repository.findByUsuarioId(usuarioId).stream().map(AgendamentoMapper::of).toList();
     }
 
     // 🔹 3. Atualizar o orçamento de um agendamento
-    public AgendamentoDetalhadoDTO atualizarOrcamento(Long agendamentoId, String codigoOrcamento) {
+    public DetalhesAgendamentoOutput atualizarOrcamento(Long agendamentoId, String codigoOrcamento) {
         Agendamento agendamento = repository.findById(agendamentoId)
                 .orElseThrow(() -> new IllegalArgumentException("Agendamento não encontrado."));
         Orcamento orcamento = orcamentoRepository.findByCodigoOrcamento(codigoOrcamento)

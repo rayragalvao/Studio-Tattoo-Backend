@@ -1,5 +1,6 @@
 package hub.orcana.controller;
 
+import hub.orcana.dto.orcamento.DetalhesOrcamentoOutput;
 import hub.orcana.service.OrcamentoService;
 import hub.orcana.tables.Orcamento;
 import io.swagger.v3.oas.annotations.Operation;
@@ -18,7 +19,7 @@ import jakarta.validation.Valid;
 
 import java.util.List;
 import java.util.Map;
-import hub.orcana.dto.DadosCadastroOrcamento;
+import hub.orcana.dto.orcamento.CadastroOrcamentoInput;
 
 @Slf4j
 @CrossOrigin(origins = "http://localhost:5174")
@@ -47,7 +48,7 @@ public class OrcamentoController {
                     @ApiResponse(responseCode = "500", description = "Erro interno do servidor",
                             content = @Content(schema = @Schema(example = "{\"timestamp\": \"2025-11-13T10:30:00Z\", \"status\": 500, \"error\": \"Internal Server Error\", \"message\": \"Erro interno do servidor\", \"path\": \"/orcamento\"}")))
             })
-    public ResponseEntity<?> postOrcamento(@ModelAttribute @Valid DadosCadastroOrcamento dados) {
+    public ResponseEntity<?> postOrcamento(@ModelAttribute @Valid CadastroOrcamentoInput dados) {
         log.info("Iniciando criação de novo orçamento: {}", dados);
         try {
             var novoOrcamento = service.postOrcamento(dados);
@@ -76,10 +77,10 @@ public class OrcamentoController {
         @ApiResponse(responseCode = "500", description = "Erro interno do servidor",
                     content = @Content(schema = @Schema(example = "{\"timestamp\": \"2025-11-13T10:30:00Z\", \"status\": 500, \"error\": \"Internal Server Error\", \"message\": \"Erro ao buscar orçamentos\", \"path\": \"/orcamento\"}")))
     })
-    public ResponseEntity<List<Orcamento>> getOrcamentos() {
+    public ResponseEntity<List<DetalhesOrcamentoOutput>> getOrcamentos() {
         log.info("Iniciando busca por todos os orçamentos");
         try {
-            List<Orcamento> orcamentos = service.findAllOrcamentos();
+            List<DetalhesOrcamentoOutput> orcamentos = service.findAllOrcamentos();
             if (orcamentos.isEmpty()) {
                 log.info("Nenhum orçamento encontrado");
                 return ResponseEntity.noContent().build();

@@ -1,4 +1,4 @@
-package hub.orcana.dto;
+package hub.orcana.dto.orcamento;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
@@ -8,7 +8,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
-public record DadosCadastroOrcamento(
+public record CadastroOrcamentoInput(
         String codigoOrcamento,
 
         @NotBlank(message = "Nome é obrigatório")

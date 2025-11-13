@@ -1,7 +1,7 @@
 package hub.orcana.controller;
 
-import hub.orcana.dto.estoque.DadosCadastroMaterial;
-import hub.orcana.dto.estoque.DetalhesMaterial;
+import hub.orcana.dto.estoque.CadastroMaterialInput;
+import hub.orcana.dto.estoque.DetalhesMaterialOutput;
 import hub.orcana.service.EstoqueService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -35,14 +35,14 @@ public class EstoqueController {
     @SecurityRequirement(name = "Bearer")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Lista de materiais retornada com sucesso",
-                content = @Content(mediaType = "application/json", schema = @Schema(implementation = DetalhesMaterial.class))),
+                content = @Content(mediaType = "application/json", schema = @Schema(implementation = DetalhesMaterialOutput.class))),
         @ApiResponse(responseCode = "204", description = "Nenhum material encontrado"),
         @ApiResponse(responseCode = "401", description = "Token de autenticação inválido ou expirado"),
         @ApiResponse(responseCode = "403", description = "Acesso negado - permissões insuficientes"),
         @ApiResponse(responseCode = "500", description = "Erro interno do servidor",
                 content = @Content(mediaType = "application/json"))
     })
-    public ResponseEntity<List<DetalhesMaterial>> getEstoque() {
+    public ResponseEntity<List<DetalhesMaterialOutput>> getEstoque() {
         log.info("Iniciando busca por todos os materiais do estoque");
         try {
             var materiais = service.getEstoque();
@@ -59,7 +59,7 @@ public class EstoqueController {
     @SecurityRequirement(name = "Bearer")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Material encontrado com sucesso",
-                content = @Content(mediaType = "application/json", schema = @Schema(implementation = DetalhesMaterial.class))),
+                content = @Content(mediaType = "application/json", schema = @Schema(implementation = DetalhesMaterialOutput.class))),
         @ApiResponse(responseCode = "400", description = "Nome do material inválido"),
         @ApiResponse(responseCode = "401", description = "Token de autenticação inválido ou expirado"),
         @ApiResponse(responseCode = "403", description = "Acesso negado - permissões insuficientes"),
@@ -67,7 +67,7 @@ public class EstoqueController {
         @ApiResponse(responseCode = "500", description = "Erro interno do servidor",
                 content = @Content(mediaType = "application/json"))
     })
-    public ResponseEntity<List<DetalhesMaterial>> getEstoqueByNome(@PathVariable @Valid String nomeMaterial) {
+    public ResponseEntity<List<DetalhesMaterialOutput>> getEstoqueByNome(@PathVariable @Valid String nomeMaterial) {
         log.info("Iniciando busca por material com nome: {}", nomeMaterial);
         try {
             var material = service.getEstoqueByNome(nomeMaterial);
@@ -84,7 +84,7 @@ public class EstoqueController {
     @SecurityRequirement(name = "Bearer")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "201", description = "Material criado com sucesso",
-                content = @Content(mediaType = "application/json", schema = @Schema(implementation = DetalhesMaterial.class))),
+                content = @Content(mediaType = "application/json", schema = @Schema(implementation = DetalhesMaterialOutput.class))),
         @ApiResponse(responseCode = "400", description = "Dados inválidos ou material já existe",
                 content = @Content(mediaType = "application/json")),
         @ApiResponse(responseCode = "401", description = "Token de autenticação inválido ou expirado"),
@@ -94,7 +94,7 @@ public class EstoqueController {
         @ApiResponse(responseCode = "500", description = "Erro interno do servidor",
                 content = @Content(mediaType = "application/json"))
     })
-    public ResponseEntity<DetalhesMaterial> postEstoque(@RequestBody @Valid DadosCadastroMaterial estoque) {
+    public ResponseEntity<DetalhesMaterialOutput> postEstoque(@RequestBody @Valid CadastroMaterialInput estoque) {
         log.info("Iniciando cadastro de novo material no estoque: {}", estoque.nome());
         try {
             var novoMaterial = service.postEstoque(estoque);
@@ -111,7 +111,7 @@ public class EstoqueController {
     @SecurityRequirement(name = "Bearer")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Material atualizado com sucesso",
-                content = @Content(mediaType = "application/json", schema = @Schema(implementation = DetalhesMaterial.class))),
+                content = @Content(mediaType = "application/json", schema = @Schema(implementation = DetalhesMaterialOutput.class))),
         @ApiResponse(responseCode = "400", description = "Dados inválidos ou ID inválido",
                 content = @Content(mediaType = "application/json")),
         @ApiResponse(responseCode = "401", description = "Token de autenticação inválido ou expirado"),
@@ -123,10 +123,10 @@ public class EstoqueController {
         @ApiResponse(responseCode = "500", description = "Erro interno do servidor",
                 content = @Content(mediaType = "application/json"))
     })
-    public ResponseEntity<DetalhesMaterial> putEstoqueById(@PathVariable Long id, @RequestBody @Valid DadosCadastroMaterial estoque) {
+    public ResponseEntity<DetalhesMaterialOutput> putEstoqueById(@PathVariable Long id, @RequestBody @Valid CadastroMaterialInput estoque) {
         log.info("Iniciando atualização do material com ID: {}", id);
         try {
-            DetalhesMaterial novoMaterial = service.putEstoqueById(id, estoque);
+            DetalhesMaterialOutput novoMaterial = service.putEstoqueById(id, estoque);
             log.info("Material com ID {} atualizado com sucesso. Nome: {}", id, novoMaterial.nome());
             return ResponseEntity.status(200).body(novoMaterial);
         } catch (Exception e) {
@@ -140,7 +140,7 @@ public class EstoqueController {
     @SecurityRequirement(name = "Bearer")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Quantidade do material atualizada com sucesso",
-                content = @Content(mediaType = "application/json", schema = @Schema(implementation = DetalhesMaterial.class))),
+                content = @Content(mediaType = "application/json", schema = @Schema(implementation = DetalhesMaterialOutput.class))),
         @ApiResponse(responseCode = "400", description = "ID inválido ou quantidade inválida (deve ser positiva)",
                 content = @Content(mediaType = "application/json")),
         @ApiResponse(responseCode = "401", description = "Token de autenticação inválido ou expirado"),
@@ -150,10 +150,10 @@ public class EstoqueController {
         @ApiResponse(responseCode = "500", description = "Erro interno do servidor",
                 content = @Content(mediaType = "application/json"))
     })
-    public ResponseEntity<DetalhesMaterial> atualizarQuantidadeById(@PathVariable Long id, @PathVariable Double quantidade) {
+    public ResponseEntity<DetalhesMaterialOutput> atualizarQuantidadeById(@PathVariable Long id, @PathVariable Double quantidade) {
         log.info("Iniciando atualização da quantidade do material com ID: {} para quantidade: {}", id, quantidade);
         try {
-            DetalhesMaterial novoMaterial = service.atualizarQuantidadeById(id, quantidade);
+            DetalhesMaterialOutput novoMaterial = service.atualizarQuantidadeById(id, quantidade);
             log.info("Quantidade do material com ID {} atualizada com sucesso para: {}", id, quantidade);
             return ResponseEntity.status(200).body(novoMaterial);
         } catch (Exception e) {
@@ -178,7 +178,7 @@ public class EstoqueController {
         @ApiResponse(responseCode = "500", description = "Erro interno do servidor",
                 content = @Content(mediaType = "application/json"))
     })
-    public ResponseEntity<?> deleteEstoqueById(@PathVariable Long id) {
+    public ResponseEntity<Void> deleteEstoqueById(@PathVariable Long id) {
         log.info("Iniciando exclusão do material com ID: {}", id);
         try {
             service.deleteEstoqueById(id);

@@ -1,7 +1,7 @@
 package hub.orcana.controller;
 
-import hub.orcana.dto.agendamento.AgendamentoDetalhadoDTO;
-import hub.orcana.dto.agendamento.CadastroAgendamento;
+import hub.orcana.dto.agendamento.DetalhesAgendamentoOutput;
+import hub.orcana.dto.agendamento.CadastroAgendamentoInput;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -48,10 +48,10 @@ public class AgendamentoController {
         @ApiResponse(responseCode = "403", description = "Acesso negado - permissões insuficientes"),
         @ApiResponse(responseCode = "500", description = "Erro interno do servidor")
     })
-    public ResponseEntity<List<AgendamentoDetalhadoDTO>> getAgendamento() {
+    public ResponseEntity<List<DetalhesAgendamentoOutput>> getAgendamento() {
         log.info("Iniciando busca por todos os agendamentos");
         try {
-            List<AgendamentoDetalhadoDTO> agenda = service.getAgendamentos();
+            List<DetalhesAgendamentoOutput> agenda = service.getAgendamentos();
             if (agenda.isEmpty()) {
                 log.info("Nenhum agendamento encontrado");
                 return ResponseEntity.status(204).body(null);
@@ -80,10 +80,10 @@ public class AgendamentoController {
         @ApiResponse(responseCode = "403", description = "Acesso negado - permissões insuficientes"),
         @ApiResponse(responseCode = "500", description = "Erro interno do servidor")
     })
-    public ResponseEntity<AgendamentoDetalhadoDTO> getAgendamentoPorId(@PathVariable Long id) {
+    public ResponseEntity<DetalhesAgendamentoOutput> getAgendamentoPorId(@PathVariable Long id) {
         log.info("Buscando agendamento por ID: {}", id);
         try {
-            AgendamentoDetalhadoDTO agendamento = service.getAgendamentoPorId(id);
+            DetalhesAgendamentoOutput agendamento = service.getAgendamentoPorId(id);
             log.info("Agendamento encontrado com sucesso para ID: {}", id);
             return ResponseEntity.status(200).body(agendamento);
         } catch (IllegalArgumentException e) {
@@ -106,10 +106,10 @@ public class AgendamentoController {
         @ApiResponse(responseCode = "403", description = "Acesso negado - permissões insuficientes"),
         @ApiResponse(responseCode = "500", description = "Erro interno do servidor")
     })
-    public ResponseEntity<List<AgendamentoDetalhadoDTO>> getAgendamentosByStatus(@PathVariable String status) {
+    public ResponseEntity<List<DetalhesAgendamentoOutput>> getAgendamentosByStatus(@PathVariable String status) {
         log.info("Buscando agendamentos por status: {}", status);
         try {
-            List<AgendamentoDetalhadoDTO> sitStatus = service.getAgendamentosByStatus(status);
+            List<DetalhesAgendamentoOutput> sitStatus = service.getAgendamentosByStatus(status);
             if (sitStatus.isEmpty()) {
                 log.info("Nenhum agendamento encontrado para o status: {}", status);
                 return ResponseEntity.status(204).body(null);
@@ -138,10 +138,10 @@ public class AgendamentoController {
         @ApiResponse(responseCode = "422", description = "Dados não processáveis - validação falhou"),
         @ApiResponse(responseCode = "500", description = "Erro interno do servidor")
     })
-    public ResponseEntity<AgendamentoDetalhadoDTO> postAgendamento(@RequestBody CadastroAgendamento agendamento) {
+    public ResponseEntity<DetalhesAgendamentoOutput> postAgendamento(@RequestBody CadastroAgendamentoInput agendamento) {
         log.info("Iniciando criação de novo agendamento: {}", agendamento);
         try {
-            AgendamentoDetalhadoDTO novaAgenda = service.postAgendamento(agendamento);
+            DetalhesAgendamentoOutput novaAgenda = service.postAgendamento(agendamento);
             log.info("Agendamento criado com sucesso: {}", novaAgenda);
             return ResponseEntity.status(201).body(novaAgenda);
         } catch (IllegalArgumentException e) {
@@ -169,7 +169,7 @@ public class AgendamentoController {
         @ApiResponse(responseCode = "422", description = "Dados não processáveis - validação falhou"),
         @ApiResponse(responseCode = "500", description = "Erro interno do servidor")
     })
-    public ResponseEntity<AgendamentoDetalhadoDTO> putAgendamento(@PathVariable Long id, @RequestBody @Valid CadastroAgendamento agendamento) {
+    public ResponseEntity<DetalhesAgendamentoOutput> putAgendamento(@PathVariable Long id, @RequestBody @Valid CadastroAgendamentoInput agendamento) {
         log.info("Iniciando atualização do agendamento ID: {}", id);
         try {
             service.putAgendamentoById(id, agendamento);
@@ -259,10 +259,10 @@ public class AgendamentoController {
         @ApiResponse(responseCode = "403", description = "Acesso negado - permissões insuficientes"),
         @ApiResponse(responseCode = "500", description = "Erro interno do servidor")
     })
-    public ResponseEntity<List<AgendamentoDetalhadoDTO>> getAgendamentosPorUsuario(@PathVariable Long usuarioId) {
+    public ResponseEntity<List<DetalhesAgendamentoOutput>> getAgendamentosPorUsuario(@PathVariable Long usuarioId) {
         log.info("Buscando agendamentos para usuário ID: {}", usuarioId);
         try {
-            List<AgendamentoDetalhadoDTO> agendamentos = service.getAgendamentosPorUsuario(usuarioId);
+            List<DetalhesAgendamentoOutput> agendamentos = service.getAgendamentosPorUsuario(usuarioId);
             if (agendamentos.isEmpty()) {
                 log.info("Nenhum agendamento encontrado para o usuário ID: {}", usuarioId);
                 return ResponseEntity.noContent().build();
@@ -293,7 +293,7 @@ public class AgendamentoController {
         @ApiResponse(responseCode = "422", description = "Dados não processáveis - validação falhou"),
         @ApiResponse(responseCode = "500", description = "Erro interno do servidor")
     })
-    public ResponseEntity<AgendamentoDetalhadoDTO> atualizarOrcamentoDoAgendamento(
+    public ResponseEntity<DetalhesAgendamentoOutput> atualizarOrcamentoDoAgendamento(
             @PathVariable Long id,
             @PathVariable String orcamentoId) {
         log.info("Iniciando associação do orçamento '{}' ao agendamento ID: {}", orcamentoId, id);

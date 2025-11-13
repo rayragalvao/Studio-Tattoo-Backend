@@ -5,7 +5,7 @@ import jakarta.validation.constraints.NotNull;
 
 import java.time.LocalDateTime;
 
-public record CadastroAgendamento (
+public record CadastroAgendamentoInput(
     @NotNull
     String emailUsuario,
     @NotNull
