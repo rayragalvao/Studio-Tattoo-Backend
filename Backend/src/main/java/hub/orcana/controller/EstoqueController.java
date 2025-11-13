@@ -2,6 +2,7 @@ package hub.orcana.controller;
 
 import hub.orcana.dto.estoque.CadastroMaterialInput;
 import hub.orcana.dto.estoque.DetalhesMaterialOutput;
+import hub.orcana.exception.DependenciaNaoEncontradaException;
 import hub.orcana.service.EstoqueService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -47,6 +48,9 @@ public class EstoqueController {
         try {
             var materiais = service.getEstoque();
             log.info("Busca por todos os materiais concluída com sucesso. Encontrados {} materiais", materiais.size());
+            if (materiais.isEmpty()) {
+                return ResponseEntity.noContent().build();
+            }
             return ResponseEntity.ok(materiais);
         } catch (Exception e) {
             log.error("Erro ao buscar todos os materiais do estoque", e);
@@ -69,10 +73,19 @@ public class EstoqueController {
     })
     public ResponseEntity<List<DetalhesMaterialOutput>> getEstoqueByNome(@PathVariable @Valid String nomeMaterial) {
         log.info("Iniciando busca por material com nome: {}", nomeMaterial);
+
+        if (nomeMaterial == null || nomeMaterial.trim().isEmpty()) {
+            log.warn("Nome do material inválido fornecido para busca");
+            return ResponseEntity.badRequest().body(null);
+        }
+
         try {
             var material = service.getEstoqueByNome(nomeMaterial);
             log.info("Busca por material '{}' concluída com sucesso. Encontrados {} materiais", nomeMaterial, material.size());
             return ResponseEntity.ok(material);
+        } catch (DependenciaNaoEncontradaException e) {
+            log.warn("Material com nome '{}' não encontrado", nomeMaterial);
+            return ResponseEntity.status(404).body(null);
         } catch (Exception e) {
             log.error("Erro ao buscar material com nome: {}", nomeMaterial, e);
             throw e;
