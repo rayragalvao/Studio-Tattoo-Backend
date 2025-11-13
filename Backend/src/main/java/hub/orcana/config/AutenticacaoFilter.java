@@ -27,6 +27,18 @@ public class AutenticacaoFilter extends OncePerRequestFilter {
 
     private final GerenciadorTokenJwt gerenciadorTokenJwt;
 
+    private static final String[] URLS_PERMITIDAS = {
+            "/v3/api-docs",
+            "/swagger-ui",
+            "/swagger-ui.html",
+            "/v3/api-docs.yaml",
+            "/h2-console",
+            "/auth",
+            "/usuario/cadastro",
+            "/usuario/login",
+            "/orcamento/cadastro"
+    };
+
     public AutenticacaoFilter(AutenticacaoService autenticacaoService, GerenciadorTokenJwt gerenciadorTokenJwt) {
         this.autenticacaoService = autenticacaoService;
         this.gerenciadorTokenJwt = gerenciadorTokenJwt;
@@ -34,6 +46,15 @@ public class AutenticacaoFilter extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
+        // Pula a validação JWT para URLs permitidas
+        String requestPath = request.getRequestURI();
+        boolean isPermittedUrl = Arrays.stream(URLS_PERMITIDAS)
+                .anyMatch(url -> requestPath.startsWith(url));
+
+        if (isPermittedUrl) {
+            filterChain.doFilter(request, response);
+            return;
+        }
         String username = null;
         String jwtToken = null;
 

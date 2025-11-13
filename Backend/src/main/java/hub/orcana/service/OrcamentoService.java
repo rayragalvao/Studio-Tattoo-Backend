@@ -79,6 +79,7 @@ public class OrcamentoService implements OrcamentoSubject{
         Orcamento orcamento = new Orcamento(
                 codigo,
                 proximaLinha,
+                dados.nome(),
                 dados.email(),
                 dados.ideia(),
                 dados.tamanho(),

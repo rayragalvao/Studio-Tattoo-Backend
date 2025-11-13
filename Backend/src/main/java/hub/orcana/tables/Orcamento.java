@@ -12,6 +12,7 @@ public class Orcamento {
     private Long id;
     @Id
     private String codigoOrcamento;
+    private String nome;
     private String email;
     private String ideia;
     private Double valor;
@@ -27,7 +28,7 @@ public class Orcamento {
 
     public Orcamento() {}
 
-    public Orcamento(String codigoOrcamento, String email, String ideia, Double tamanho, String cores, String localCorpo, List<String> imagemReferencia) {
+    public Orcamento(String codigoOrcamento, String nome, String email, String ideia, Double tamanho, String cores, String localCorpo, List<String> imagemReferencia) {
         this.codigoOrcamento = codigoOrcamento;
         this.email = email;
         this.ideia = ideia;
@@ -37,9 +38,10 @@ public class Orcamento {
         this.imagemReferencia = imagemReferencia;
     }
 
-    public Orcamento(String codigoOrcamento, Long id, String email, String ideia, Double tamanho, String cores, String localCorpo, List<String> imagemReferencia) {
+    public Orcamento(String codigoOrcamento, Long id, String nome, String email, String ideia, Double tamanho, String cores, String localCorpo, List<String> imagemReferencia) {
         this.codigoOrcamento = codigoOrcamento;
         this.id = id;
+        this.nome = nome;
         this.email = email;
         this.ideia = ideia;
         this.tamanho = tamanho;
