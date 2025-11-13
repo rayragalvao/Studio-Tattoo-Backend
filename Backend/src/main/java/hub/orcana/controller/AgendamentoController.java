@@ -23,7 +23,7 @@ import java.util.List;
 @Slf4j
 @RestController
 @RequestMapping("/agendamento")
-@Tag(name = "Agendamentos", description = "API para gerenciamento de agendamentos")
+@Tag(name = "Agendamentos", description = "Gerenciamento de agendamentos")
 public class AgendamentoController {
 
     private final AgendamentoService service;

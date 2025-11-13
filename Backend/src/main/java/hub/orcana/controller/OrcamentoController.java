@@ -24,7 +24,7 @@ import hub.orcana.dto.DadosCadastroOrcamento;
 @CrossOrigin(origins = "http://localhost:5174")
 @RestController
 @RequestMapping("/orcamento")
-@Tag(name = "Orçamentos", description = "API para gerenciamento de orçamentos de tatuagens")
+@Tag(name = "Orçamentos", description = "Gerenciamento de orçamentos de tatuagens")
 public class OrcamentoController {
     private final OrcamentoService service;
 
