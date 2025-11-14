@@ -13,6 +13,7 @@ import hub.orcana.observer.OrcamentoSubject;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 @Service
 //@RequiredArgsConstructor comentei devido ao construtor manual, onde implemento o attach do observer
@@ -51,6 +52,14 @@ public class OrcamentoService implements OrcamentoSubject{
         }
     }
 
+    private String gerarCodigoOrcamento() {
+        String uuid = UUID.randomUUID().toString().substring(0, 8).toUpperCase();
+        if (repository.findByCodigoOrcamento("ORC-" + uuid).isPresent()) {
+            return gerarCodigoOrcamento();
+        }
+        return "ORC-" + uuid;
+    }
+
     public Orcamento postOrcamento(CadastroOrcamentoInput dados) {
 
         List<String> urlImagens = new ArrayList<>();
@@ -62,21 +71,11 @@ public class OrcamentoService implements OrcamentoSubject{
             }
         }
 
-        // codigo vindo do front (String). Se ausente, gera fallback
-        String codigo = String.valueOf(dados.codigoOrcamento());
-        if (codigo == null || codigo.isBlank() || "null".equals(codigo)) {
-            var ultimo = repository.findTopByOrderByIdDesc();
-            Long novoNum = ultimo.map(o -> o.getLinhaId() + 1).orElse(1L);
-            codigo = "ORC-" + novoNum;
-        }
-
-        // calcula proximo id numerico (linha)
-        var ultimoLinha = repository.findTopByOrderByIdDesc();
-        Long proximaLinha = ultimoLinha.map(o -> o.getLinhaId() + 1).orElse(1L);
+        // gera codigo unico
+        String codigo = gerarCodigoOrcamento();
 
         Orcamento orcamento = new Orcamento(
                 codigo,
-                proximaLinha,
                 dados.nome(),
                 dados.email(),
                 dados.ideia(),
@@ -86,10 +85,8 @@ public class OrcamentoService implements OrcamentoSubject{
                 urlImagens
         );
 
-        // salva antes de enviar e-mail para não falhar a operação principal
         Orcamento salvo = repository.save(orcamento);
 
-        // tenta enviar e-mail, mas não falha a criação em caso de erro no envio
         try {
             notifyObservers(salvo);
         } catch (Exception e) {
