@@ -25,7 +25,6 @@ public class EstoqueService implements EstoqueSubject{
         this.attach(emailService);
     }
 
-
     @Override
     public void attach(EstoqueObserver observer) {
         if (!observers.contains(observer)) {
@@ -45,12 +44,6 @@ public class EstoqueService implements EstoqueSubject{
         }
     }
 
-
-
-
-
-
-    // Lista todos os materiais existentes
     public List<DetalhesMaterialOutput> getEstoque() {
         List<DetalhesMaterialOutput> materiais = repository.findAll().stream()
                 .map(atual -> new DetalhesMaterialOutput(
@@ -64,11 +57,9 @@ public class EstoqueService implements EstoqueSubject{
         return materiais;
     }
 
-    // Busca material pelo nome
-    public List<DetalhesMaterialOutput> getEstoqueByNome(String nomeMaterial) {
-        var materiais = repository.findAll()
+    public DetalhesMaterialOutput getEstoqueByNome(String nomeMaterial) {
+        var materiais = repository.findEstoqueByNome(nomeMaterial)
                 .stream()
-                .filter(atual -> nomeMaterial.equals(atual.getNome()))
                 .map(atual -> new DetalhesMaterialOutput(
                         atual.getId(),
                         atual.getNome(),
@@ -81,10 +72,9 @@ public class EstoqueService implements EstoqueSubject{
         if (materiais.isEmpty()) {
             throw new DependenciaNaoEncontradaException("Material");
         }
-        return materiais;
+        return materiais.getFirst();
     }
 
-    // Cadastra um novo material
     public DetalhesMaterialOutput postEstoque(CadastroMaterialInput estoque) {
         if (repository.existsByNomeIgnoreCase(estoque.nome())) {
             throw new ResponseStatusException(HttpStatusCode.valueOf(409), "Material já cadastrado.");
@@ -107,7 +97,6 @@ public class EstoqueService implements EstoqueSubject{
         return detalhes;
     }
 
-    // Atualiza um material existente pelo ID
     public DetalhesMaterialOutput putEstoqueById(Long id, CadastroMaterialInput estoque) {
         if (!repository.existsById(id)) {
             throw new DependenciaNaoEncontradaException("Material");
@@ -153,7 +142,6 @@ public class EstoqueService implements EstoqueSubject{
         return detalhes;
     }
 
-    // Exclui um estoque existente pelo ID
     public void deleteEstoqueById(Long id) {
             if (!repository.existsById(id)) {
                 throw new DependenciaNaoEncontradaException("Material");
