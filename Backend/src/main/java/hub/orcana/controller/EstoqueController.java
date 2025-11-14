@@ -71,7 +71,7 @@ public class EstoqueController {
         @ApiResponse(responseCode = "500", description = "Erro interno do servidor",
                 content = @Content(mediaType = "application/json"))
     })
-    public ResponseEntity<List<DetalhesMaterialOutput>> getEstoqueByNome(@PathVariable @Valid String nomeMaterial) {
+    public ResponseEntity<DetalhesMaterialOutput> getEstoqueByNome(@PathVariable @Valid String nomeMaterial) {
         log.info("Iniciando busca por material com nome: {}", nomeMaterial);
 
         if (nomeMaterial == null || nomeMaterial.trim().isEmpty()) {
@@ -81,7 +81,7 @@ public class EstoqueController {
 
         try {
             var material = service.getEstoqueByNome(nomeMaterial);
-            log.info("Busca por material '{}' concluída com sucesso. Encontrados {} materiais", nomeMaterial, material.size());
+            log.info("Busca por material '{}' concluída com sucesso.", nomeMaterial);
             return ResponseEntity.ok(material);
         } catch (DependenciaNaoEncontradaException e) {
             log.warn("Material com nome '{}' não encontrado", nomeMaterial);

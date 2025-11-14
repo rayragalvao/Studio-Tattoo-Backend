@@ -44,7 +44,7 @@ class EstoqueControllerTest {
 
         DetalhesMaterialOutput material2 = new DetalhesMaterialOutput(
                 2L,
-                "Agulha 3RL",
+                "Agulha",
                 25.0,
                 "unidade",
                 5.0
@@ -63,7 +63,7 @@ class EstoqueControllerTest {
 
     @Test
     @DisplayName("Deve retornar o estoque com sucesso")
-    void getEstoqueSucesso() {
+    void getEstoque_deveRetornarListaComSucesso() {
         when(estoqueService.getEstoque()).thenReturn(materiaisEsperados);
 
         ResponseEntity<List<DetalhesMaterialOutput>> materiais = estoqueController.getEstoque();
@@ -78,7 +78,7 @@ class EstoqueControllerTest {
 
     @Test
     @DisplayName("Deve retornar lista vazia quando não houver materiais em estoque")
-    void getEstoqueVazio() {
+    void getEstoque_deveRetornarCorpoVazio() {
         when(estoqueService.getEstoque()).thenReturn(List.of());
 
         ResponseEntity<List<DetalhesMaterialOutput>> materiais = estoqueController.getEstoque();
@@ -89,7 +89,7 @@ class EstoqueControllerTest {
 
     @Test
     @DisplayName("Deve lidar com exceção ao obter o estoque")
-    void getEstoqueComExcecao() {
+    void getEstoque_deveLidarComExcecao() {
         when(estoqueService.getEstoque()).thenThrow(new RuntimeException("Erro ao acessar o banco de dados"));
         Exception exception = assertThrows(RuntimeException.class, () -> {
             estoqueController.getEstoque();
@@ -101,43 +101,42 @@ class EstoqueControllerTest {
 
     @Test
     @DisplayName("Deve encontrar o material com sucesso pelo nome")
-    void getEstoqueByNomeSucesso() {
+    void getEstoqueByNome_deveRetornarListaFiltradaComSucesso() {
         String nomeMaterial = "Tinta Preta";
-        List<DetalhesMaterialOutput> materiaisFiltrados = List.of(materiaisEsperados.get(0));
+        DetalhesMaterialOutput materiaisFiltrados = materiaisEsperados.getFirst();
 
         when(estoqueService.getEstoqueByNome(nomeMaterial)).thenReturn(materiaisFiltrados);
 
-        ResponseEntity<List<DetalhesMaterialOutput>> materiais = estoqueController.getEstoqueByNome(nomeMaterial);
+        ResponseEntity<DetalhesMaterialOutput> material = estoqueController.getEstoqueByNome(nomeMaterial);
 
-        assertNotNull(materiais);
-        assertEquals(HttpStatus.OK, materiais.getStatusCode());
-        assertNotNull(materiais.getBody());
-        assertEquals(1, materiais.getBody().size());
-        assertEquals("Tinta Preta", materiais.getBody().get(0).nome());
+        assertNotNull(material);
+        assertEquals(HttpStatus.OK, material.getStatusCode());
+        assertNotNull(material.getBody());
+        assertEquals("Tinta Preta", material.getBody().nome());
 
         verify(estoqueService, times(1)).getEstoqueByNome(nomeMaterial);
     }
 
     @Test
     @DisplayName("Deve retornar erro 404 quando não encontrar material pelo nome")
-    void getEstoqueByNomeNaoEncontrado() {
+    void getEstoqueByNome_deveRetornarMaterialNaoEncontrado() {
         String nomeMaterial = "Material Inexistente";
 
         when(estoqueService.getEstoqueByNome(nomeMaterial))
                 .thenThrow(new DependenciaNaoEncontradaException("Material Inexistente"));
 
-        ResponseEntity<List<DetalhesMaterialOutput>> materiais = estoqueController.getEstoqueByNome(nomeMaterial);
+        ResponseEntity<DetalhesMaterialOutput> material = estoqueController.getEstoqueByNome(nomeMaterial);
 
-        assertEquals(HttpStatus.NOT_FOUND, materiais.getStatusCode());
+        assertEquals(HttpStatus.NOT_FOUND, material.getStatusCode());
         verify(estoqueService, times(1)).getEstoqueByNome(nomeMaterial);
     }
 
     @Test
     @DisplayName("Deve retornar erro 400 se nome de material estiver vazio")
-    void getEstoqueByNomeNomeVazio() {
+    void getEstoqueByNome_deveLancarExcessaoQuandoNomeVazio() {
         String nomeMaterial = "   ";
 
-        ResponseEntity<List<DetalhesMaterialOutput>> materiais = estoqueController.getEstoqueByNome(nomeMaterial);
+        ResponseEntity<DetalhesMaterialOutput> materiais = estoqueController.getEstoqueByNome(nomeMaterial);
 
         assertEquals(HttpStatus.BAD_REQUEST, materiais.getStatusCode());
         verify(estoqueService, times(0)).getEstoqueByNome(anyString());
@@ -145,7 +144,7 @@ class EstoqueControllerTest {
 
     @Test
     @DisplayName("Deve lidar com exceção ao buscar material pelo nome")
-    void getEstoqueByNomeComExcecao() {
+    void getEstoqueByNome_deveLidarComExcecao() {
         String nomeMaterial = "Tinta Preta";
 
         when(estoqueService.getEstoqueByNome(nomeMaterial))
@@ -161,7 +160,7 @@ class EstoqueControllerTest {
 
     @Test
     @DisplayName("Deve cadastrar material com sucesso")
-    void cadastrarMaterialSucesso() {
+    void cadastrarMaterial_deveCadastrarComSucesso() {
         CadastroMaterialInput input = new CadastroMaterialInput(
                 "Tinta Vermelha",
                 30.0,
@@ -187,7 +186,7 @@ class EstoqueControllerTest {
 
     @Test
     @DisplayName("Deve lidar com exceção ao cadastrar material")
-    void cadastrarMaterialComExcecao() {
+    void cadastrarMaterial_deveLidarComExcecao() {
         CadastroMaterialInput input = new CadastroMaterialInput(
                 "Tinta Vermelha",
                 30.0,
@@ -208,7 +207,7 @@ class EstoqueControllerTest {
 
     @Test
     @DisplayName("Deve atualizar quantidade do material com sucesso")
-    void atualizarQuantidadePorIdSucesso() {
+    void atualizarQuantidadeById_deveAtualizarComSucesso() {
         Long id = 1L;
         Double novaQuantidade = 75.0;
         DetalhesMaterialOutput materialAtualizado = new DetalhesMaterialOutput(
@@ -231,7 +230,7 @@ class EstoqueControllerTest {
 
     @Test
     @DisplayName("Deve lidar com exceção ao atualizar quantidade do material")
-    void atualizarQuantidadePorIdComExcecao() {
+    void atualizarQuantidadeById_deveLidarComExcecao() {
         Long id = 1L;
         Double novaQuantidade = 75.0;
 
@@ -247,8 +246,8 @@ class EstoqueControllerTest {
     }
 
     @Test
-    @DisplayName("Deve atualizar quantidade com material não encontrado")
-    void atualizarQuantidadePorIdMaterialNaoEncontrado() {
+    @DisplayName("Deve lidar com excessão quando o com material não foi encontrado")
+    void atualizarQuantidadeById_deveLidarComExcessaoQuandoMaterialNaoEncontrado() {
         Long id = 999L;
         Double novaQuantidade = 50.0;
 
@@ -265,7 +264,7 @@ class EstoqueControllerTest {
 
     @Test
     @DisplayName("Deve deletar material com sucesso")
-    void deletarMaterialPorIdSucesso() {
+    void deletarMaterialById_deveDeletarComSucesso() {
         Long id = 1L;
 
         doNothing().when(estoqueService).deleteEstoqueById(id);
@@ -279,7 +278,7 @@ class EstoqueControllerTest {
 
     @Test
     @DisplayName("Deve lidar com exceção ao deletar material")
-    void deletarMaterialPorIdComExcecao() {
+    void deletarMaterialById_deveLidarComExcecao() {
         Long id = 1L;
 
         doThrow(new RuntimeException("Erro ao acessar o banco de dados"))
@@ -295,7 +294,7 @@ class EstoqueControllerTest {
 
     @Test
     @DisplayName("Deve lidar com material não encontrado ao deletar")
-    void deletarMaterialPorIdMaterialNaoEncontrado() {
+    void deletarMaterialById_deveLidarComExcessaoQuandoMaterialNaoEncontrado() {
         Long id = 999L;
 
         doThrow(new DependenciaNaoEncontradaException("Material não encontrado"))
@@ -311,7 +310,7 @@ class EstoqueControllerTest {
 
     @Test
     @DisplayName("Deve atualizar material pelo ID com sucesso")
-    void putEstoqueByIdSucesso() {
+    void putEstoqueById_deveAtualizarComSucesso() {
         Long id = 1L;
         CadastroMaterialInput input = new CadastroMaterialInput(
                 "Tinta Preta",
@@ -344,7 +343,7 @@ class EstoqueControllerTest {
 
     @Test
     @DisplayName("Deve lidar com exceção ao atualizar material pelo ID")
-    void putEstoqueByIdComExcecao() {
+    void putEstoqueById_deveLidarComExcecao() {
         Long id = 1L;
         CadastroMaterialInput input = new CadastroMaterialInput(
                 "Tinta Preta",
@@ -366,7 +365,7 @@ class EstoqueControllerTest {
 
     @Test
     @DisplayName("Deve lançar exceção de material não encontrado ao atualizar por ID")
-    void putEstoqueByIdMaterialNaoEncontrado() {
+    void putEstoqueById_deveLidarComExcessaoQuandoMaterialNaoEncontrado() {
         Long id = 999L;
         CadastroMaterialInput input = new CadastroMaterialInput(
                 "Material Inexistente",
@@ -376,15 +375,13 @@ class EstoqueControllerTest {
         );
 
         when(estoqueService.putEstoqueById(id, input))
-                .thenThrow(new DependenciaNaoEncontradaException("Material não encontrado"));
+                .thenThrow(new DependenciaNaoEncontradaException("Material Inexistente"));
 
         Exception exception = assertThrows(DependenciaNaoEncontradaException.class, () -> {
             estoqueController.putEstoqueById(id, input);
         });
 
-        // Observação: a mensagem é formatada pela exception como "<nome> não encontrado(a) no sistema"
-        // e como passamos "Material não encontrado" a mensagem final fica duplicada conforme padrão atual dos testes
-        assertEquals("Material não encontrado não encontrado(a) no sistema", exception.getMessage());
+        assertEquals("Material Inexistente não encontrado(a) no sistema", exception.getMessage());
         verify(estoqueService, times(1)).putEstoqueById(id, input);
     }
 }
