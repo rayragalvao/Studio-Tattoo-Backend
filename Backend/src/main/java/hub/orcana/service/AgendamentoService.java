@@ -11,7 +11,11 @@ import hub.orcana.tables.repository.AgendamentoRepository;
 import hub.orcana.tables.repository.OrcamentoRepository;
 import hub.orcana.tables.repository.UsuarioRepository;
 import org.springframework.stereotype.Service;
+
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class AgendamentoService {
@@ -56,6 +60,12 @@ public class AgendamentoService {
         Orcamento orcamento = orcamentoRepository.findByCodigoOrcamento(agendamento.codigoOrcamento())
                 .orElseThrow(() -> new IllegalArgumentException("Orçamento não encontrado."));
 
+        // Verifica se já existe agendamento para este orçamento
+        Optional<Agendamento> agendamentoExistente = repository.findByOrcamentoCodigoOrcamento(agendamento.codigoOrcamento());
+        if (agendamentoExistente.isPresent()) {
+            throw new IllegalArgumentException("Já existe um agendamento para este código de orçamento.");
+        }
+
         Agendamento novoAgendamento = AgendamentoMapper.of(agendamento, usuario, orcamento);
         novoAgendamento.setStatus(StatusAgendamento.AGUARDANDO);
         Agendamento salvo = repository.save(novoAgendamento);
@@ -90,6 +100,32 @@ public class AgendamentoService {
         if (repository.existsById(id)) {
             throw new IllegalArgumentException("Erro ao excluir agendamento.");
         }
+    }
+
+    // ------------------ VALIDAÇÕES E BUSCAS ------------------
+
+    // Verifica se um código de orçamento já possui agendamento
+    public boolean verificarCodigoOrcamento(String codigoOrcamento) {
+        // Primeiro verifica se o orçamento existe
+        Optional<Orcamento> orcamento = orcamentoRepository.findByCodigoOrcamento(codigoOrcamento);
+        if (orcamento.isEmpty()) {
+            return false; // Orçamento não existe
+        }
+        
+        // Verifica se já existe agendamento para este orçamento
+        Optional<Agendamento> agendamento = repository.findByOrcamentoCodigoOrcamento(codigoOrcamento);
+        return agendamento.isEmpty(); // Retorna true se NÃO existe agendamento (código disponível)
+    }
+
+    // Retorna as datas que possuem agendamentos
+    public List<String> getDatasOcupadas() {
+        LocalDateTime hoje = LocalDateTime.now();
+        List<LocalDateTime> datasComAgendamento = repository.findDatasComAgendamento(hoje);
+        
+        return datasComAgendamento.stream()
+                .map(data -> LocalDate.from(data).toString())
+                .distinct()
+                .toList();
     }
 
     // ------------------ RELACIONAMENTOS ------------------
