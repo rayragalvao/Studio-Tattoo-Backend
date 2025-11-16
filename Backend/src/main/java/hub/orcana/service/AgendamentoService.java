@@ -60,7 +60,6 @@ public class AgendamentoService {
         Orcamento orcamento = orcamentoRepository.findByCodigoOrcamento(agendamento.codigoOrcamento())
                 .orElseThrow(() -> new IllegalArgumentException("Orçamento não encontrado."));
 
-        // Verifica se já existe agendamento para este orçamento
         Optional<Agendamento> agendamentoExistente = repository.findByOrcamentoCodigoOrcamento(agendamento.codigoOrcamento());
         if (agendamentoExistente.isPresent()) {
             throw new IllegalArgumentException("Já existe um agendamento para este código de orçamento.");
@@ -102,47 +101,38 @@ public class AgendamentoService {
         }
     }
 
-    // ------------------ VALIDAÇÕES E BUSCAS ------------------
-
-    // Verifica se um código de orçamento já possui agendamento
     public boolean verificarCodigoOrcamento(String codigoOrcamento) {
-        // Primeiro verifica se o orçamento existe
         Optional<Orcamento> orcamento = orcamentoRepository.findByCodigoOrcamento(codigoOrcamento);
         if (orcamento.isEmpty()) {
-            return false; // Orçamento não existe
+            return false;
         }
         
-        // Verifica se já existe agendamento para este orçamento
         Optional<Agendamento> agendamento = repository.findByOrcamentoCodigoOrcamento(codigoOrcamento);
-        return agendamento.isEmpty(); // Retorna true se NÃO existe agendamento (código disponível)
+        return agendamento.isEmpty();
     }
 
-    // Retorna as datas que possuem agendamentos
     public List<String> getDatasOcupadas() {
-        LocalDateTime hoje = LocalDateTime.now();
-        List<LocalDateTime> datasComAgendamento = repository.findDatasComAgendamento(hoje);
+        LocalDateTime hoje = LocalDateTime.now().withHour(0).withMinute(0).withSecond(0).withNano(0);
+        List<Agendamento> agendamentos = repository.findAll().stream()
+                .filter(a -> a.getDataHora().isAfter(hoje) || a.getDataHora().isEqual(hoje))
+                .toList();
         
-        return datasComAgendamento.stream()
-                .map(data -> LocalDate.from(data).toString())
+        return agendamentos.stream()
+                .map(a -> a.getDataHora().toLocalDate().toString())
                 .distinct()
                 .toList();
     }
 
-    // ------------------ RELACIONAMENTOS ------------------
-
-    // 🔹 1. Agendamento detalhado com usuário e orçamento
     public DetalhesAgendamentoOutput getAgendamentoCompleto(Long id) {
         Agendamento agendamento = repository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Agendamento não encontrado."));
         return AgendamentoMapper.of(agendamento);
     }
 
-    // 🔹 2. Listar agendamentos por usuário
     public List<DetalhesAgendamentoOutput> getAgendamentosPorUsuario(Long usuarioId) {
         return repository.findByUsuarioId(usuarioId).stream().map(AgendamentoMapper::of).toList();
     }
 
-    // 🔹 3. Atualizar o orçamento de um agendamento
     public DetalhesAgendamentoOutput atualizarOrcamento(Long agendamentoId, String codigoOrcamento) {
         Agendamento agendamento = repository.findById(agendamentoId)
                 .orElseThrow(() -> new IllegalArgumentException("Agendamento não encontrado."));
