@@ -36,7 +36,9 @@ public class AutenticacaoFilter extends OncePerRequestFilter {
             "/auth",
             "/usuario/cadastro",
             "/usuario/login",
-            "/orcamento/cadastro"
+            "/orcamento/cadastro",
+            "/agendamento/datas-ocupadas",
+            "/agendamento/validar-codigo"
     };
 
     public AutenticacaoFilter(AutenticacaoService autenticacaoService, GerenciadorTokenJwt gerenciadorTokenJwt) {
@@ -46,10 +48,9 @@ public class AutenticacaoFilter extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-        // Pula a validação JWT para URLs permitidas
         String requestPath = request.getRequestURI();
         boolean isPermittedUrl = Arrays.stream(URLS_PERMITIDAS)
-                .anyMatch(url -> requestPath.startsWith(url));
+                .anyMatch(url -> requestPath.startsWith(url) || requestPath.equals(url));
 
         if (isPermittedUrl) {
             filterChain.doFilter(request, response);

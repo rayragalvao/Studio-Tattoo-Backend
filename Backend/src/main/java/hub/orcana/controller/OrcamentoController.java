@@ -55,7 +55,7 @@ public class OrcamentoController {
             log.info("Orçamento criado com sucesso. Código: {}", novoOrcamento.getCodigoOrcamento());
             return ResponseEntity.status(201).body(Map.of(
                     "success", true,
-                    "id", novoOrcamento.getCodigoOrcamento(),
+                    "codigo", novoOrcamento.getCodigoOrcamento(),
                     "message", "Orçamento criado com sucesso"
             ));
         } catch (Exception e) {

@@ -9,8 +9,6 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.List;
 
 public record CadastroOrcamentoInput(
-        String codigoOrcamento,
-
         @NotBlank(message = "Nome é obrigatório")
         String nome,
 
