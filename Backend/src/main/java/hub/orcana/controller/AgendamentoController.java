@@ -306,4 +306,47 @@ public class AgendamentoController {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
         }
     }
+
+    @GetMapping("/validar-codigo/{codigoOrcamento}")
+    @Operation(summary = "Valida código de orçamento",
+               description = "Verifica se um código de orçamento existe e está disponível para agendamento")
+    @SecurityRequirement(name = "Bearer")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Código validado com sucesso"),
+        @ApiResponse(responseCode = "400", description = "Erro na validação"),
+        @ApiResponse(responseCode = "401", description = "Token de autenticação inválido ou expirado"),
+        @ApiResponse(responseCode = "500", description = "Erro interno do servidor")
+    })
+    public ResponseEntity<Boolean> validarCodigoOrcamento(@PathVariable String codigoOrcamento) {
+        log.info("Validando código de orçamento: {}", codigoOrcamento);
+        try {
+            boolean isValido = service.verificarCodigoOrcamento(codigoOrcamento);
+            log.info("Código {} é {}", codigoOrcamento, isValido ? "válido" : "inválido");
+            return ResponseEntity.ok(isValido);
+        } catch (Exception e) {
+            log.error("Erro ao validar código de orçamento '{}': {}", codigoOrcamento, e.getMessage(), e);
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
+        }
+    }
+
+    @GetMapping("/datas-ocupadas")
+    @Operation(summary = "Busca datas com agendamentos",
+               description = "Retorna todas as datas que já possuem agendamentos")
+    @SecurityRequirement(name = "Bearer")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Lista de datas retornada com sucesso"),
+        @ApiResponse(responseCode = "401", description = "Token de autenticação inválido ou expirado"),
+        @ApiResponse(responseCode = "500", description = "Erro interno do servidor")
+    })
+    public ResponseEntity<List<String>> getDatasOcupadas() {
+        log.info("Buscando datas com agendamentos");
+        try {
+            List<String> datasOcupadas = service.getDatasOcupadas();
+            log.info("Retornadas {} datas com agendamentos", datasOcupadas.size());
+            return ResponseEntity.ok(datasOcupadas);
+        } catch (Exception e) {
+            log.error("Erro ao buscar datas ocupadas: {}", e.getMessage(), e);
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
+        }
+    }
 }

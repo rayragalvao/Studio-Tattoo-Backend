@@ -11,7 +11,11 @@ import hub.orcana.tables.repository.AgendamentoRepository;
 import hub.orcana.tables.repository.OrcamentoRepository;
 import hub.orcana.tables.repository.UsuarioRepository;
 import org.springframework.stereotype.Service;
+
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class AgendamentoService {
@@ -56,6 +60,11 @@ public class AgendamentoService {
         Orcamento orcamento = orcamentoRepository.findByCodigoOrcamento(agendamento.codigoOrcamento())
                 .orElseThrow(() -> new IllegalArgumentException("Orçamento não encontrado."));
 
+        Optional<Agendamento> agendamentoExistente = repository.findByOrcamentoCodigoOrcamento(agendamento.codigoOrcamento());
+        if (agendamentoExistente.isPresent()) {
+            throw new IllegalArgumentException("Já existe um agendamento para este código de orçamento.");
+        }
+
         Agendamento novoAgendamento = AgendamentoMapper.of(agendamento, usuario, orcamento);
         novoAgendamento.setStatus(StatusAgendamento.AGUARDANDO);
         Agendamento salvo = repository.save(novoAgendamento);
@@ -92,21 +101,38 @@ public class AgendamentoService {
         }
     }
 
-    // ------------------ RELACIONAMENTOS ------------------
+    public boolean verificarCodigoOrcamento(String codigoOrcamento) {
+        Optional<Orcamento> orcamento = orcamentoRepository.findByCodigoOrcamento(codigoOrcamento);
+        if (orcamento.isEmpty()) {
+            return false;
+        }
+        
+        Optional<Agendamento> agendamento = repository.findByOrcamentoCodigoOrcamento(codigoOrcamento);
+        return agendamento.isEmpty();
+    }
 
-    // 🔹 1. Agendamento detalhado com usuário e orçamento
+    public List<String> getDatasOcupadas() {
+        LocalDateTime hoje = LocalDateTime.now().withHour(0).withMinute(0).withSecond(0).withNano(0);
+        List<Agendamento> agendamentos = repository.findAll().stream()
+                .filter(a -> a.getDataHora().isAfter(hoje) || a.getDataHora().isEqual(hoje))
+                .toList();
+        
+        return agendamentos.stream()
+                .map(a -> a.getDataHora().toLocalDate().toString())
+                .distinct()
+                .toList();
+    }
+
     public DetalhesAgendamentoOutput getAgendamentoCompleto(Long id) {
         Agendamento agendamento = repository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Agendamento não encontrado."));
         return AgendamentoMapper.of(agendamento);
     }
 
-    // 🔹 2. Listar agendamentos por usuário
     public List<DetalhesAgendamentoOutput> getAgendamentosPorUsuario(Long usuarioId) {
         return repository.findByUsuarioId(usuarioId).stream().map(AgendamentoMapper::of).toList();
     }
 
-    // 🔹 3. Atualizar o orçamento de um agendamento
     public DetalhesAgendamentoOutput atualizarOrcamento(Long agendamentoId, String codigoOrcamento) {
         Agendamento agendamento = repository.findById(agendamentoId)
                 .orElseThrow(() -> new IllegalArgumentException("Agendamento não encontrado."));
