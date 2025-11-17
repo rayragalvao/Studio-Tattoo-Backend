@@ -29,13 +29,17 @@ class EstoqueServiceTest {
     @Mock
     private EstoqueRepository repository;
 
-    @InjectMocks
+    @Mock
+    private EmailService emailService;
+
     private EstoqueService estoqueService;
 
     private List<Estoque> materiaisEsperados;
 
     @BeforeEach
     void setUp() {
+        estoqueService = new EstoqueService(repository, emailService);
+
         Estoque material1 = new Estoque("Tinta Preta", 10.0, "ml", 5.0);
         material1.setId(1L);
 
