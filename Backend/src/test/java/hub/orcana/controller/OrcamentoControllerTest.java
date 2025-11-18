@@ -100,7 +100,8 @@ class OrcamentoControllerTest {
 
         assertNotNull(codigo);
         assertTrue(codigo.startsWith("ORC-"));
-        assertEquals(12, codigo.length());
+        assertEquals(12
+                , codigo.length());
     }
 
     @Test
