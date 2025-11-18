@@ -60,7 +60,7 @@ public class OrcamentoController {
             ));
         } catch (Exception e) {
             log.error("Erro ao criar orçamento: {}", e.getMessage(), e);
-            throw e;
+            throw e; //
         }
     }
 
