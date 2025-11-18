@@ -18,5 +18,7 @@ public interface OrcamentoRepository extends JpaRepository<Orcamento, String> {
     Optional<Orcamento> findById(Long id);
 
     Optional<Orcamento> findByCodigoOrcamento(String codigoOrcamento);
+    long countByStatus(String status);
 
+   // long countByStatus(String pendente);
 }

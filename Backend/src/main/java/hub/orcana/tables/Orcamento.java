@@ -22,6 +22,7 @@ public class Orcamento {
     private Time tempo;
     private String localCorpo;
     private List<String> imagemReferencia;
+    private String status;
     @ManyToOne
     @JoinColumn(name = "usuario_id")
     private Usuario usuario;
@@ -106,6 +107,13 @@ public class Orcamento {
 
     public void setEmail(String email) {
         this.email = email;
+    }
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
     }
 
     public List<String> getImagemReferencia() { return imagemReferencia;}
