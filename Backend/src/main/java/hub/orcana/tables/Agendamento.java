@@ -54,4 +54,7 @@ public class Agendamento {
         this.id = id;
     }
 
+    public Object orElse(Object o) {
+        return o;
+    }
 }
