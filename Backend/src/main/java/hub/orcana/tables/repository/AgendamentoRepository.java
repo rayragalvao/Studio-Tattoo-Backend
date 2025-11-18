@@ -1,16 +1,14 @@
-//
-
 package hub.orcana.tables.repository;
 
 import hub.orcana.tables.Agendamento;
-import hub.orcana.tables.StatusAgendamento; // Importar o Enum
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import java.time.LocalDateTime;
+
 import java.util.List;
-import java.util.Optional; // Importar Optional
+import java.util.Optional;
 
 @Repository
 public interface AgendamentoRepository extends JpaRepository<Agendamento, Long> {
@@ -31,4 +29,12 @@ public interface AgendamentoRepository extends JpaRepository<Agendamento, Long> 
             @Param("fim") LocalDateTime fim
     );
 
+
+    Optional<Agendamento> findByOrcamentoCodigoOrcamento(String codigoOrcamento);
+
+    @Query("SELECT a FROM Agendamento a WHERE FUNCTION('DATE', a.dataHora) = FUNCTION('DATE', :data)")
+    List<Agendamento> findByData(@Param("data") LocalDateTime data);
+
+    @Query("SELECT DISTINCT FUNCTION('DATE', a.dataHora) FROM Agendamento a WHERE a.dataHora >= :dataInicio")
+    List<LocalDateTime> findDatasComAgendamento(@Param("dataInicio") LocalDateTime dataInicio);
 }
