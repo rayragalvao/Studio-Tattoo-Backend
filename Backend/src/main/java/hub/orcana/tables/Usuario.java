@@ -1,9 +1,6 @@
 package hub.orcana.tables;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
@@ -14,6 +11,7 @@ import java.util.Date;
 
 @ToString
 @Entity
+@Table(name = "usuario")
 public class Usuario {
 
     @Id
@@ -22,20 +20,29 @@ public class Usuario {
 
     @NotBlank
     @Setter
+    @Column(nullable = false)
     private String nome;
 
     @Email
     @Setter
+    @Column(nullable = false, unique = true)
     private String email;
 
     @Pattern(regexp = "^$|^\\(\\d{2}\\)\\s\\d{4,5}-\\d{4}$")
     @Setter
+    @Column(length = 20)
     private String telefone;
+
     @Setter
+    @Column(nullable = false)
     private String senha;
+
     @Setter
+    @Column(name = "dt_nasc")
     private Date dtNasc;
+
     @Setter
+    @Column(name = "is_admin", nullable = false)
     private boolean isAdmin;
 
     public void setId(Long id) {

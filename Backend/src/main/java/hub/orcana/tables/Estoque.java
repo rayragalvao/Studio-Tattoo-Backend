@@ -5,16 +5,24 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
 @Entity
+@Table(name = "estoque")
 public class Estoque {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
     @NotBlank
+    @Column(nullable = false)
     private String nome;
+
     @NotNull
+    @Column(nullable = false)
     private Double quantidade;
+
     @NotBlank
+    @Column(name = "unidade_medida", nullable = false, length = 50)
     private String unidadeMedida;
 
+    @Column(name = "min_aviso")
     private Double minAviso;
 
     public Estoque() {
