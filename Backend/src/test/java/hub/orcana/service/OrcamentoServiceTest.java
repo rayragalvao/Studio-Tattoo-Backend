@@ -44,7 +44,8 @@ class OrcamentoServiceTest {
                 10.0,
                 "Preto, Vermelho",
                 "Braço direito",
-                imagens
+                imagens,
+                1L
         );
     }
 
@@ -98,7 +99,8 @@ class OrcamentoServiceTest {
                 10.0,
                 "Preto, Vermelho",
                 "Braço direito",
-                null
+                null,
+                1L
         );
 
         when(repository.findByCodigoOrcamento(anyString())).thenReturn(Optional.empty());
@@ -120,7 +122,7 @@ class OrcamentoServiceTest {
         AtomicInteger chamada = new AtomicInteger(0);
         when(repository.findByCodigoOrcamento(anyString()))
                 .thenAnswer(inv -> chamada.getAndIncrement() == 0
-                        ? Optional.of(new Orcamento("ORC-COLISAO", "X", "x@x", "y", 1.0, "c", "l", List.of()))
+                        ? Optional.of(new Orcamento("ORC-COLISAO", "X", "x@x", "y", 1.0, "c", "l", List.of(), 1L))
                         : Optional.empty());
         when(repository.save(any(Orcamento.class))).thenAnswer(inv -> inv.getArgument(0));
 
@@ -159,7 +161,8 @@ class OrcamentoServiceTest {
                 7.5,
                 "Rosa",
                 "Antebraço",
-                List.of("http://cdn/a.png", "http://cdn/b.png")
+                List.of("http://cdn/a.png", "http://cdn/b.png"),
+                1L
         );
 
         when(repository.findAll()).thenReturn(List.of(o));

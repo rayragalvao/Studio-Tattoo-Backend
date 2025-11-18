@@ -49,7 +49,7 @@ public class Orcamento {
 
     public Orcamento() {}
 
-    public Orcamento(String codigoOrcamento, String nome, String email, String ideia, Double tamanho, String cores, String localCorpo, List<String> imagemReferencia) {
+    public Orcamento(String codigoOrcamento, String nome, String email, String ideia, Double tamanho, String cores, String localCorpo, List<String> imagemReferencia, Long usuarioId) {
         this.codigoOrcamento = codigoOrcamento;
         this.nome = nome;
         this.email = email;
@@ -58,6 +58,10 @@ public class Orcamento {
         this.cores = cores;
         this.localCorpo = localCorpo;
         this.imagemReferencia = imagemReferencia;
+        if (usuarioId != null) {
+            this.usuario = new Usuario();
+            this.usuario.setId(usuarioId);
+        }
     }
 
     public Orcamento(String codigoOrcamento, Long id, String nome, String email, String ideia, Double tamanho, String cores, String localCorpo, List<String> imagemReferencia) {

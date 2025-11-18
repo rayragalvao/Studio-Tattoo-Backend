@@ -3,7 +3,9 @@ package hub.orcana.service;
 import hub.orcana.dto.orcamento.CadastroOrcamentoInput;
 import hub.orcana.dto.orcamento.DetalhesOrcamentoOutput;
 import hub.orcana.tables.Orcamento;
+import hub.orcana.tables.Usuario;
 import hub.orcana.tables.repository.OrcamentoRepository;
+import hub.orcana.tables.repository.UsuarioRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -25,12 +27,14 @@ public class OrcamentoService implements OrcamentoSubject{
     private final GerenciadorDeArquivosService gerenciadorService;
     private final EmailService emailService;
     private final List<OrcamentoObserver> observers = new ArrayList<>();
+    private final UsuarioRepository usuarioRepository;
 
-    public OrcamentoService(OrcamentoRepository repository, GerenciadorDeArquivosService gerenciadorService, EmailService emailService) {
+    public OrcamentoService(OrcamentoRepository repository, GerenciadorDeArquivosService gerenciadorService, EmailService emailService, UsuarioRepository usuarioRepository) {
         this.repository = repository;
         this.gerenciadorService = gerenciadorService;
         this.emailService = emailService;
         this.attach(emailService);
+        this.usuarioRepository = usuarioRepository;
     }
 
     @Override
@@ -52,6 +56,13 @@ public class OrcamentoService implements OrcamentoSubject{
         }
     }
 
+    private Long verificarEmailExistente(String email) {
+        return usuarioRepository.findByEmail(email)
+                .map(Usuario::getId)
+                .orElse(null);
+    }
+
+
     private String gerarCodigoOrcamento() {
         String uuid = UUID.randomUUID().toString().substring(0, 8).toUpperCase();
         if (repository.findByCodigoOrcamento("ORC-" + uuid).isPresent()) {
@@ -63,6 +74,7 @@ public class OrcamentoService implements OrcamentoSubject{
     public Orcamento postOrcamento(CadastroOrcamentoInput dados) {
 
         List<String> urlImagens = new ArrayList<>();
+        Long usuario_id = verificarEmailExistente(dados.email());
 
         if (dados.imagemReferencia() != null && !dados.imagemReferencia().isEmpty()) {
             for (MultipartFile file : dados.imagemReferencia()) {
@@ -82,7 +94,8 @@ public class OrcamentoService implements OrcamentoSubject{
                 dados.tamanho(),
                 dados.cores(),
                 dados.localCorpo(),
-                urlImagens
+                urlImagens,
+                usuario_id
         );
 
         Orcamento salvo = repository.save(orcamento);

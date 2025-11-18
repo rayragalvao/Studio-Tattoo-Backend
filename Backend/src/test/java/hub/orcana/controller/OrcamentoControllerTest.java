@@ -53,7 +53,8 @@ class OrcamentoControllerTest {
                 10.0,
                 "Preto, Vermelho",
                 "Braço direito",
-                List.of(arquivoSimulado)
+                List.of(arquivoSimulado),
+                2L
         );
 
         orcamentoSimulado = new Orcamento(
@@ -64,7 +65,8 @@ class OrcamentoControllerTest {
                 10.0,
                 "Preto, Vermelho",
                 "Braço direito",
-                List.of("url1.jpg")
+                List.of("url1.jpg"),
+                1L
         );
     }
 
@@ -198,7 +200,8 @@ class OrcamentoControllerTest {
                 12.0,
                 "Preto e vermelho",
                 "Braço direito",
-                List.of(arquivoSimulado, arquivo2)
+                List.of(arquivoSimulado, arquivo2),
+                1L
         );
 
         when(servico.postOrcamento(any(CadastroOrcamentoInput.class)))
