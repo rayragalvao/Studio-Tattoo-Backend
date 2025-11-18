@@ -29,5 +29,7 @@ public record CadastroOrcamentoInput(
         @NotBlank(message = "Local do corpo é obrigatório")
         String localCorpo,
 
-        List<MultipartFile> imagemReferencia
+        List<MultipartFile> imagemReferencia,
+
+        Long usuario_id
 ) {}
