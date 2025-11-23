@@ -1,5 +1,6 @@
 package hub.orcana.tables;
 
+import hub.orcana.tables.StatusAgendamento;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.FutureOrPresent;
 import jakarta.validation.constraints.NotNull;
@@ -8,18 +9,28 @@ import lombok.Setter;
 import java.time.LocalDateTime;
 
 @Entity
+@Table(name = "agendamento")
 public class Agendamento {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @FutureOrPresent @NotNull @Setter
+
+    @FutureOrPresent
+    @NotNull
+    @Setter
+    @Column(name = "data_hora", nullable = false)
     private LocalDateTime dataHora;
-    @Enumerated(EnumType.STRING) @Setter
+
+    @Enumerated(EnumType.STRING)
+    @Setter
+    @Column(name = "status", nullable = false, length = 50)
     private StatusAgendamento status;
-    @ManyToOne
-    @JoinColumn(name = "usuario_id")
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "usuario_id", nullable = false)
     private Usuario usuario;
-    @ManyToOne
-    @JoinColumn(name = "orcamento_codigoOrcamento", referencedColumnName = "codigoOrcamento")
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "orcamento_id", nullable = false)
     private Orcamento orcamento;
 
     public Orcamento getOrcamento() {

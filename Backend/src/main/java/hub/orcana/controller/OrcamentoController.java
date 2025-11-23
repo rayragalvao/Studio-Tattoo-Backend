@@ -49,6 +49,7 @@ public class OrcamentoController {
                             content = @Content(schema = @Schema(example = "{\"timestamp\": \"2025-11-13T10:30:00Z\", \"status\": 500, \"error\": \"Internal Server Error\", \"message\": \"Erro interno do servidor\", \"path\": \"/orcamento\"}")))
             })
     public ResponseEntity<?> postOrcamento(@ModelAttribute @Valid CadastroOrcamentoInput dados) {
+
         log.info("Iniciando criação de novo orçamento: {}", dados);
         try {
             var novoOrcamento = service.postOrcamento(dados);
@@ -60,7 +61,7 @@ public class OrcamentoController {
             ));
         } catch (Exception e) {
             log.error("Erro ao criar orçamento: {}", e.getMessage(), e);
-            throw e;
+            throw e; //
         }
     }
 

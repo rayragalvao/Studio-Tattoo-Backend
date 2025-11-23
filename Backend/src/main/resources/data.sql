@@ -1,6 +1,6 @@
 -- Inserindo dados iniciais na tabela estoque
 INSERT INTO estoque (nome, quantidade, unidade_medida, min_aviso) VALUES
-    ('Luvas', 100, 'unidades', NULL),
+    ('Luvas', 1, 'unidades', 10),
     ('Vaselina', 150, 'g', NULL),
     ('Tinta preta', 30, 'ml', NULL),
     ('Tinta vermelha', 30, 'ml', NULL),
