@@ -100,17 +100,43 @@ public class OrcamentoService implements OrcamentoSubject{
     public List<DetalhesOrcamentoOutput> findAllOrcamentos() {
         return repository.findAll().stream().map(
                 orcamento -> new DetalhesOrcamentoOutput(
+                        orcamento.getId(),
                         orcamento.getCodigoOrcamento(),
                         orcamento.getNome(),
                         orcamento.getEmail(),
                         orcamento.getIdeia(),
+                        orcamento.getValor(),
                         orcamento.getTamanho(),
+                        orcamento.getEstilo(),
                         orcamento.getCores(),
+                        orcamento.getTempo(),
                         orcamento.getLocalCorpo(),
-                        orcamento.getImagemReferencia()
+                        orcamento.getImagemReferencia(),
+                        orcamento.getStatus() != null ? orcamento.getStatus().name() : "AGUARDANDO_RESPOSTA"
                 )
         ).toList(
         );
+    }
+
+    public List<DetalhesOrcamentoOutput> findOrcamentosPorUsuario(Long usuarioId) {
+        log.info("Buscando orçamentos para usuário ID: {}", usuarioId);
+        return repository.findByUsuarioId(usuarioId).stream().map(
+                orcamento -> new DetalhesOrcamentoOutput(
+                        orcamento.getId(),
+                        orcamento.getCodigoOrcamento(),
+                        orcamento.getNome(),
+                        orcamento.getEmail(),
+                        orcamento.getIdeia(),
+                        orcamento.getValor(),
+                        orcamento.getTamanho(),
+                        orcamento.getEstilo(),
+                        orcamento.getCores(),
+                        orcamento.getTempo(),
+                        orcamento.getLocalCorpo(),
+                        orcamento.getImagemReferencia(),
+                        orcamento.getStatus() != null ? orcamento.getStatus().name() : "AGUARDANDO_RESPOSTA"
+                )
+        ).toList();
     }
 
 }

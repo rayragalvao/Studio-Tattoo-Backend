@@ -25,17 +25,24 @@ public class Orcamento {
     @ManyToOne
     @JoinColumn(name = "usuario_id")
     private Usuario usuario;
+    @Enumerated(EnumType.STRING)
+    @Column(name = "status")
+    private StatusOrcamento status;
 
-    public Orcamento() {}
+    public Orcamento() {
+        this.status = StatusOrcamento.AGUARDANDO_RESPOSTA;
+    }
 
     public Orcamento(String codigoOrcamento, String nome, String email, String ideia, Double tamanho, String cores, String localCorpo, List<String> imagemReferencia) {
         this.codigoOrcamento = codigoOrcamento;
+        this.nome = nome;
         this.email = email;
         this.ideia = ideia;
         this.tamanho = tamanho;
         this.cores = cores;
         this.localCorpo = localCorpo;
         this.imagemReferencia = imagemReferencia;
+        this.status = StatusOrcamento.AGUARDANDO_RESPOSTA;
     }
 
     public Orcamento(String codigoOrcamento, Long id, String nome, String email, String ideia, Double tamanho, String cores, String localCorpo, List<String> imagemReferencia) {
@@ -112,5 +119,13 @@ public class Orcamento {
 
     public String getLocalCorpo() {
         return localCorpo;
+    }
+
+    public StatusOrcamento getStatus() {
+        return status;
+    }
+
+    public void setStatus(StatusOrcamento status) {
+        this.status = status;
     }
 }

@@ -94,4 +94,37 @@ public class OrcamentoController {
         }
     }
 
+    @GetMapping("/usuario/{usuarioId}")
+    @Operation(summary = "Listar todos os orçamentos de um usuário",
+               description = "Retorna uma lista com todos os orçamentos associados ao usuário especificado")
+    @SecurityRequirement(name = "Bearer")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Lista de orçamentos do usuário retornada com sucesso",
+                    content = @Content(schema = @Schema(implementation = Orcamento.class))),
+        @ApiResponse(responseCode = "204", description = "Nenhum orçamento encontrado para o usuário especificado"),
+        @ApiResponse(responseCode = "404", description = "Usuário não encontrado com o ID fornecido",
+                    content = @Content(schema = @Schema(implementation = String.class))),
+        @ApiResponse(responseCode = "400", description = "ID de usuário inválido ou erro nos parâmetros",
+                    content = @Content(schema = @Schema(implementation = String.class))),
+        @ApiResponse(responseCode = "401", description = "Token de autenticação inválido ou expirado"),
+        @ApiResponse(responseCode = "403", description = "Acesso negado - permissões insuficientes"),
+        @ApiResponse(responseCode = "500", description = "Erro interno do servidor")
+    })
+    public ResponseEntity<List<DetalhesOrcamentoOutput>> getOrcamentosPorUsuario(@PathVariable Long usuarioId) {
+        log.info("Buscando orçamentos para usuário ID: {}", usuarioId);
+        try {
+            List<DetalhesOrcamentoOutput> orcamentos = service.findOrcamentosPorUsuario(usuarioId);
+            if (orcamentos.isEmpty()) {
+                log.info("Nenhum orçamento encontrado para o usuário ID: {}", usuarioId);
+                return ResponseEntity.noContent().build();
+            } else {
+                log.info("Encontrados {} orçamentos para o usuário ID: {}", orcamentos.size(), usuarioId);
+                return ResponseEntity.ok(orcamentos);
+            }
+        } catch (Exception e) {
+            log.error("Erro ao buscar orçamentos do usuário ID {}: {}", usuarioId, e.getMessage(), e);
+            throw e;
+        }
+    }
+
 }

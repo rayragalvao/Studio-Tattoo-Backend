@@ -19,4 +19,7 @@ public interface OrcamentoRepository extends JpaRepository<Orcamento, String> {
 
     Optional<Orcamento> findByCodigoOrcamento(String codigoOrcamento);
 
+    @Query("SELECT o FROM Orcamento o WHERE o.usuario.id = :usuarioId ORDER BY o.id DESC")
+    List<Orcamento> findByUsuarioId(@Param("usuarioId") Long usuarioId);
+
 }
