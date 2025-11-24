@@ -1,6 +1,9 @@
 package hub.orcana.service;
 
-import hub.orcana.tables.StatusAgendamento; // 1. IMPORTAR O ENUM
+import hub.orcana.dto.dashboard.DashboardOutput;
+import hub.orcana.tables.Estoque;
+import hub.orcana.tables.StatusAgendamento;
+import hub.orcana.tables.Agendamento;
 import hub.orcana.tables.repository.AgendamentoRepository;
 import hub.orcana.tables.repository.EstoqueRepository;
 import hub.orcana.tables.repository.OrcamentoRepository;
@@ -10,7 +13,6 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 @Service
 public class DashboardService {
@@ -27,36 +29,47 @@ public class DashboardService {
         this.estoqueRepository = estoqueRepository;
     }
 
-
     public List<Double> getFaturamentoUltimos12Meses() {
         List<Double> faturamentoMensal = new ArrayList<>();
         LocalDateTime hoje = LocalDate.now().atTime(23, 59, 59);
+
         for (int i = 0; i < 12; i++) {
             LocalDateTime fimDoPeriodo = hoje.minusMonths(i);
-            LocalDateTime inicioDoPeriodo = fimDoPeriodo.withDayOfMonth(1).withHour(0).withMinute(0).withSecond(0);
+            LocalDateTime inicioDoPeriodo = fimDoPeriodo.withDayOfMonth(1)
+                    .withHour(0).withMinute(0).withSecond(0);
 
-            Double faturamento = agendamentoRepository.sumValorTotalAgendamentosPorPeriodo(inicioDoPeriodo, fimDoPeriodo);
+            // Busca agendamentos do período com orçamento carregado
+            List<Agendamento> agendamentos = agendamentoRepository
+                    .findAllWithOrcamentoByDataHoraBetween(inicioDoPeriodo, fimDoPeriodo);
+
+            // Soma os valores dos orçamentos vinculados (apenas agendamentos concluídos)
+            Double faturamento = agendamentos.stream()
+                    .filter(a -> a.getStatus() == StatusAgendamento.CONCLUIDO) // Só conta concluídos
+                    .map(a -> a.getOrcamento() != null && a.getOrcamento().getValor() != null
+                            ? a.getOrcamento().getValor()
+                            : 0.0)
+                    .reduce(0.0, Double::sum);
+
             faturamentoMensal.add(faturamento);
         }
-        java.util.Collections.reverse(faturamentoMensal);
 
+        java.util.Collections.reverse(faturamentoMensal);
         return faturamentoMensal;
     }
 
-    public Map<String, Object> getDashboardKPIs() {
-        var proximoAgendamentoOptional = agendamentoRepository.findTopByStatusOrderByDataHoraAsc(StatusAgendamento.PENDENTE);
+    public DashboardOutput getDashboardKPIs() {
+        Agendamento proximoAgendamento = agendamentoRepository
+                .findTopByStatusOrderByDataHoraAsc(StatusAgendamento.PENDENTE)
+                .orElse(null);
+
         long orcamentosPendentes = orcamentoRepository.countByStatus("PENDENTE");
+
         LocalDateTime inicioDoDia = LocalDate.now().atStartOfDay();
         LocalDateTime fimDoDia = LocalDate.now().atTime(23, 59, 59);
 
-        var agendamentosDoDia = agendamentoRepository.findAllByDataHoraBetween(inicioDoDia, fimDoDia);
-        var alertasEstoque = estoqueRepository.findAllAlertasEstoque();
+        List<Agendamento> agendamentosDoDia = agendamentoRepository.findAllByDataHoraBetween(inicioDoDia, fimDoDia);
+        List<Estoque> alertasEstoque = estoqueRepository.findAllByQuantidadeLessThanMinAviso();
 
-        return Map.of(
-                "proximoAgendamento", proximoAgendamentoOptional.orElse(null),
-                "orcamentosPendentes", orcamentosPendentes,
-                "agendamentosDoDia", agendamentosDoDia,
-                "alertasEstoque", alertasEstoque
-        );
+        return new DashboardOutput(proximoAgendamento, orcamentosPendentes, agendamentosDoDia, alertasEstoque);
     }
 }

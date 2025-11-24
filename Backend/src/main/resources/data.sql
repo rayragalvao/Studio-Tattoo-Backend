@@ -23,4 +23,5 @@ INSERT INTO estoque (nome, quantidade, unidade_medida, min_aviso) VALUES
 
 INSERT INTO usuario (nome, email, telefone, senha, dt_nasc, is_admin) VALUES
   ('admin', 'admin@gmail.com', '(11) 99999-9999', '$2a$10$mLZ3Uq7mYdoZZuO8OnBGmeeZ5eMG2sslJiJunOtylsjr.yU9jw1bC', '1990-01-01', TRUE),
+  ('adminTeste', 'adminteste@gmail.com', '(11) 95404-2929', 'Senha123@', '1992-01-21', TRUE),
   ('user', 'user@gmail.com', '(11) 98888-8888', '$2a$10$Vh8y2vflQWGG/VEqjaC1yOfZQhoGYDEZruob3lngf3Rfnh7wwTH66', '1995-05-15', FALSE)

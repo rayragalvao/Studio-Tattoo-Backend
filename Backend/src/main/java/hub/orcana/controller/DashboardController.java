@@ -1,6 +1,7 @@
 package hub.orcana.controller;
 
-import hub.orcana.service.DashboardService; // 1. Mudar o serviço
+import hub.orcana.dto.dashboard.DashboardOutput;
+import hub.orcana.service.DashboardService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -10,7 +11,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
-import java.util.Map;
 
 @RestController
 @RequestMapping("/dashboard")
@@ -31,11 +31,11 @@ public class DashboardController {
         return ResponseEntity.ok(faturamento);
     }
 
-    @GetMapping("/kpis") 
+    @GetMapping("/kpis")
     @Operation(summary = "Retorna os principais KPIs para o dashboard")
     @SecurityRequirement(name = "Bearer")
-    public ResponseEntity<Map<String, Object>> getDashboardKPIs() {
-        Map<String, Object> kpis = service.getDashboardKPIs();
+    public ResponseEntity<DashboardOutput> getDashboardKPIs() {
+        DashboardOutput kpis = service.getDashboardKPIs();
         return ResponseEntity.ok(kpis);
     }
 }

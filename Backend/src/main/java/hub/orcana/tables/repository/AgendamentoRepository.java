@@ -21,13 +21,15 @@ public interface AgendamentoRepository extends JpaRepository<Agendamento, Long> 
     @Query("SELECT COALESCE(SUM(o.valor), 0.0) " +
             "FROM Agendamento a " +
             "JOIN a.orcamento o " +
-            "WHERE a.status = 'FINALIZADO' " +
+            "WHERE a.status = 'CONCLUIDO' " +
             "AND a.dataHora BETWEEN :inicio AND :fim")
     Double sumValorTotalAgendamentosPorPeriodo(
             @Param("inicio") LocalDateTime inicio,
             @Param("fim") LocalDateTime fim
     );
 
+    @Query("SELECT a FROM Agendamento a LEFT JOIN FETCH a.orcamento WHERE a.dataHora BETWEEN :inicio AND :fim")
+    List<Agendamento> findAllWithOrcamentoByDataHoraBetween(@Param("inicio") LocalDateTime inicio, @Param("fim") LocalDateTime fim);
 
     Optional<Agendamento> findByOrcamentoCodigoOrcamento(String codigoOrcamento);
 
