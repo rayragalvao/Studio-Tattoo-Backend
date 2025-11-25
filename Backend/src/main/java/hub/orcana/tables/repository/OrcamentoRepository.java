@@ -1,6 +1,7 @@
 package hub.orcana.tables.repository;
 
 import hub.orcana.tables.Orcamento;
+import hub.orcana.tables.StatusOrcamento;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -18,7 +19,7 @@ public interface OrcamentoRepository extends JpaRepository<Orcamento, String> {
     Optional<Orcamento> findById(Long id);
 
     Optional<Orcamento> findByCodigoOrcamento(String codigoOrcamento);
-    long countByStatus(String status);
+    long countByStatus(StatusOrcamento status);
 
    // long countByStatus(String pendente);
 }

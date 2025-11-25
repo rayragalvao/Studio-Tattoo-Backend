@@ -4,6 +4,7 @@ import hub.orcana.dto.orcamento.CadastroOrcamentoInput;
 import hub.orcana.dto.orcamento.DetalhesOrcamentoOutput;
 import hub.orcana.service.OrcamentoService;
 import hub.orcana.tables.Orcamento;
+import hub.orcana.tables.StatusOrcamento;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -66,7 +67,8 @@ class OrcamentoControllerTest {
                 "Preto, Vermelho",
                 "Braço direito",
                 List.of("url1.jpg"),
-                1L
+                1L,
+                StatusOrcamento.PENDENTE
         );
     }
 

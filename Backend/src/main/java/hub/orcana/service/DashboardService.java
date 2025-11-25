@@ -4,6 +4,7 @@ import hub.orcana.dto.dashboard.DashboardOutput;
 import hub.orcana.tables.Estoque;
 import hub.orcana.tables.StatusAgendamento;
 import hub.orcana.tables.Agendamento;
+import hub.orcana.tables.StatusOrcamento;
 import hub.orcana.tables.repository.AgendamentoRepository;
 import hub.orcana.tables.repository.EstoqueRepository;
 import hub.orcana.tables.repository.OrcamentoRepository;
@@ -62,7 +63,7 @@ public class DashboardService {
                 .findTopByStatusOrderByDataHoraAsc(StatusAgendamento.PENDENTE)
                 .orElse(null);
 
-        long orcamentosPendentes = orcamentoRepository.countByStatus("PENDENTE");
+        long orcamentosPendentes = orcamentoRepository.countByStatus(StatusOrcamento.PENDENTE);
 
         LocalDateTime inicioDoDia = LocalDate.now().atStartOfDay();
         LocalDateTime fimDoDia = LocalDate.now().atTime(23, 59, 59);

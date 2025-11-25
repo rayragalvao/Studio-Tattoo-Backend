@@ -2,6 +2,7 @@ package hub.orcana.service;
 import hub.orcana.dto.orcamento.CadastroOrcamentoInput;
 import hub.orcana.dto.orcamento.DetalhesOrcamentoOutput;
 import hub.orcana.tables.Orcamento;
+import hub.orcana.tables.StatusOrcamento;
 import hub.orcana.tables.repository.OrcamentoRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -122,7 +123,7 @@ class OrcamentoServiceTest {
         AtomicInteger chamada = new AtomicInteger(0);
         when(repository.findByCodigoOrcamento(anyString()))
                 .thenAnswer(inv -> chamada.getAndIncrement() == 0
-                        ? Optional.of(new Orcamento("ORC-COLISAO", "X", "x@x", "y", 1.0, "c", "l", List.of(), 1L))
+                        ? Optional.of(new Orcamento("ORC-COLISAO", "X", "x@x", "y", 1.0, "c", "l", List.of(), 1L, StatusOrcamento.PENDENTE))
                         : Optional.empty());
         when(repository.save(any(Orcamento.class))).thenAnswer(inv -> inv.getArgument(0));
 
@@ -162,7 +163,8 @@ class OrcamentoServiceTest {
                 "Rosa",
                 "Antebraço",
                 List.of("http://cdn/a.png", "http://cdn/b.png"),
-                1L
+                1L,
+                StatusOrcamento.PENDENTE
         );
 
         when(repository.findAll()).thenReturn(List.of(o));
