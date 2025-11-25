@@ -3,6 +3,7 @@ package hub.orcana.service;
 import hub.orcana.dto.orcamento.CadastroOrcamentoInput;
 import hub.orcana.dto.orcamento.DetalhesOrcamentoOutput;
 import hub.orcana.tables.Orcamento;
+import hub.orcana.tables.StatusOrcamento;
 import hub.orcana.tables.Usuario;
 import hub.orcana.tables.repository.OrcamentoRepository;
 import hub.orcana.tables.repository.UsuarioRepository;
@@ -95,7 +96,8 @@ public class OrcamentoService implements OrcamentoSubject{
                 dados.cores(),
                 dados.localCorpo(),
                 urlImagens,
-                usuario_id
+                usuario_id,
+                StatusOrcamento.PENDENTE
         );
 
         Orcamento salvo = repository.save(orcamento);

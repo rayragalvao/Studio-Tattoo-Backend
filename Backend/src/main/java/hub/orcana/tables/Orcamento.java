@@ -45,8 +45,8 @@ public class    Orcamento {
     @Column(name = "imagem_url", length = 500)
     private List<String> imagemReferencia;
 
-  //  @ManyToOne(fetch = FetchType.LAZY)
-    private String status;
+    private StatusOrcamento status;
+
     @ManyToOne
     @JoinColumn(name = "usuario_id")
     @JsonIgnoreProperties({"hibernateLazyInitializer", "handler", "senha"})
@@ -54,7 +54,7 @@ public class    Orcamento {
 
     public Orcamento() {}
 
-    public Orcamento(String codigoOrcamento, String nome, String email, String ideia, Double tamanho, String cores, String localCorpo, List<String> imagemReferencia, Long usuarioId) {
+    public Orcamento(String codigoOrcamento, String nome, String email, String ideia, Double tamanho, String cores, String localCorpo, List<String> imagemReferencia, Long usuarioId, StatusOrcamento status) {
         this.codigoOrcamento = codigoOrcamento;
         this.nome = nome;
         this.email = email;
@@ -67,6 +67,7 @@ public class    Orcamento {
             this.usuario = new Usuario();
             this.usuario.setId(usuarioId);
         }
+        this.status = status;
     }
 
     public Orcamento(String codigoOrcamento, Long id, String nome, String email, String ideia, Double tamanho, String cores, String localCorpo, List<String> imagemReferencia) {
@@ -141,10 +142,10 @@ public class    Orcamento {
         this.email = email;
     }
     public String getStatus() {
-        return status;
+        return email;
     }
 
-    public void setStatus(String status) {
+    public void setStatus(StatusOrcamento status) {
         this.status = status;
     }
 
