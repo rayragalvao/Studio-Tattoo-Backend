@@ -2,6 +2,7 @@ package hub.orcana.tables;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
+import lombok.Setter;
 import lombok.ToString;
 
 import java.sql.Time;
@@ -45,6 +46,8 @@ public class    Orcamento {
     @Column(name = "imagem_url", length = 500)
     private List<String> imagemReferencia;
 
+    @Enumerated(EnumType.STRING)
+    @Column(name = "status")
     private StatusOrcamento status;
 
     @ManyToOne
