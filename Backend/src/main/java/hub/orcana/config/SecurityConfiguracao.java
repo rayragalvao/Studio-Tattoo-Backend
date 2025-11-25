@@ -52,7 +52,7 @@ public class SecurityConfiguracao {
             "/usuario/login",
             "/orcamento/cadastro",
             "/agendamento/datas-ocupadas",
-            "/agendamento/validar-codigo/**"
+            "/agendamento/validar-codigo/**",
     };
 
     @Bean

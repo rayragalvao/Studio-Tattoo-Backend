@@ -186,4 +186,13 @@ public class UsuarioController {
             throw e;
         }
     }
+
+
+    //temporario para testes
+    @GetMapping("/encode/{senha}")
+    public String encode(@PathVariable String senha) {
+        return new org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder().encode(senha);
+    }
+
+
 }

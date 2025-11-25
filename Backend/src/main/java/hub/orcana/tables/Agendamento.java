@@ -1,5 +1,6 @@
 package hub.orcana.tables;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import hub.orcana.tables.StatusAgendamento;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.FutureOrPresent;
@@ -10,6 +11,7 @@ import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "agendamento")
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"}) // ← ADICIONE ISSO
 public class Agendamento {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -27,11 +29,15 @@ public class Agendamento {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "usuario_id", nullable = false)
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler", "senha"}) // ← ADICIONE ISSO
     private Usuario usuario;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "orcamento_id", nullable = false)
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"}) // ← ADICIONE ISSO
     private Orcamento orcamento;
+
+    // ... resto do código igual
 
     public Orcamento getOrcamento() {
         return orcamento;
@@ -64,5 +70,4 @@ public class Agendamento {
     public void setId(Long id) {
         this.id = id;
     }
-
 }

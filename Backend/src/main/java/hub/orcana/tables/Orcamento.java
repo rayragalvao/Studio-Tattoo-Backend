@@ -1,5 +1,6 @@
 package hub.orcana.tables;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.ToString;
 
@@ -9,7 +10,8 @@ import java.util.List;
 @ToString
 @Entity
 @Table(name = "orcamento")
-public class Orcamento {
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
+public class    Orcamento {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -43,8 +45,11 @@ public class Orcamento {
     @Column(name = "imagem_url", length = 500)
     private List<String> imagemReferencia;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+  //  @ManyToOne(fetch = FetchType.LAZY)
+    private String status;
+    @ManyToOne
     @JoinColumn(name = "usuario_id")
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler", "senha"})
     private Usuario usuario;
 
     public Orcamento() {}
@@ -134,6 +139,13 @@ public class Orcamento {
 
     public void setEmail(String email) {
         this.email = email;
+    }
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
     }
 
     public List<String> getImagemReferencia() { return imagemReferencia;}
