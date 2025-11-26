@@ -13,4 +13,6 @@ public interface UsuarioRepository extends JpaRepository<Usuario, Long> {
     boolean existsByTelefone(String telefone);
 
     List<Usuario> findAllByIsAdmin(boolean b);
+
+    String getEmailByIsAdminTrue();
 }

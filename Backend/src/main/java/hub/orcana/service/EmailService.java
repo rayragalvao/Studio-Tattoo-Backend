@@ -1,21 +1,22 @@
 package hub.orcana.service;
 
 import hub.orcana.observer.OrcamentoObserver;
-import org.springframework.beans.factory.annotation.Autowired;
+import hub.orcana.tables.repository.UsuarioRepository;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
 import hub.orcana.observer.EstoqueObserver;
-import hub.orcana.observer.OrcamentoObserver;
 import hub.orcana.tables.Orcamento;
 
 @Service
 public class EmailService implements EstoqueObserver, OrcamentoObserver {
 
     private final JavaMailSender mailSender;
+    private final UsuarioRepository usuarioRepository;
 
-    public EmailService(JavaMailSender mailSender) {
+    public EmailService(JavaMailSender mailSender, UsuarioRepository usuarioRepository) {
         this.mailSender = mailSender;
+        this.usuarioRepository = usuarioRepository;
     }
 
 //    private String templateEmail = "<!DOCTYPE html><html lang=\"pt-br\"><head><meta charset=\"UTF-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\"><title>[ASSUNTO DO SEU E-MAIL]</title><link rel=\"preconnect\" href=\"https://fonts.googleapis.com\"><link rel=\"preconnect\" href=\"https://fonts.gstatic.com\" crossorigin>";
@@ -30,7 +31,7 @@ public class EmailService implements EstoqueObserver, OrcamentoObserver {
         mailSender.send(message);
     }
 
-    public void enviaEmailNovoOrcamento(String emailCliente, String codigoOrcamento) {
+    public void enviaEmailNovoOrcamento(String emailCliente, String nomeCliente, String codigoOrcamento) {
         if (emailCliente == null || emailCliente.isBlank()) {
             throw new IllegalArgumentException("Destinatário inválido para envio de e-mail.");
         }
@@ -44,7 +45,7 @@ public class EmailService implements EstoqueObserver, OrcamentoObserver {
                 "Equipe Júpiter Frito";
 
         String textoFinal = textoInicial
-                .replace("$nomeCliente", emailCliente)
+                .replace("$nomeCliente", nomeCliente)
                 .replace("$codigoOrcamento", codigoOrcamento);
 
         enviarTextoSimples(emailCliente, assunto, textoFinal);
@@ -52,16 +53,13 @@ public class EmailService implements EstoqueObserver, OrcamentoObserver {
 
     @Override
     public void updateOrcamento(Orcamento orcamento) {
-        // 1. Notificação para o Cliente (existente)
-        enviaEmailNovoOrcamento(orcamento.getEmail(), orcamento.getCodigoOrcamento());
+        String emailTatuador = usuarioRepository.getEmailByIsAdminTrue();
 
-        // 2. Notificação para o Tatuador/Gestor (Novo)
-        enviaEmailParaTatuador(orcamento);
+        enviaEmailNovoOrcamento(orcamento.getEmail(), orcamento.getNome(), orcamento.getCodigoOrcamento());
+        enviaEmailParaTatuador(orcamento, emailTatuador);
     }
 
-    private void enviaEmailParaTatuador(Orcamento orcamento) {
-        String emailTatuador = "nicollas.bpereira@sptech.school.com"; //Teste email
-
+    private void enviaEmailParaTatuador(Orcamento orcamento, String emailTatuador) {
         String assunto = "Novo Orçamento Recebido: " + orcamento.getCodigoOrcamento();
         String texto = String.format(
                 "Um novo orçamento foi enviado:\n\n" +
@@ -71,7 +69,6 @@ public class EmailService implements EstoqueObserver, OrcamentoObserver {
                         "Tamanho: %.2f\n" +
                         "Cores: %s\n" +
                         "Local do Corpo: %s\n" +
-                        // O token pode ser o próprio Código do Orçamento ou um campo de agendamento futuro
                         "Imagens: %d anexos (verifique a pasta de uploads).\n\n" +
                         "Acesse o painel para análise.",
                 orcamento.getCodigoOrcamento(),
@@ -88,13 +85,11 @@ public class EmailService implements EstoqueObserver, OrcamentoObserver {
 
     @Override
     public void updateEstoque(String materialNome, Double quantidadeAtual, Double minAviso) {
-        // Se minAviso não for definido (nulo) ou a quantidade for maior, não dispara o alerta
         if (minAviso == null || quantidadeAtual > minAviso) {
             return;
         }
 
-        // Lógica de envio de e-mail de alerta
-        String destinatario = "nicollas.bpereira@sptech.school"; // Email teste
+        String emailTatuador = usuarioRepository.getEmailByIsAdminTrue();
         String assunto = "ALERTA CRÍTICO DE ESTOQUE: " + materialNome;
         String texto = String.format(
                 "Atenção! O material '%s' atingiu o limite crítico.\n" +
@@ -103,7 +98,7 @@ public class EmailService implements EstoqueObserver, OrcamentoObserver {
                 materialNome, quantidadeAtual, "unidades/ml/g", minAviso
         );
 
-        enviarTextoSimples(destinatario, assunto, texto);
+        enviarTextoSimples(emailTatuador, assunto, texto);
     }
 }
 
