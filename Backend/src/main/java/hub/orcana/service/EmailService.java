@@ -8,6 +8,8 @@ import org.springframework.stereotype.Service;
 import hub.orcana.observer.EstoqueObserver;
 import hub.orcana.tables.Orcamento;
 
+import java.util.List;
+
 @Service
 public class EmailService implements EstoqueObserver, OrcamentoObserver {
 
@@ -53,13 +55,13 @@ public class EmailService implements EstoqueObserver, OrcamentoObserver {
 
     @Override
     public void updateOrcamento(Orcamento orcamento) {
-        String emailTatuador = usuarioRepository.getEmailByIsAdminTrue();
+        List<String> emailTatuador = usuarioRepository.getEmailByIsAdminTrue();
 
         enviaEmailNovoOrcamento(orcamento.getEmail(), orcamento.getNome(), orcamento.getCodigoOrcamento());
         enviaEmailParaTatuador(orcamento, emailTatuador);
     }
 
-    private void enviaEmailParaTatuador(Orcamento orcamento, String emailTatuador) {
+    private void enviaEmailParaTatuador(Orcamento orcamento, List<String> emailTatuador) {
         String assunto = "Novo Orçamento Recebido: " + orcamento.getCodigoOrcamento();
         String texto = String.format(
                 "Um novo orçamento foi enviado:\n\n" +
@@ -80,7 +82,9 @@ public class EmailService implements EstoqueObserver, OrcamentoObserver {
                 orcamento.getImagemReferencia().size()
         );
 
-        enviarTextoSimples(emailTatuador, assunto, texto);
+        emailTatuador.forEach(email -> {
+            enviarTextoSimples(email, assunto, texto);
+        });
     }
 
     @Override
@@ -89,7 +93,7 @@ public class EmailService implements EstoqueObserver, OrcamentoObserver {
             return;
         }
 
-        String emailTatuador = usuarioRepository.getEmailByIsAdminTrue();
+        List<String> emailTatuador = usuarioRepository.getEmailByIsAdminTrue();
         String assunto = "ALERTA CRÍTICO DE ESTOQUE: " + materialNome;
         String texto = String.format(
                 "Atenção! O material '%s' atingiu o limite crítico.\n" +
@@ -98,7 +102,9 @@ public class EmailService implements EstoqueObserver, OrcamentoObserver {
                 materialNome, quantidadeAtual, "unidades/ml/g", minAviso
         );
 
-        enviarTextoSimples(emailTatuador, assunto, texto);
+        emailTatuador.forEach(email -> {
+            enviarTextoSimples(email, assunto, texto);
+        });
     }
 }
 
