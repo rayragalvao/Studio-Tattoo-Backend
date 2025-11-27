@@ -14,10 +14,6 @@ public interface OrcamentoRepository extends JpaRepository<Orcamento, String> {
     @Query("SELECT o FROM Orcamento o WHERE o.email = :email")
     List<Orcamento> findOrcamentoByEmail(@Param("email") String email);
 
-    Optional<Orcamento> findTopByOrderByIdDesc();
-
-    Optional<Orcamento> findById(Long id);
-
     Optional<Orcamento> findByCodigoOrcamento(String codigoOrcamento);
     long countByStatus(StatusOrcamento status);
 

@@ -33,7 +33,7 @@ public class Agendamento {
     private Usuario usuario;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "orcamento_id", nullable = false)
+    @JoinColumn(name = "codigo_orcamento", nullable = false)
     @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"}) // ← ADICIONE ISSO
     private Orcamento orcamento;
 

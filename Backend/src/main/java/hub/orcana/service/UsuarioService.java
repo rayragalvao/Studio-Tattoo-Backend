@@ -99,7 +99,7 @@ public class UsuarioService {
         }
 
         orcamentosEncontrados.forEach(orcamento -> {
-            log.info("Associando orçamento {} ao novo usuário {}", orcamento.getId(), usuario.getEmail());
+            log.info("Associando orçamento {} ao novo usuário {}", orcamento.getCodigoOrcamento(), usuario.getEmail());
             orcamento.setUsuario(usuario);
         });
 

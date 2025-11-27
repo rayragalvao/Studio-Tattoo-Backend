@@ -14,9 +14,6 @@ import java.util.List;
 @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class    Orcamento {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
     @Column(name = "codigo_orcamento", unique = true, nullable = false, length = 20)
     private String codigoOrcamento;
 
@@ -31,7 +28,6 @@ public class    Orcamento {
 
     private Double valor;
     private Double tamanho;
-    private String estilo;
 
     @Column(length = 500)
     private String cores;
@@ -42,7 +38,7 @@ public class    Orcamento {
     private String localCorpo;
 
     @ElementCollection
-    @CollectionTable(name = "orcamento_imagens", joinColumns = @JoinColumn(name = "orcamento_id"))
+    @CollectionTable(name = "orcamento_imagens", joinColumns = @JoinColumn(name = "orcamento_codigo"))
     @Column(name = "imagem_url", length = 500)
     private List<String> imagemReferencia;
 
@@ -75,7 +71,6 @@ public class    Orcamento {
 
     public Orcamento(String codigoOrcamento, Long id, String nome, String email, String ideia, Double tamanho, String cores, String localCorpo, List<String> imagemReferencia) {
         this.codigoOrcamento = codigoOrcamento;
-        this.id = id;
         this.nome = nome;
         this.email = email;
         this.ideia = ideia;
@@ -105,14 +100,6 @@ public class    Orcamento {
 
     public void setCodigoOrcamento(String codigoOrcamento) { this.codigoOrcamento = codigoOrcamento; }
 
-
-    public Long getLinhaId() { return id; }
-
-    public void setLinhaId(Long id) { this.id = id; }
-
-    // Compatibilidade: getId() retorna o id numérico como antes
-    public Long getId() { return this.id; }
-
     public String getIdeia() {
         return ideia;
     }
@@ -123,10 +110,6 @@ public class    Orcamento {
 
     public Double getTamanho() {
         return tamanho;
-    }
-
-    public String getEstilo() {
-        return estilo;
     }
 
     public String getCores() {
