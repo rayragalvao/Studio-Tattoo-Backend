@@ -53,6 +53,7 @@ public class SecurityConfiguracao {
             "/orcamento/cadastro",
             "/agendamento/datas-ocupadas",
             "/agendamento/validar-codigo/**",
+            "/uploads/**"
     };
 
     @Bean

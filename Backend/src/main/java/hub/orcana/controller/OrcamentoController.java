@@ -70,12 +70,12 @@ public class OrcamentoController {
             description = "Retorna uma lista completa de todos os orçamentos cadastrados no sistema")
     @SecurityRequirement(name = "Bearer")
     @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "Lista de orçamentos retornada com sucesso",
+            @ApiResponse(responseCode = "200", description = "Lista de orçamentos retornada com sucesso",
                     content = @Content(schema = @Schema(implementation = Orcamento.class))),
-        @ApiResponse(responseCode = "204", description = "Nenhum orçamento encontrado"),
-        @ApiResponse(responseCode = "401", description = "Token de autenticação inválido ou expirado"),
-        @ApiResponse(responseCode = "403", description = "Acesso negado - permissões insuficientes"),
-        @ApiResponse(responseCode = "500", description = "Erro interno do servidor",
+            @ApiResponse(responseCode = "204", description = "Nenhum orçamento encontrado"),
+            @ApiResponse(responseCode = "401", description = "Token de autenticação inválido ou expirado"),
+            @ApiResponse(responseCode = "403", description = "Acesso negado - permissões insuficientes"),
+            @ApiResponse(responseCode = "500", description = "Erro interno do servidor",
                     content = @Content(schema = @Schema(example = "{\"timestamp\": \"2025-11-13T10:30:00Z\", \"status\": 500, \"error\": \"Internal Server Error\", \"message\": \"Erro ao buscar orçamentos\", \"path\": \"/orcamento\"}")))
     })
     public ResponseEntity<List<DetalhesOrcamentoOutput>> getOrcamentos() {
@@ -92,6 +92,44 @@ public class OrcamentoController {
         } catch (Exception e) {
             log.error("Erro ao buscar orçamentos: {}", e.getMessage(), e);
             throw e;
+        }
+    }
+
+    @PutMapping("/{codigo}")
+    @Operation(summary = "Atualizar orçamento com valor e tempo estimado",
+            description = "Atualiza um orçamento existente com valor da tatuagem e tempo estimado da sessão")
+    @SecurityRequirement(name = "Bearer")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Orçamento atualizado com sucesso"),
+            @ApiResponse(responseCode = "404", description = "Orçamento não encontrado"),
+            @ApiResponse(responseCode = "401", description = "Token de autenticação inválido"),
+            @ApiResponse(responseCode = "500", description = "Erro interno do servidor")
+    })
+    public ResponseEntity<?> atualizarOrcamento(
+            @PathVariable String codigo,
+            @RequestBody Map<String, Object> dados) {
+
+        log.info("Atualizando orçamento: {} com dados: {}", codigo, dados);
+        try {
+            var orcamentoAtualizado = service.atualizarOrcamento(codigo, dados);
+            log.info("Orçamento {} atualizado com sucesso", codigo);
+            return ResponseEntity.ok(Map.of(
+                    "success", true,
+                    "message", "Orçamento atualizado com sucesso",
+                    "orcamento", orcamentoAtualizado
+            ));
+        } catch (RuntimeException e) {
+            log.error("Erro ao atualizar orçamento {}: {}", codigo, e.getMessage());
+            return ResponseEntity.status(404).body(Map.of(
+                    "success", false,
+                    "message", e.getMessage()
+            ));
+        } catch (Exception e) {
+            log.error("Erro ao atualizar orçamento {}: {}", codigo, e.getMessage(), e);
+            return ResponseEntity.status(500).body(Map.of(
+                    "success", false,
+                    "message", "Erro ao atualizar orçamento: " + e.getMessage()
+            ));
         }
     }
 

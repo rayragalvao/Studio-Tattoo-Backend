@@ -10,6 +10,7 @@ public record DetalhesOrcamentoOutput (
         Double tamanho,
         String cores,
         String localCorpo,
-        List<String> imagemReferencia
+        List<String> imagemReferencia,
+        String status
 ) {
 }

@@ -6,6 +6,7 @@ import lombok.Setter;
 import lombok.ToString;
 
 import java.sql.Time;
+import java.time.LocalTime;
 import java.util.List;
 
 @ToString
@@ -104,20 +105,46 @@ public class    Orcamento {
         return ideia;
     }
 
+    public void setIdeia(String ideia) {
+        this.ideia = ideia;
+    }
+
     public Double getValor() {
         return valor;
+    }
+
+    public void setValor(Double valor) {
+        this.valor = valor;
     }
 
     public Double getTamanho() {
         return tamanho;
     }
 
+    public void setTamanho(Double tamanho) {
+        this.tamanho = tamanho;
+    }
+
     public String getCores() {
         return cores;
     }
 
+    public void setCores(String cores) {
+        this.cores = cores;
+    }
+
     public Time getTempo() {
         return tempo;
+    }
+
+    public void setTempo(Time tempo) {
+        this.tempo = tempo;
+    }
+
+    public void setTempo(LocalTime localTime) {
+        if (localTime != null) {
+            this.tempo = Time.valueOf(localTime);
+        }
     }
 
     public String getEmail() {
@@ -127,6 +154,7 @@ public class    Orcamento {
     public void setEmail(String email) {
         this.email = email;
     }
+
     public String getStatus() {
         return email;
     }
@@ -140,4 +168,9 @@ public class    Orcamento {
     public String getLocalCorpo() {
         return localCorpo;
     }
+
+    public void setLocalCorpo(String localCorpo) {
+        this.localCorpo = localCorpo;
+    }
+
 }
