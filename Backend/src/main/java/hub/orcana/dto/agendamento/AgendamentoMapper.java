@@ -12,10 +12,12 @@ public class AgendamentoMapper {
                 agendamento.getStatus().name(),
                 agendamento.getUsuario().getNome(),
                 agendamento.getUsuario().getEmail(),
+                agendamento.getOrcamento().getCodigoOrcamento(),
                 agendamento.getOrcamento().getIdeia(),
                 agendamento.getOrcamento().getTamanho(),
                 agendamento.getOrcamento().getCores(),
-                agendamento.getOrcamento().getLocalCorpo()
+                agendamento.getOrcamento().getLocalCorpo(),
+                null
         );
         return dto;
     }

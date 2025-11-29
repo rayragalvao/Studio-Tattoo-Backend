@@ -95,4 +95,32 @@ public class OrcamentoController {
         }
     }
 
+    @GetMapping("/usuario/{usuarioId}")
+    @Operation(summary = "Listar orçamentos de um usuário específico",
+            description = "Retorna todos os orçamentos associados a um usuário")
+    @SecurityRequirement(name = "Bearer")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Lista de orçamentos retornada com sucesso"),
+        @ApiResponse(responseCode = "204", description = "Nenhum orçamento encontrado para este usuário"),
+        @ApiResponse(responseCode = "401", description = "Token de autenticação inválido ou expirado"),
+        @ApiResponse(responseCode = "404", description = "Usuário não encontrado"),
+        @ApiResponse(responseCode = "500", description = "Erro interno do servidor")
+    })
+    public ResponseEntity<List<DetalhesOrcamentoOutput>> getOrcamentosPorUsuario(@PathVariable Long usuarioId) {
+        log.info("Iniciando busca por orçamentos do usuário ID: {}", usuarioId);
+        try {
+            List<DetalhesOrcamentoOutput> orcamentos = service.findOrcamentosByUsuarioId(usuarioId);
+            if (orcamentos.isEmpty()) {
+                log.info("Nenhum orçamento encontrado para o usuário ID: {}", usuarioId);
+                return ResponseEntity.noContent().build();
+            } else {
+                log.info("Retornando {} orçamentos para o usuário ID: {}", orcamentos.size(), usuarioId);
+                return ResponseEntity.ok(orcamentos);
+            }
+        } catch (Exception e) {
+            log.error("Erro ao buscar orçamentos do usuário ID {}: {}", usuarioId, e.getMessage(), e);
+            throw e;
+        }
+    }
+
 }

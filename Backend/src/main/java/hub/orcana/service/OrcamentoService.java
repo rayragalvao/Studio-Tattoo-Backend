@@ -75,7 +75,6 @@ public class OrcamentoService implements OrcamentoSubject{
     public Orcamento postOrcamento(CadastroOrcamentoInput dados) {
 
         List<String> urlImagens = new ArrayList<>();
-        Long usuario_id = verificarEmailExistente(dados.email());
 
         if (dados.imagemReferencia() != null && !dados.imagemReferencia().isEmpty()) {
             for (MultipartFile file : dados.imagemReferencia()) {
@@ -87,6 +86,8 @@ public class OrcamentoService implements OrcamentoSubject{
         // gera codigo unico
         String codigo = gerarCodigoOrcamento();
 
+        Usuario usuario = usuarioRepository.findByEmail(dados.email()).orElse(null);
+
         Orcamento orcamento = new Orcamento(
                 codigo,
                 dados.nome(),
@@ -96,9 +97,16 @@ public class OrcamentoService implements OrcamentoSubject{
                 dados.cores(),
                 dados.localCorpo(),
                 urlImagens,
-                usuario_id,
+                usuario != null ? usuario.getId() : null,
                 StatusOrcamento.PENDENTE
         );
+
+        if (usuario != null) {
+            orcamento.setUsuario(usuario);
+            log.info("Orçamento {} vinculado ao usuário existente: {}", codigo, usuario.getEmail());
+        } else {
+            log.info("Orçamento {} criado sem vínculo com usuário (email não cadastrado)", codigo);
+        }
 
         Orcamento salvo = repository.save(orcamento);
 
@@ -126,6 +134,27 @@ public class OrcamentoService implements OrcamentoSubject{
                 )
         ).toList(
         );
+    }
+
+    public List<DetalhesOrcamentoOutput> findOrcamentosByUsuarioId(Long usuarioId) {
+        return repository.findByUsuarioId(usuarioId).stream().map(
+                orcamento -> {
+                    log.info("Orçamento {}: imagemReferencia = {}", orcamento.getCodigoOrcamento(), orcamento.getImagemReferencia());
+                    return new DetalhesOrcamentoOutput(
+                            orcamento.getCodigoOrcamento(),
+                            orcamento.getNome(),
+                            orcamento.getEmail(),
+                            orcamento.getIdeia(),
+                            orcamento.getTamanho(),
+                            orcamento.getCores(),
+                            orcamento.getLocalCorpo(),
+                            orcamento.getImagemReferencia(),
+                            orcamento.getValor(),
+                            orcamento.getTempo(),
+                            orcamento.getStatus()
+                    );
+                }
+        ).toList();
     }
 
 }
