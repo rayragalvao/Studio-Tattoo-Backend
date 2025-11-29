@@ -24,7 +24,6 @@ public class AutenticacaoFilter extends OncePerRequestFilter {
     private static final Logger LOGGER = LoggerFactory.getLogger(AutenticacaoFilter.class);
 
     private final AutenticacaoService autenticacaoService;
-
     private final GerenciadorTokenJwt gerenciadorTokenJwt;
 
     private static final String[] URLS_PERMITIDAS = {
@@ -47,15 +46,22 @@ public class AutenticacaoFilter extends OncePerRequestFilter {
     }
 
     @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
+    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
+            throws ServletException, IOException {
+
         String requestPath = request.getRequestURI();
+
+        // Verifica URLs permitidas
         boolean isPermittedUrl = Arrays.stream(URLS_PERMITIDAS)
                 .anyMatch(url -> requestPath.startsWith(url) || requestPath.equals(url));
 
+        // Se for URL permitida, passa direto
         if (isPermittedUrl) {
             filterChain.doFilter(request, response);
             return;
         }
+
+
         String username = null;
         String jwtToken = null;
 
@@ -69,8 +75,8 @@ public class AutenticacaoFilter extends OncePerRequestFilter {
                 LOGGER.info("[FALHA DE AUTENTICACAO] Token expirado, usuario: {} - {}",
                         e.getClaims().getSubject(), e.getMessage()
                 );
-                LOGGER.trace("[FALHA DE AUTENTICACAO] Stack trace: ", e);
                 response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                return;
             }
         }
 
@@ -85,13 +91,11 @@ public class AutenticacaoFilter extends OncePerRequestFilter {
         UserDetails userDetails = autenticacaoService.loadUserByUsername(username);
 
         if (gerenciadorTokenJwt.validateToken(jwtToken, userDetails)) {
-
             UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
                     userDetails, null, userDetails.getAuthorities()
             );
 
             authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-
             SecurityContextHolder.getContext().setAuthentication(authentication);
         }
     }

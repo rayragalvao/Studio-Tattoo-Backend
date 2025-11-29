@@ -4,6 +4,7 @@ import hub.orcana.dto.orcamento.CadastroOrcamentoInput;
 import hub.orcana.dto.orcamento.DetalhesOrcamentoOutput;
 import hub.orcana.service.OrcamentoService;
 import hub.orcana.tables.Orcamento;
+import hub.orcana.tables.StatusOrcamento;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -66,7 +67,8 @@ class OrcamentoControllerTest {
                 "Preto, Vermelho",
                 "Braço direito",
                 List.of("url1.jpg"),
-                1L
+                1L,
+                StatusOrcamento.PENDENTE
         );
     }
 
@@ -131,7 +133,8 @@ class OrcamentoControllerTest {
                 10.0,
                 "Preto e vermelho",
                 "Braço direito",
-                List.of("url1.jpg")
+                List.of("url1.jpg"),
+                "PENDENTE"
         ));
         orcamentos.add(new DetalhesOrcamentoOutput(
                 "ORC-E5F6G7H8",
@@ -141,7 +144,8 @@ class OrcamentoControllerTest {
                 8.5,
                 "Colorido",
                 "Tornozelo",
-                List.of("url2.jpg")
+                List.of("url2.jpg"),
+                "PENDENTE"
         ));
 
         when(servico.findAllOrcamentos()).thenReturn(orcamentos);

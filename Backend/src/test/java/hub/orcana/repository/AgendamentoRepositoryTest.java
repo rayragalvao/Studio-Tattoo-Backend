@@ -75,7 +75,6 @@ class AgendamentoRepositoryTest {
         assertEquals(dataHora, salvo.getDataHora());
         assertEquals(StatusAgendamento.AGUARDANDO, salvo.getStatus());
         assertEquals(usuario.getId(), salvo.getUsuario().getId());
-        assertEquals(orcamento.getId(), salvo.getOrcamento().getId());
     }
 
     @Test
@@ -422,7 +421,6 @@ class AgendamentoRepositoryTest {
 
         assertNotNull(recuperado);
         assertNotNull(recuperado.getOrcamento());
-        assertEquals(orcamento.getId(), recuperado.getOrcamento().getId());
         assertEquals(orcamento.getCodigoOrcamento(), recuperado.getOrcamento().getCodigoOrcamento());
         assertEquals(orcamento.getIdeia(), recuperado.getOrcamento().getIdeia());
     }

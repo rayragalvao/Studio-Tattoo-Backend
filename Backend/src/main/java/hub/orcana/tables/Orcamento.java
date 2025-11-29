@@ -1,19 +1,20 @@
 package hub.orcana.tables;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
+import lombok.Setter;
 import lombok.ToString;
 
 import java.sql.Time;
+import java.time.LocalTime;
 import java.util.List;
 
 @ToString
 @Entity
 @Table(name = "orcamento")
-public class Orcamento {
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
+public class    Orcamento {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
     @Column(name = "codigo_orcamento", unique = true, nullable = false, length = 20)
     private String codigoOrcamento;
 
@@ -28,7 +29,6 @@ public class Orcamento {
 
     private Double valor;
     private Double tamanho;
-    private String estilo;
 
     @Column(length = 500)
     private String cores;
@@ -39,17 +39,22 @@ public class Orcamento {
     private String localCorpo;
 
     @ElementCollection
-    @CollectionTable(name = "orcamento_imagens", joinColumns = @JoinColumn(name = "orcamento_id"))
+    @CollectionTable(name = "orcamento_imagens", joinColumns = @JoinColumn(name = "orcamento_codigo"))
     @Column(name = "imagem_url", length = 500)
     private List<String> imagemReferencia;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @Enumerated(EnumType.STRING)
+    @Column(name = "status")
+    private StatusOrcamento status;
+
+    @ManyToOne
     @JoinColumn(name = "usuario_id")
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler", "senha"})
     private Usuario usuario;
 
     public Orcamento() {}
 
-    public Orcamento(String codigoOrcamento, String nome, String email, String ideia, Double tamanho, String cores, String localCorpo, List<String> imagemReferencia, Long usuarioId) {
+    public Orcamento(String codigoOrcamento, String nome, String email, String ideia, Double tamanho, String cores, String localCorpo, List<String> imagemReferencia, Long usuarioId, StatusOrcamento status) {
         this.codigoOrcamento = codigoOrcamento;
         this.nome = nome;
         this.email = email;
@@ -62,11 +67,11 @@ public class Orcamento {
             this.usuario = new Usuario();
             this.usuario.setId(usuarioId);
         }
+        this.status = status;
     }
 
     public Orcamento(String codigoOrcamento, Long id, String nome, String email, String ideia, Double tamanho, String cores, String localCorpo, List<String> imagemReferencia) {
         this.codigoOrcamento = codigoOrcamento;
-        this.id = id;
         this.nome = nome;
         this.email = email;
         this.ideia = ideia;
@@ -96,36 +101,50 @@ public class Orcamento {
 
     public void setCodigoOrcamento(String codigoOrcamento) { this.codigoOrcamento = codigoOrcamento; }
 
-
-    public Long getLinhaId() { return id; }
-
-    public void setLinhaId(Long id) { this.id = id; }
-
-    // Compatibilidade: getId() retorna o id numérico como antes
-    public Long getId() { return this.id; }
-
     public String getIdeia() {
         return ideia;
+    }
+
+    public void setIdeia(String ideia) {
+        this.ideia = ideia;
     }
 
     public Double getValor() {
         return valor;
     }
 
+    public void setValor(Double valor) {
+        this.valor = valor;
+    }
+
     public Double getTamanho() {
         return tamanho;
     }
 
-    public String getEstilo() {
-        return estilo;
+    public void setTamanho(Double tamanho) {
+        this.tamanho = tamanho;
     }
 
     public String getCores() {
         return cores;
     }
 
+    public void setCores(String cores) {
+        this.cores = cores;
+    }
+
     public Time getTempo() {
         return tempo;
+    }
+
+    public void setTempo(Time tempo) {
+        this.tempo = tempo;
+    }
+
+    public void setTempo(LocalTime localTime) {
+        if (localTime != null) {
+            this.tempo = Time.valueOf(localTime);
+        }
     }
 
     public String getEmail() {
@@ -136,9 +155,22 @@ public class Orcamento {
         this.email = email;
     }
 
+    public String getStatus() {
+        return email;
+    }
+
+    public void setStatus(StatusOrcamento status) {
+        this.status = status;
+    }
+
     public List<String> getImagemReferencia() { return imagemReferencia;}
 
     public String getLocalCorpo() {
         return localCorpo;
     }
+
+    public void setLocalCorpo(String localCorpo) {
+        this.localCorpo = localCorpo;
+    }
+
 }
