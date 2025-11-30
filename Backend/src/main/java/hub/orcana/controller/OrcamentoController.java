@@ -123,4 +123,107 @@ public class OrcamentoController {
         }
     }
 
+    @PutMapping("/{codigo}")
+    @Operation(summary = "Atualizar informações de um orçamento",
+            description = "Permite atualizar dados do orçamento como tamanho, local do corpo, cores e descrição")
+    @SecurityRequirement(name = "Bearer")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Orçamento atualizado com sucesso"),
+        @ApiResponse(responseCode = "400", description = "Dados inválidos"),
+        @ApiResponse(responseCode = "401", description = "Token de autenticação inválido ou expirado"),
+        @ApiResponse(responseCode = "404", description = "Orçamento não encontrado"),
+        @ApiResponse(responseCode = "500", description = "Erro interno do servidor")
+    })
+    public ResponseEntity<?> atualizarOrcamento(
+            @PathVariable String codigo,
+            @RequestBody Map<String, Object> dados) {
+        log.info("Atualizando orçamento {}: {}", codigo, dados);
+        try {
+            Double tamanho = dados.get("tamanho") != null ? 
+                    ((Number) dados.get("tamanho")).doubleValue() : null;
+            String localCorpo = (String) dados.get("localCorpo");
+            String cores = (String) dados.get("cores");
+            String ideia = (String) dados.get("ideia");
+
+            var orcamentoAtualizado = service.atualizarOrcamento(codigo, tamanho, localCorpo, cores, ideia);
+            log.info("Orçamento {} atualizado com sucesso", codigo);
+            return ResponseEntity.ok(Map.of(
+                    "success", true,
+                    "message", "Orçamento atualizado com sucesso",
+                    "codigo", orcamentoAtualizado.getCodigoOrcamento()
+            ));
+        } catch (RuntimeException e) {
+            log.error("Erro ao atualizar orçamento {}: {}", codigo, e.getMessage());
+            return ResponseEntity.status(404).body(Map.of(
+                    "success", false,
+                    "message", e.getMessage()
+            ));
+        } catch (Exception e) {
+            log.error("Erro inesperado ao atualizar orçamento {}: {}", codigo, e.getMessage(), e);
+            return ResponseEntity.status(500).body(Map.of(
+                    "success", false,
+                    "message", "Erro ao atualizar orçamento"
+            ));
+        }
+    }
+
+    @GetMapping("/{codigo}/tem-agendamento")
+    @Operation(summary = "Verificar se orçamento possui agendamento",
+            description = "Retorna se existe um agendamento vinculado ao orçamento")
+    @SecurityRequirement(name = "Bearer")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Verificação realizada com sucesso"),
+        @ApiResponse(responseCode = "401", description = "Token de autenticação inválido ou expirado"),
+        @ApiResponse(responseCode = "500", description = "Erro interno do servidor")
+    })
+    public ResponseEntity<?> verificarSeTemAgendamento(@PathVariable String codigo) {
+        log.info("Verificando se orçamento {} possui agendamento", codigo);
+        try {
+            boolean temAgendamento = service.verificarSeTemAgendamento(codigo);
+            return ResponseEntity.ok(Map.of(
+                    "temAgendamento", temAgendamento
+            ));
+        } catch (Exception e) {
+            log.error("Erro ao verificar agendamento do orçamento {}: {}", codigo, e.getMessage(), e);
+            return ResponseEntity.status(500).body(Map.of(
+                    "success", false,
+                    "message", "Erro ao verificar agendamento"
+            ));
+        }
+    }
+
+    @DeleteMapping("/{codigo}")
+    @Operation(summary = "Excluir um orçamento",
+            description = "Remove permanentemente um orçamento do sistema e seu agendamento relacionado (se houver)")
+    @SecurityRequirement(name = "Bearer")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Orçamento excluído com sucesso"),
+        @ApiResponse(responseCode = "401", description = "Token de autenticação inválido ou expirado"),
+        @ApiResponse(responseCode = "404", description = "Orçamento não encontrado"),
+        @ApiResponse(responseCode = "500", description = "Erro interno do servidor")
+    })
+    public ResponseEntity<?> deletarOrcamento(@PathVariable String codigo) {
+        log.info("Deletando orçamento: {}", codigo);
+        try {
+            service.deletarOrcamento(codigo);
+            log.info("Orçamento {} deletado com sucesso", codigo);
+            return ResponseEntity.ok(Map.of(
+                    "success", true,
+                    "message", "Orçamento excluído com sucesso"
+            ));
+        } catch (RuntimeException e) {
+            log.error("Erro ao deletar orçamento {}: {}", codigo, e.getMessage());
+            return ResponseEntity.status(404).body(Map.of(
+                    "success", false,
+                    "message", e.getMessage()
+            ));
+        } catch (Exception e) {
+            log.error("Erro inesperado ao deletar orçamento {}: {}", codigo, e.getMessage(), e);
+            return ResponseEntity.status(500).body(Map.of(
+                    "success", false,
+                    "message", "Erro ao excluir orçamento"
+            ));
+        }
+    }
+
 }

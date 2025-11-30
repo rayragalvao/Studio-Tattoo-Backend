@@ -2,9 +2,11 @@ package hub.orcana.service;
 
 import hub.orcana.dto.orcamento.CadastroOrcamentoInput;
 import hub.orcana.dto.orcamento.DetalhesOrcamentoOutput;
+import hub.orcana.tables.Agendamento;
 import hub.orcana.tables.Orcamento;
 import hub.orcana.tables.StatusOrcamento;
 import hub.orcana.tables.Usuario;
+import hub.orcana.tables.repository.AgendamentoRepository;
 import hub.orcana.tables.repository.OrcamentoRepository;
 import hub.orcana.tables.repository.UsuarioRepository;
 import org.slf4j.Logger;
@@ -29,13 +31,15 @@ public class OrcamentoService implements OrcamentoSubject{
     private final EmailService emailService;
     private final List<OrcamentoObserver> observers = new ArrayList<>();
     private final UsuarioRepository usuarioRepository;
+    private final AgendamentoRepository agendamentoRepository;
 
-    public OrcamentoService(OrcamentoRepository repository, GerenciadorDeArquivosService gerenciadorService, EmailService emailService, UsuarioRepository usuarioRepository) {
+    public OrcamentoService(OrcamentoRepository repository, GerenciadorDeArquivosService gerenciadorService, EmailService emailService, UsuarioRepository usuarioRepository, AgendamentoRepository agendamentoRepository) {
         this.repository = repository;
         this.gerenciadorService = gerenciadorService;
         this.emailService = emailService;
         this.attach(emailService);
         this.usuarioRepository = usuarioRepository;
+        this.agendamentoRepository = agendamentoRepository;
     }
 
     @Override
@@ -155,6 +159,46 @@ public class OrcamentoService implements OrcamentoSubject{
                     );
                 }
         ).toList();
+    }
+
+    public Orcamento atualizarOrcamento(String codigo, Double tamanho, String localCorpo, String cores, String ideia) {
+        log.info("Atualizando orçamento: {}", codigo);
+        Orcamento orcamento = repository.findByCodigoOrcamento(codigo)
+                .orElseThrow(() -> new RuntimeException("Orçamento não encontrado: " + codigo));
+        
+        if (tamanho != null) {
+            orcamento.setTamanho(tamanho);
+        }
+        if (localCorpo != null && !localCorpo.isBlank()) {
+            orcamento.setLocalCorpo(localCorpo);
+        }
+        if (cores != null && !cores.isBlank()) {
+            orcamento.setCores(cores);
+        }
+        if (ideia != null && !ideia.isBlank()) {
+            orcamento.setIdeia(ideia);
+        }
+        
+        return repository.save(orcamento);
+    }
+
+    public boolean verificarSeTemAgendamento(String codigo) {
+        return agendamentoRepository.findByOrcamentoCodigoOrcamento(codigo).isPresent();
+    }
+
+    public void deletarOrcamento(String codigo) {
+        log.info("Deletando orçamento: {}", codigo);
+        Orcamento orcamento = repository.findByCodigoOrcamento(codigo)
+                .orElseThrow(() -> new RuntimeException("Orçamento não encontrado: " + codigo));
+        
+        agendamentoRepository.findByOrcamentoCodigoOrcamento(codigo).ifPresent(agendamento -> {
+            log.info("Deletando agendamento relacionado ao orçamento {}: {}", codigo, agendamento.getId());
+            agendamentoRepository.delete(agendamento);
+            log.info("Agendamento {} deletado com sucesso", agendamento.getId());
+        });
+        
+        repository.delete(orcamento);
+        log.info("Orçamento {} deletado com sucesso", codigo);
     }
 
 }
