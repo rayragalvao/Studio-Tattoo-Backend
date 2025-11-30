@@ -1,6 +1,7 @@
 package hub.orcana.service;
 
 import hub.orcana.observer.OrcamentoObserver;
+import hub.orcana.tables.repository.TemplateEmailRepository;
 import hub.orcana.tables.repository.UsuarioRepository;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -15,13 +16,13 @@ public class EmailService implements EstoqueObserver, OrcamentoObserver {
 
     private final JavaMailSender mailSender;
     private final UsuarioRepository usuarioRepository;
+    private final TemplateEmailRepository templateEmailRepository;
 
-    public EmailService(JavaMailSender mailSender, UsuarioRepository usuarioRepository) {
+    public EmailService(JavaMailSender mailSender, UsuarioRepository usuarioRepository, TemplateEmailRepository templateEmailRepository) {
         this.mailSender = mailSender;
         this.usuarioRepository = usuarioRepository;
+        this.templateEmailRepository = templateEmailRepository;
     }
-
-//    private String templateEmail = "<!DOCTYPE html><html lang=\"pt-br\"><head><meta charset=\"UTF-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\"><title>[ASSUNTO DO SEU E-MAIL]</title><link rel=\"preconnect\" href=\"https://fonts.googleapis.com\"><link rel=\"preconnect\" href=\"https://fonts.gstatic.com\" crossorigin>";
 
     public void enviarTextoSimples(String destinatario, String assunto, String texto) {
         SimpleMailMessage message = new SimpleMailMessage();
@@ -38,17 +39,17 @@ public class EmailService implements EstoqueObserver, OrcamentoObserver {
             throw new IllegalArgumentException("Destinatário inválido para envio de e-mail.");
         }
 
-        String assunto = "Confirmação de Recebimento de Orçamento - Júpiter Frito";
-        String textoInicial = "Olá $nomeCliente, recebemos sua solicitação de orçamento e " +
-                "os detalhes já estão sendo analisados. Em breve, entraremos em contato com você.\n\n" +
-                "Não esqueça de anotar o código do seu orçamento para futuras referências: $codigoOrcamento\n\n" +
-                "Obrigado por escolher a Júpiter Frito! :) \n\n" +
-                "Atenciosamente,\n\n" +
-                "Equipe Júpiter Frito";
+        String assunto = templateEmailRepository.findByNomeTemplate("orcamento_cliente")
+                .map(template -> template.getAssunto())
+                .orElseThrow(() -> new IllegalStateException("Template 'orcamento_cliente' não encontrado"));
+
+        String textoInicial = templateEmailRepository.findByNomeTemplate("orcamento_cliente")
+                .map(template -> template.getCorpoEmail().toString())
+                .orElseThrow(() -> new IllegalStateException("Template 'orcamento_cliente' não encontrado"));
 
         String textoFinal = textoInicial
-                .replace("$nomeCliente", nomeCliente)
-                .replace("$codigoOrcamento", codigoOrcamento);
+                .replace("${nomeCliente}", nomeCliente)
+                .replace("${codigoOrcamento}", codigoOrcamento);
 
         enviarTextoSimples(emailCliente, assunto, textoFinal);
     }
@@ -62,29 +63,32 @@ public class EmailService implements EstoqueObserver, OrcamentoObserver {
     }
 
     private void enviaEmailParaTatuador(Orcamento orcamento, List<String> emailTatuador) {
-        String assunto = "Novo Orçamento Recebido: " + orcamento.getCodigoOrcamento();
-        String texto = String.format(
-                "Um novo orçamento foi enviado:\n\n" +
-                        "Código: %s\n" +
-                        "Email do Cliente: %s\n" +
-                        "Ideia: %s\n" +
-                        "Tamanho: %.2f\n" +
-                        "Cores: %s\n" +
-                        "Local do Corpo: %s\n" +
-                        "Imagens: %d anexos (verifique a pasta de uploads).\n\n" +
-                        "Acesse o painel para análise.",
-                orcamento.getCodigoOrcamento(),
-                orcamento.getEmail(),
-                orcamento.getIdeia(),
-                orcamento.getTamanho(),
-                orcamento.getCores(),
-                orcamento.getLocalCorpo(),
-                orcamento.getImagemReferencia().size()
-        );
+        String assunto = templateEmailRepository.findByNomeTemplate("orcamento_tatuador")
+                .map(template -> template.getAssunto())
+                .orElseThrow(() -> new IllegalStateException("Template 'orcamento_tatuador' não encontrado"));
+
+        String textoInicial = templateEmailRepository.findByNomeTemplate("orcamento_tatuador")
+                .map(template -> template.getCorpoEmail().toString())
+                .orElseThrow(() -> new IllegalStateException("Template 'orcamento_tatuador' não encontrado"));
+
+        String nomeAdmin = usuarioRepository.getNomeByIsAdminTrue().stream().findFirst()
+                .orElse("Administrador");
+
+        String textoFinal = textoInicial
+                .replace("${nomeAdmin}", nomeAdmin)
+                .replace("${codigoOrcamento}", orcamento.getCodigoOrcamento())
+                .replace("${nomeCliente}", orcamento.getNome())
+                .replace("${emailCliente}", orcamento.getEmail())
+                .replace("${ideia}", orcamento.getIdeia())
+                .replace("${tamanho}", String.format("%.2f", orcamento.getTamanho()))
+                .replace("${cores}", orcamento.getCores())
+                .replace("${localCorpo}", orcamento.getLocalCorpo())
+                .replace("${imagens}", String.valueOf(orcamento.getImagemReferencia().size()));
 
         emailTatuador.forEach(email -> {
-            enviarTextoSimples(email, assunto, texto);
+            enviarTextoSimples(email, assunto, textoFinal);
         });
+
     }
 
     @Override

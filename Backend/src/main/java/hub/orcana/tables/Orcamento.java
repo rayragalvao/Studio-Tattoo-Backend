@@ -39,7 +39,7 @@ public class    Orcamento {
     private String localCorpo;
 
     @ElementCollection
-    @CollectionTable(name = "orcamento_imagens", joinColumns = @JoinColumn(name = "orcamento_codigo"))
+    @CollectionTable(name = "orcamento_imagens", joinColumns = @JoinColumn(name = "codigo_orcamento"))
     @Column(name = "imagem_url", length = 500)
     private List<String> imagemReferencia;
 
