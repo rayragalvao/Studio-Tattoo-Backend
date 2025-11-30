@@ -16,6 +16,7 @@ public record DetalhesOrcamentoOutput (
         Double valor,
         Time tempo,
         StatusOrcamento status
+        String status
 ) {
     public DetalhesOrcamentoOutput(String codigoOrcamento, String nome, String email, String ideia, 
                                     Double tamanho, String cores, String localCorpo, List<String> imagemReferencia) {

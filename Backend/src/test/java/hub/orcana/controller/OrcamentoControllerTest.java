@@ -133,7 +133,8 @@ class OrcamentoControllerTest {
                 10.0,
                 "Preto e vermelho",
                 "Braço direito",
-                List.of("url1.jpg")
+                List.of("url1.jpg"),
+                "PENDENTE"
         ));
         orcamentos.add(new DetalhesOrcamentoOutput(
                 "ORC-E5F6G7H8",
@@ -143,7 +144,8 @@ class OrcamentoControllerTest {
                 8.5,
                 "Colorido",
                 "Tornozelo",
-                List.of("url2.jpg")
+                List.of("url2.jpg"),
+                "PENDENTE"
         ));
 
         when(servico.findAllOrcamentos()).thenReturn(orcamentos);

@@ -6,6 +6,7 @@ import lombok.Setter;
 import lombok.ToString;
 
 import java.sql.Time;
+import java.time.LocalTime;
 import java.util.List;
 
 @ToString
@@ -140,6 +141,12 @@ public class    Orcamento {
         this.tempo = tempo;
     }
 
+    public void setTempo(LocalTime localTime) {
+        if (localTime != null) {
+            this.tempo = Time.valueOf(localTime);
+        }
+    }
+
     public String getEmail() {
         return email;
     }
@@ -150,6 +157,9 @@ public class    Orcamento {
     
     public StatusOrcamento getStatus() {
         return status;
+
+    public String getStatus() {
+        return email;
     }
 
     public void setStatus(StatusOrcamento status) {
@@ -169,4 +179,6 @@ public class    Orcamento {
     public void setLocalCorpo(String localCorpo) {
         this.localCorpo = localCorpo;
     }
+}
+
 }
