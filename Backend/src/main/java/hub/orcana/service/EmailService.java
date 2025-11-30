@@ -110,5 +110,6 @@ public class EmailService implements EstoqueObserver, OrcamentoObserver {
             enviarTextoSimples(email, assunto, texto);
         });
     }
+
 }
 
