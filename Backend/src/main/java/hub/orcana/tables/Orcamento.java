@@ -38,7 +38,7 @@ public class    Orcamento {
     @Column(name = "local_corpo", length = 200)
     private String localCorpo;
 
-    @ElementCollection
+    @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(name = "orcamento_imagens", joinColumns = @JoinColumn(name = "orcamento_codigo"))
     @Column(name = "imagem_url", length = 500)
     private List<String> imagemReferencia;
@@ -154,6 +154,9 @@ public class    Orcamento {
     public void setEmail(String email) {
         this.email = email;
     }
+    
+    public StatusOrcamento getStatus() {
+        return status;
 
     public String getStatus() {
         return email;
@@ -165,6 +168,10 @@ public class    Orcamento {
 
     public List<String> getImagemReferencia() { return imagemReferencia;}
 
+    public void setImagemReferencia(List<String> imagemReferencia) {
+        this.imagemReferencia = imagemReferencia;
+    }
+
     public String getLocalCorpo() {
         return localCorpo;
     }
@@ -172,5 +179,6 @@ public class    Orcamento {
     public void setLocalCorpo(String localCorpo) {
         this.localCorpo = localCorpo;
     }
+}
 
 }

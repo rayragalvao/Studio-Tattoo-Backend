@@ -8,8 +8,10 @@ public record DetalhesAgendamentoOutput(
         String status,
         String nomeUsuario,
         String emailUsuario,
+        String codigoOrcamento,
         String ideia,
         Double tamanho,
         String cores,
-        String localCorpo
+        String localCorpo,
+        String observacoes
 ) {}
