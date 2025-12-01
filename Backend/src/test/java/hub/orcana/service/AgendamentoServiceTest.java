@@ -63,7 +63,7 @@ class AgendamentoServiceTest {
         agendamento = new Agendamento();
         agendamento.setId(1L);
         agendamento.setDataHora(dataHora);
-        agendamento.setStatus(StatusAgendamento.AGUARDANDO);
+        agendamento.setStatus(StatusAgendamento.PENDENTE);
         agendamento.setUsuario(usuario);
         agendamento.setOrcamento(orcamento);
 
@@ -71,7 +71,7 @@ class AgendamentoServiceTest {
                 "joao@email.com",
                 "ORC123",
                 dataHora,
-                StatusAgendamento.AGUARDANDO
+                StatusAgendamento.PENDENTE
         );
     }
 
@@ -162,12 +162,12 @@ class AgendamentoServiceTest {
         when(agendamentoRepository.findAll()).thenReturn(agendamentos);
 
 
-        List<DetalhesAgendamentoOutput> resultado = agendamentoService.getAgendamentosByStatus("AGUARDANDO");
+        List<DetalhesAgendamentoOutput> resultado = agendamentoService.getAgendamentosByStatus("PENDENTE");
 
 
         assertNotNull(resultado);
         assertEquals(1, resultado.size());
-        assertEquals("AGUARDANDO", resultado.get(0).status());
+        assertEquals("PENDENTE", resultado.get(0).status());
         verify(agendamentoRepository, times(1)).findAll();
     }
 
@@ -401,7 +401,7 @@ class AgendamentoServiceTest {
 
         Agendamento agendamento1 = new Agendamento();
         agendamento1.setDataHora(amanha);
-        agendamento1.setStatus(StatusAgendamento.AGUARDANDO);
+        agendamento1.setStatus(StatusAgendamento.PENDENTE);
         agendamento1.setUsuario(usuario);
         agendamento1.setOrcamento(orcamento);
 
@@ -509,7 +509,7 @@ class AgendamentoServiceTest {
         Agendamento agendamentoAtualizado = new Agendamento();
         agendamentoAtualizado.setId(1L);
         agendamentoAtualizado.setDataHora(dataHora);
-        agendamentoAtualizado.setStatus(StatusAgendamento.AGUARDANDO);
+        agendamentoAtualizado.setStatus(StatusAgendamento.PENDENTE);
         agendamentoAtualizado.setUsuario(usuario);
         agendamentoAtualizado.setOrcamento(novoOrcamento);
         

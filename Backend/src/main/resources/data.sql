@@ -34,12 +34,22 @@ INSERT INTO orcamento (codigo_orcamento, nome, email, ideia, valor, tamanho, cor
   ('ORC005', 'Carlos Mendes', 'carlos@email.com', 'Frase inspiracional', 180.00, 3.0,  'Preto', '01:00:00', 'Antebraço', 'PENDENTE', 2),
   ('ORC006', 'Luiza Pompermayer', 'luiza@email.com', 'Tatuagem minimalista', 120.00, 4.0,  'Preto', '01:15:00', 'Tornozelo', 'APROVADO', 2);
 
+-- Inserindo imagens de referência para os orçamentos
+INSERT INTO orcamento_imagens (orcamento_codigo, imagem_url) VALUES
+  ('ORC001', 'https://i.pinimg.com/736x/60/90/60/609060f0c63bc1f05cfba42e06ceb5a8.jpg'),
+  ('ORC001', 'https://i.pinimg.com/736x/ac/85/9a/ac859a1c2308be0aaa94b28d9e76ce28.jpg'),
+  ('ORC002', 'https://i.pinimg.com/736x/94/99/d4/9499d4c2b1c34ead6a1f7e12c2bfbb3b.jpg'),
+  ('ORC003', 'https://i.pinimg.com/736x/ab/61/93/ab6193c5c2b45d8a3bd6f39eb59e5e90.jpg'),
+  ('ORC004', 'https://i.pinimg.com/736x/46/fb/db/46fbdba86147a4c0c4c9e8e1dc8ed4e6.jpg'),
+  ('ORC005', 'https://i.pinimg.com/736x/d3/8f/94/d38f949c4b87d9f5ca97f0e01c31c8f2.jpg'),
+  ('ORC006', 'https://i.pinimg.com/736x/2e/3e/4c/2e3e4c8e0b5f6f4b3a1f8e9d7c6b5a4d.jpg');
+
 -- Inserindo agendamentos de exemplo para o usuário 'user' (id = 2)
 -- Alguns para hoje (26/11/2025) e outros para 08/12/2025
 INSERT INTO agendamento (data_hora, status, usuario_id, codigo_orcamento) VALUES
   -- Agendamentos para hoje (26/11/2025)
   ('2025-11-26 09:00:00', 'CONFIRMADO', 2, 'ORC002'), -- Rosa no punho - aprovada
-  ('2025-11-26 14:30:00', 'AGUARDANDO', 2, 'ORC001'), -- Dragão no braço - pendente
+  ('2025-11-26 14:30:00', 'PENDENTE', 2, 'ORC001'), -- Dragão no braço - pendente
   ('2025-11-26 16:00:00', 'CONCLUIDO', 2, 'ORC006'), -- Tatuagem minimalista - aprovada
 
   -- Agendamentos para 08/12/2025

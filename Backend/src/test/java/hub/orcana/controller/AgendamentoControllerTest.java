@@ -43,20 +43,22 @@ class AgendamentoControllerTest {
         agendamentoOutput = new DetalhesAgendamentoOutput(
                 1L,
                 dataHora,
-                "AGUARDANDO",
+                "PENDENTE",
                 "João Silva",
                 "joao@email.com",
+                "ORC123",
                 "Dragão nas costas",
                 20.5,
                 "Preto e Vermelho",
-                "Costas"
+                "Costas",
+                null
         );
 
         agendamentoInput = new CadastroAgendamentoInput(
                 "joao@email.com",
                 "ORC123",
                 dataHora,
-                StatusAgendamento.AGUARDANDO
+                StatusAgendamento.PENDENTE
         );
     }
 
@@ -70,10 +72,12 @@ class AgendamentoControllerTest {
                 "CONFIRMADO",
                 "Maria Santos",
                 "maria@email.com",
+                "ORC124",
                 "Rosa no braço",
                 10.0,
                 "Rosa e Verde",
-                "Braço"
+                "Braço",
+                null
         );
         List<DetalhesAgendamentoOutput> agendamentos = Arrays.asList(agendamentoOutput, agendamento2);
         when(agendamentoService.getAgendamentos()).thenReturn(agendamentos);
@@ -179,19 +183,19 @@ class AgendamentoControllerTest {
     void deveRetornar200ComAgendamentosPorStatus() {
 
         List<DetalhesAgendamentoOutput> agendamentos = Arrays.asList(agendamentoOutput);
-        when(agendamentoService.getAgendamentosByStatus("AGUARDANDO")).thenReturn(agendamentos);
+        when(agendamentoService.getAgendamentosByStatus("PENDENTE")).thenReturn(agendamentos);
 
 
         ResponseEntity<List<DetalhesAgendamentoOutput>> response = 
-                agendamentoController.getAgendamentosByStatus("AGUARDANDO");
+                agendamentoController.getAgendamentosByStatus("PENDENTE");
 
 
         assertNotNull(response);
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertNotNull(response.getBody());
         assertEquals(1, response.getBody().size());
-        assertEquals("AGUARDANDO", response.getBody().get(0).status());
-        verify(agendamentoService, times(1)).getAgendamentosByStatus("AGUARDANDO");
+        assertEquals("PENDENTE", response.getBody().get(0).status());
+        verify(agendamentoService, times(1)).getAgendamentosByStatus("PENDENTE");
     }
 
     @Test
@@ -430,10 +434,12 @@ class AgendamentoControllerTest {
                 "CONFIRMADO",
                 "João Silva",
                 "joao@email.com",
+                "ORC125",
                 "Leão no braço",
                 15.0,
                 "Colorido",
-                "Braço"
+                "Braço",
+                null
         );
         List<DetalhesAgendamentoOutput> agendamentos = Arrays.asList(agendamentoOutput, agendamento2);
         when(agendamentoService.getAgendamentos()).thenReturn(agendamentos);
@@ -491,11 +497,11 @@ class AgendamentoControllerTest {
                 "joao@email.com",
                 "ORC123",
                 dataLimite,
-                StatusAgendamento.AGUARDANDO
+                StatusAgendamento.PENDENTE
         );
         DetalhesAgendamentoOutput outputFuturo = new DetalhesAgendamentoOutput(
-                1L, dataLimite, "AGUARDANDO", "João Silva", "joao@email.com",
-                "Dragão nas costas", 20.5, "Preto e Vermelho", "Costas"
+                1L, dataLimite, "PENDENTE", "João Silva", "joao@email.com",
+                "ORC123", "Dragão nas costas", 20.5, "Preto e Vermelho", "Costas", null
         );
         when(agendamentoService.postAgendamento(any(CadastroAgendamentoInput.class)))
                 .thenReturn(outputFuturo);
@@ -521,7 +527,7 @@ class AgendamentoControllerTest {
         );
         DetalhesAgendamentoOutput outputAtualizado = new DetalhesAgendamentoOutput(
                 1L, dataHora.plusHours(2), "CONFIRMADO", "João Silva", "joao@email.com",
-                "Dragão nas costas", 20.5, "Preto e Vermelho", "Costas"
+                "ORC123", "Dragão nas costas", 20.5, "Preto e Vermelho", "Costas", null
         );
         when(agendamentoService.putAgendamentoById(eq(1L), any(CadastroAgendamentoInput.class)))
                 .thenReturn(outputAtualizado);

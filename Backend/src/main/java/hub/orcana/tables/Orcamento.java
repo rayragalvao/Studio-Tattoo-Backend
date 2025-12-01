@@ -38,8 +38,8 @@ public class    Orcamento {
     @Column(name = "local_corpo", length = 200)
     private String localCorpo;
 
-    @ElementCollection
-    @CollectionTable(name = "orcamento_imagens", joinColumns = @JoinColumn(name = "codigo_orcamento"))
+    @ElementCollection(fetch = FetchType.EAGER)
+    @CollectionTable(name = "orcamento_imagens", joinColumns = @JoinColumn(name = "orcamento_codigo"))
     @Column(name = "imagem_url", length = 500)
     private List<String> imagemReferencia;
 

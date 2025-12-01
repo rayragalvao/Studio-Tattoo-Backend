@@ -2,9 +2,11 @@ package hub.orcana.service;
 
 import hub.orcana.dto.orcamento.CadastroOrcamentoInput;
 import hub.orcana.dto.orcamento.DetalhesOrcamentoOutput;
+import hub.orcana.tables.Agendamento;
 import hub.orcana.tables.Orcamento;
 import hub.orcana.tables.StatusOrcamento;
 import hub.orcana.tables.Usuario;
+import hub.orcana.tables.repository.AgendamentoRepository;
 import hub.orcana.tables.repository.OrcamentoRepository;
 import hub.orcana.tables.repository.UsuarioRepository;
 import org.slf4j.Logger;
@@ -30,13 +32,15 @@ public class OrcamentoService implements OrcamentoSubject{
     private final EmailService emailService;
     private final List<OrcamentoObserver> observers = new ArrayList<>();
     private final UsuarioRepository usuarioRepository;
+    private final AgendamentoRepository agendamentoRepository;
 
-    public OrcamentoService(OrcamentoRepository repository, GerenciadorDeArquivosService gerenciadorService, EmailService emailService, UsuarioRepository usuarioRepository) {
+    public OrcamentoService(OrcamentoRepository repository, GerenciadorDeArquivosService gerenciadorService, EmailService emailService, UsuarioRepository usuarioRepository, AgendamentoRepository agendamentoRepository) {
         this.repository = repository;
         this.gerenciadorService = gerenciadorService;
         this.emailService = emailService;
         this.attach(emailService);
         this.usuarioRepository = usuarioRepository;
+        this.agendamentoRepository = agendamentoRepository;
     }
 
     @Override
@@ -76,7 +80,6 @@ public class OrcamentoService implements OrcamentoSubject{
     public Orcamento postOrcamento(CadastroOrcamentoInput dados) {
 
         List<String> urlImagens = new ArrayList<>();
-        Long usuario_id = verificarEmailExistente(dados.email());
 
         if (dados.imagemReferencia() != null && !dados.imagemReferencia().isEmpty()) {
             for (MultipartFile file : dados.imagemReferencia()) {
@@ -88,6 +91,8 @@ public class OrcamentoService implements OrcamentoSubject{
         // gera codigo unico
         String codigo = gerarCodigoOrcamento();
 
+        Usuario usuario = usuarioRepository.findByEmail(dados.email()).orElse(null);
+
         Orcamento orcamento = new Orcamento(
                 codigo,
                 dados.nome(),
@@ -97,9 +102,16 @@ public class OrcamentoService implements OrcamentoSubject{
                 dados.cores(),
                 dados.localCorpo(),
                 urlImagens,
-                usuario_id,
+                usuario != null ? usuario.getId() : null,
                 StatusOrcamento.PENDENTE
         );
+
+        if (usuario != null) {
+            orcamento.setUsuario(usuario);
+            log.info("Orçamento {} vinculado ao usuário existente: {}", codigo, usuario.getEmail());
+        } else {
+            log.info("Orçamento {} criado sem vínculo com usuário (email não cadastrado)", codigo);
+        }
 
         Orcamento salvo = repository.save(orcamento);
 
@@ -124,10 +136,73 @@ public class OrcamentoService implements OrcamentoSubject{
                         orcamento.getCores(),
                         orcamento.getLocalCorpo(),
                         orcamento.getImagemReferencia(),
+                        orcamento.getValor(),
+                        orcamento.getTempo(),
                         orcamento.getStatus()
                 )
         ).toList(
         );
+    }
+
+    public List<DetalhesOrcamentoOutput> findOrcamentosByUsuarioId(Long usuarioId) {
+        return repository.findByUsuarioId(usuarioId).stream().map(
+                orcamento -> {
+                    log.info("Orçamento {}: imagemReferencia = {}", orcamento.getCodigoOrcamento(), orcamento.getImagemReferencia());
+                    return new DetalhesOrcamentoOutput(
+                            orcamento.getCodigoOrcamento(),
+                            orcamento.getNome(),
+                            orcamento.getEmail(),
+                            orcamento.getIdeia(),
+                            orcamento.getTamanho(),
+                            orcamento.getCores(),
+                            orcamento.getLocalCorpo(),
+                            orcamento.getImagemReferencia(),
+                            orcamento.getValor(),
+                            orcamento.getTempo(),
+                            orcamento.getStatus()
+                    );
+                }
+        ).toList();
+    }
+
+    public Orcamento atualizarOrcamento(String codigo, Double tamanho, String localCorpo, String cores, String ideia) {
+        log.info("Atualizando orçamento: {}", codigo);
+        Orcamento orcamento = repository.findByCodigoOrcamento(codigo)
+                .orElseThrow(() -> new RuntimeException("Orçamento não encontrado: " + codigo));
+        
+        if (tamanho != null) {
+            orcamento.setTamanho(tamanho);
+        }
+        if (localCorpo != null && !localCorpo.isBlank()) {
+            orcamento.setLocalCorpo(localCorpo);
+        }
+        if (cores != null && !cores.isBlank()) {
+            orcamento.setCores(cores);
+        }
+        if (ideia != null && !ideia.isBlank()) {
+            orcamento.setIdeia(ideia);
+        }
+        
+        return repository.save(orcamento);
+    }
+
+    public boolean verificarSeTemAgendamento(String codigo) {
+        return agendamentoRepository.findByOrcamentoCodigoOrcamento(codigo).isPresent();
+    }
+
+    public void deletarOrcamento(String codigo) {
+        log.info("Deletando orçamento: {}", codigo);
+        Orcamento orcamento = repository.findByCodigoOrcamento(codigo)
+                .orElseThrow(() -> new RuntimeException("Orçamento não encontrado: " + codigo));
+
+        agendamentoRepository.findByOrcamentoCodigoOrcamento(codigo).ifPresent(agendamento -> {
+            log.info("Deletando agendamento relacionado ao orçamento {}: {}", codigo, agendamento.getId());
+            agendamentoRepository.delete(agendamento);
+            log.info("Agendamento {} deletado com sucesso", agendamento.getId());
+        });
+
+        repository.delete(orcamento);
+        log.info("Orçamento {} deletado com sucesso", codigo);
     }
 
     public DetalhesOrcamentoOutput atualizarOrcamento(String codigo, Map<String, Object> dados) {
@@ -233,6 +308,8 @@ public class OrcamentoService implements OrcamentoSubject{
                 salvo.getCores(),
                 salvo.getLocalCorpo(),
                 salvo.getImagemReferencia(),
+                salvo.getValor(),
+                salvo.getTempo(),
                 salvo.getStatus()
         );
     }

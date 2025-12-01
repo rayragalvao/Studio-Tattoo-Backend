@@ -98,12 +98,16 @@ public class UsuarioService {
             return;
         }
 
+        log.info("Encontrados {} orçamento(s) para associar ao usuário {}", orcamentosEncontrados.size(), usuario.getEmail());
+        
         orcamentosEncontrados.forEach(orcamento -> {
-            log.info("Associando orçamento {} ao novo usuário {}", orcamento.getCodigoOrcamento(), usuario.getEmail());
+            log.info("Associando orçamento {} ao usuário ID: {} ({})", 
+                orcamento.getCodigoOrcamento(), usuario.getId(), usuario.getEmail());
             orcamento.setUsuario(usuario);
         });
 
         orcamentoRepository.saveAll(orcamentosEncontrados);
+        log.info("Orçamentos associados com sucesso ao usuário {}", usuario.getEmail());
     }
 
     public UsuarioToken autenticar(LoginUsuario usuario) {
@@ -148,6 +152,30 @@ public class UsuarioService {
         usuario.setId(id);
         Usuario atualizado = repository.save(usuario);
         log.info("Usuário atualizado com sucesso: ID {}", atualizado.getId());
+        return UsuarioMapper.of(atualizado);
+    }
+
+    @Transactional
+    public ListarUsuarios atualizarPerfil(Long id, AtualizarPerfilUsuario perfilUsuario) {
+        Usuario usuario = repository.findById(id)
+                .orElseThrow(() -> new DependenciaNaoEncontradaException("Usuário"));
+
+        usuario.setNome(perfilUsuario.nome());
+        usuario.setTelefone(perfilUsuario.telefone());
+        
+        if (perfilUsuario.dtNasc() != null && !perfilUsuario.dtNasc().isEmpty()) {
+            try {
+                java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+                sdf.setTimeZone(java.util.TimeZone.getDefault());
+                usuario.setDtNasc(sdf.parse(perfilUsuario.dtNasc() + "T12:00:00"));
+            } catch (java.text.ParseException e) {
+                log.error("Erro ao fazer parse da data: {}", perfilUsuario.dtNasc(), e);
+                throw new IllegalArgumentException("Formato de data inválido. Use yyyy-MM-dd");
+            }
+        }
+
+        Usuario atualizado = repository.save(usuario);
+        log.info("Perfil do usuário atualizado com sucesso: ID {}", atualizado.getId());
         return UsuarioMapper.of(atualizado);
     }
 
