@@ -13,6 +13,6 @@ public interface EstoqueRepository extends JpaRepository<Estoque, Long> {
 
     List<Estoque> findEstoqueByNome(String nome);
 
-    @Query("SELECT e FROM Estoque e WHERE e.minAviso IS NOT NULL AND e.quantidade < e.minAviso")
+    @Query("SELECT e FROM Estoque e WHERE e.quantidade < e.minAviso")
     List<Estoque> findAllByQuantidadeLessThanMinAviso(); // alerta de estoque
 }
