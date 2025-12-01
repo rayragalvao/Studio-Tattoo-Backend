@@ -1,0 +1,583 @@
+package hub.orcana.service;
+
+import hub.orcana.dto.dashboard.DashboardOutput;
+import hub.orcana.tables.Agendamento;
+import hub.orcana.tables.Estoque;
+import hub.orcana.tables.Orcamento;
+import hub.orcana.tables.StatusAgendamento;
+import hub.orcana.tables.StatusOrcamento;
+import hub.orcana.tables.Usuario;
+import hub.orcana.tables.repository.AgendamentoRepository;
+import hub.orcana.tables.repository.EstoqueRepository;
+import hub.orcana.tables.repository.OrcamentoRepository;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
+
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.*;
+
+@ExtendWith(MockitoExtension.class)
+class DashboardServiceTest {
+
+    @Mock
+    private AgendamentoRepository agendamentoRepository;
+
+    @Mock
+    private OrcamentoRepository orcamentoRepository;
+
+    @Mock
+    private EstoqueRepository estoqueRepository;
+
+    @InjectMocks
+    private DashboardService dashboardService;
+
+    private Usuario usuario;
+    private Orcamento orcamento;
+    private Agendamento agendamento;
+    private Estoque estoque;
+
+    @BeforeEach
+    void setUp() {
+        usuario = new Usuario();
+        usuario.setId(1L);
+        usuario.setNome("João Silva");
+        usuario.setEmail("joao@email.com");
+
+        orcamento = new Orcamento("ORC123", 1L, "João Silva", "joao@email.com",
+                "Dragão nas costas", 20.5, "Preto e Vermelho", "Costas", null);
+        orcamento.setValor(1500.0);
+
+        agendamento = new Agendamento();
+        agendamento.setId(1L);
+        agendamento.setDataHora(LocalDateTime.now().plusDays(1));
+        agendamento.setStatus(StatusAgendamento.CONCLUIDO);
+        agendamento.setUsuario(usuario);
+        agendamento.setOrcamento(orcamento);
+
+        estoque = new Estoque("Tinta Preta", 5.0, "ml", 10.0);
+        estoque.setId(1L);
+    }
+
+    // ==================== TESTES PARA getFaturamentoUltimos12Meses ====================
+
+    @Test
+    @DisplayName("Deve retornar faturamento dos últimos 12 meses com valores corretos")
+    void deveRetornarFaturamentoUltimos12Meses() {
+        // Arrange
+        LocalDateTime hoje = LocalDate.now().atTime(23, 59, 59);
+
+        // Criar agendamentos para diferentes meses
+        List<Agendamento> agendamentosMes1 = criarAgendamentosParaMes(hoje, 1000.0, 500.0);
+        List<Agendamento> agendamentosMes2 = criarAgendamentosParaMes(hoje.minusMonths(1), 2000.0);
+        List<Agendamento> agendamentosMes3 = criarAgendamentosParaMes(hoje.minusMonths(2), 1500.0, 800.0);
+
+        when(agendamentoRepository.findAllWithOrcamentoByDataHoraBetween(any(), any()))
+                .thenReturn(agendamentosMes1)
+                .thenReturn(agendamentosMes2)
+                .thenReturn(agendamentosMes3)
+                .thenReturn(Collections.emptyList())
+                .thenReturn(Collections.emptyList())
+                .thenReturn(Collections.emptyList())
+                .thenReturn(Collections.emptyList())
+                .thenReturn(Collections.emptyList())
+                .thenReturn(Collections.emptyList())
+                .thenReturn(Collections.emptyList())
+                .thenReturn(Collections.emptyList())
+                .thenReturn(Collections.emptyList());
+
+        // Act
+        List<Double> resultado = dashboardService.getFaturamentoUltimos12Meses();
+
+        // Assert
+        assertNotNull(resultado);
+        assertEquals(12, resultado.size());
+        verify(agendamentoRepository, times(12)).findAllWithOrcamentoByDataHoraBetween(any(), any());
+    }
+
+    @Test
+    @DisplayName("Deve contar apenas agendamentos concluídos no faturamento")
+    void deveContarApenasAgendamentosConcluidos() {
+        // Arrange
+        Agendamento agendamentoConcluido = criarAgendamento(1L, StatusAgendamento.CONCLUIDO, 1000.0);
+        Agendamento agendamentoPendente = criarAgendamento(2L, StatusAgendamento.PENDENTE, 500.0);
+        Agendamento agendamentoCancelado = criarAgendamento(3L, StatusAgendamento.CANCELADO, 300.0);
+
+        List<Agendamento> agendamentos = Arrays.asList(
+                agendamentoConcluido,
+                agendamentoPendente,
+                agendamentoCancelado
+        );
+
+        when(agendamentoRepository.findAllWithOrcamentoByDataHoraBetween(any(), any()))
+                .thenReturn(agendamentos)
+                .thenReturn(Collections.emptyList())
+                .thenReturn(Collections.emptyList())
+                .thenReturn(Collections.emptyList())
+                .thenReturn(Collections.emptyList())
+                .thenReturn(Collections.emptyList())
+                .thenReturn(Collections.emptyList())
+                .thenReturn(Collections.emptyList())
+                .thenReturn(Collections.emptyList())
+                .thenReturn(Collections.emptyList())
+                .thenReturn(Collections.emptyList())
+                .thenReturn(Collections.emptyList());
+
+        // Act
+        List<Double> resultado = dashboardService.getFaturamentoUltimos12Meses();
+
+        // Assert
+        assertNotNull(resultado);
+        assertEquals(12, resultado.size());
+        // Primeiro mês deve ter apenas o valor do agendamento concluído
+        assertEquals(1000.0, resultado.get(11)); // Último item (mês atual)
+    }
+
+    @Test
+    @DisplayName("Deve retornar zero quando não houver agendamentos no mês")
+    void deveRetornarZeroQuandoNaoHouverAgendamentos() {
+        // Arrange
+        when(agendamentoRepository.findAllWithOrcamentoByDataHoraBetween(any(), any()))
+                .thenReturn(Collections.emptyList());
+
+        // Act
+        List<Double> resultado = dashboardService.getFaturamentoUltimos12Meses();
+
+        // Assert
+        assertNotNull(resultado);
+        assertEquals(12, resultado.size());
+        assertTrue(resultado.stream().allMatch(valor -> valor == 0.0));
+    }
+
+    @Test
+    @DisplayName("Deve tratar agendamentos com orçamento null")
+    void deveTratarAgendamentosComOrcamentoNull() {
+        // Arrange
+        Agendamento agendamentoSemOrcamento = new Agendamento();
+        agendamentoSemOrcamento.setId(1L);
+        agendamentoSemOrcamento.setStatus(StatusAgendamento.CONCLUIDO);
+        agendamentoSemOrcamento.setOrcamento(null);
+
+        when(agendamentoRepository.findAllWithOrcamentoByDataHoraBetween(any(), any()))
+                .thenReturn(Arrays.asList(agendamentoSemOrcamento))
+                .thenReturn(Collections.emptyList())
+                .thenReturn(Collections.emptyList())
+                .thenReturn(Collections.emptyList())
+                .thenReturn(Collections.emptyList())
+                .thenReturn(Collections.emptyList())
+                .thenReturn(Collections.emptyList())
+                .thenReturn(Collections.emptyList())
+                .thenReturn(Collections.emptyList())
+                .thenReturn(Collections.emptyList())
+                .thenReturn(Collections.emptyList())
+                .thenReturn(Collections.emptyList());
+
+        // Act
+        List<Double> resultado = dashboardService.getFaturamentoUltimos12Meses();
+
+        // Assert
+        assertNotNull(resultado);
+        assertEquals(0.0, resultado.get(11)); // Deve ser 0 pois orçamento é null
+    }
+
+    @Test
+    @DisplayName("Deve tratar agendamentos com valor null no orçamento")
+    void deveTratarAgendamentosComValorNullNoOrcamento() {
+        // Arrange
+        Orcamento orcamentoSemValor = new Orcamento("ORC456", 1L, "João Silva", "joao@email.com",
+                "Tatuagem", 10.0, "Preto", "Braço", null);
+
+        Agendamento agendamentoComOrcamentoSemValor = criarAgendamento(1L, StatusAgendamento.CONCLUIDO, null);
+        agendamentoComOrcamentoSemValor.setOrcamento(orcamentoSemValor);
+
+        when(agendamentoRepository.findAllWithOrcamentoByDataHoraBetween(any(), any()))
+                .thenReturn(Arrays.asList(agendamentoComOrcamentoSemValor))
+                .thenReturn(Collections.emptyList())
+                .thenReturn(Collections.emptyList())
+                .thenReturn(Collections.emptyList())
+                .thenReturn(Collections.emptyList())
+                .thenReturn(Collections.emptyList())
+                .thenReturn(Collections.emptyList())
+                .thenReturn(Collections.emptyList())
+                .thenReturn(Collections.emptyList())
+                .thenReturn(Collections.emptyList())
+                .thenReturn(Collections.emptyList())
+                .thenReturn(Collections.emptyList());
+
+        // Act
+        List<Double> resultado = dashboardService.getFaturamentoUltimos12Meses();
+
+        // Assert
+        assertNotNull(resultado);
+        assertEquals(0.0, resultado.get(11)); // Deve ser 0 pois valor é null
+    }
+
+    @Test
+    @DisplayName("Deve somar múltiplos agendamentos do mesmo mês")
+    void deveSomarMultiplosAgendamentosDoMesmoMes() {
+        // Arrange
+        List<Agendamento> agendamentos = Arrays.asList(
+                criarAgendamento(1L, StatusAgendamento.CONCLUIDO, 1000.0),
+                criarAgendamento(2L, StatusAgendamento.CONCLUIDO, 1500.0),
+                criarAgendamento(3L, StatusAgendamento.CONCLUIDO, 2000.0)
+        );
+
+        when(agendamentoRepository.findAllWithOrcamentoByDataHoraBetween(any(), any()))
+                .thenReturn(agendamentos)
+                .thenReturn(Collections.emptyList())
+                .thenReturn(Collections.emptyList())
+                .thenReturn(Collections.emptyList())
+                .thenReturn(Collections.emptyList())
+                .thenReturn(Collections.emptyList())
+                .thenReturn(Collections.emptyList())
+                .thenReturn(Collections.emptyList())
+                .thenReturn(Collections.emptyList())
+                .thenReturn(Collections.emptyList())
+                .thenReturn(Collections.emptyList())
+                .thenReturn(Collections.emptyList());
+
+        // Act
+        List<Double> resultado = dashboardService.getFaturamentoUltimos12Meses();
+
+        // Assert
+        assertNotNull(resultado);
+        assertEquals(4500.0, resultado.get(11)); // Soma: 1000 + 1500 + 2000
+    }
+
+    @Test
+    @DisplayName("Deve reverter a ordem dos meses para cronológico")
+    void deveReverterOrdemDosMesesParaCronologico() {
+        // Arrange
+        when(agendamentoRepository.findAllWithOrcamentoByDataHoraBetween(any(), any()))
+                .thenReturn(criarAgendamentosParaMes(LocalDate.now().atTime(23, 59, 59), 100.0))
+                .thenReturn(criarAgendamentosParaMes(LocalDate.now().atTime(23, 59, 59), 200.0))
+                .thenReturn(criarAgendamentosParaMes(LocalDate.now().atTime(23, 59, 59), 300.0))
+                .thenReturn(Collections.emptyList())
+                .thenReturn(Collections.emptyList())
+                .thenReturn(Collections.emptyList())
+                .thenReturn(Collections.emptyList())
+                .thenReturn(Collections.emptyList())
+                .thenReturn(Collections.emptyList())
+                .thenReturn(Collections.emptyList())
+                .thenReturn(Collections.emptyList())
+                .thenReturn(Collections.emptyList());
+
+        // Act
+        List<Double> resultado = dashboardService.getFaturamentoUltimos12Meses();
+
+        // Assert
+        assertNotNull(resultado);
+        assertEquals(12, resultado.size());
+        // A lista deve estar em ordem cronológica (mais antigo primeiro)
+    }
+
+    // ==================== TESTES PARA getDashboardKPIs ====================
+
+    @Test
+    @DisplayName("Deve retornar próximo agendamento pendente")
+    void deveRetornarProximoAgendamentoPendente() {
+        // Arrange
+        Agendamento proximoAgendamento = criarAgendamento(1L, StatusAgendamento.PENDENTE, 1000.0);
+        proximoAgendamento.setDataHora(LocalDateTime.now().plusDays(1));
+
+        when(agendamentoRepository.findTopByStatusOrderByDataHoraAsc(StatusAgendamento.PENDENTE))
+                .thenReturn(Optional.of(proximoAgendamento));
+        when(orcamentoRepository.countByStatus(StatusOrcamento.PENDENTE)).thenReturn(5L);
+        when(agendamentoRepository.findAllByDataHoraBetween(any(), any()))
+                .thenReturn(Collections.emptyList());
+        when(estoqueRepository.findAllByQuantidadeLessThanMinAviso())
+                .thenReturn(Collections.emptyList());
+
+        // Act
+        DashboardOutput resultado = dashboardService.getDashboardKPIs();
+
+        // Assert
+        assertNotNull(resultado);
+        assertNotNull(resultado.proximoAgendamento());
+        assertEquals(1L, resultado.proximoAgendamento().getId());
+        assertEquals(StatusAgendamento.PENDENTE, resultado.proximoAgendamento().getStatus());
+    }
+
+    @Test
+    @DisplayName("Deve retornar null quando não houver próximo agendamento")
+    void deveRetornarNullQuandoNaoHouverProximoAgendamento() {
+        // Arrange
+        when(agendamentoRepository.findTopByStatusOrderByDataHoraAsc(StatusAgendamento.PENDENTE))
+                .thenReturn(Optional.empty());
+        when(orcamentoRepository.countByStatus(StatusOrcamento.PENDENTE)).thenReturn(0L);
+        when(agendamentoRepository.findAllByDataHoraBetween(any(), any()))
+                .thenReturn(Collections.emptyList());
+        when(estoqueRepository.findAllByQuantidadeLessThanMinAviso())
+                .thenReturn(Collections.emptyList());
+
+        // Act
+        DashboardOutput resultado = dashboardService.getDashboardKPIs();
+
+        // Assert
+        assertNotNull(resultado);
+        assertNull(resultado.proximoAgendamento());
+    }
+
+    @Test
+    @DisplayName("Deve contar orçamentos pendentes corretamente")
+    void deveContarOrcamentosPendentesCorretamente() {
+        // Arrange
+        when(agendamentoRepository.findTopByStatusOrderByDataHoraAsc(StatusAgendamento.PENDENTE))
+                .thenReturn(Optional.empty());
+        when(orcamentoRepository.countByStatus(StatusOrcamento.PENDENTE)).thenReturn(15L);
+        when(agendamentoRepository.findAllByDataHoraBetween(any(), any()))
+                .thenReturn(Collections.emptyList());
+        when(estoqueRepository.findAllByQuantidadeLessThanMinAviso())
+                .thenReturn(Collections.emptyList());
+
+        // Act
+        DashboardOutput resultado = dashboardService.getDashboardKPIs();
+
+        // Assert
+        assertNotNull(resultado);
+        assertEquals(15L, resultado.orcamentosPendentes());
+        verify(orcamentoRepository, times(1)).countByStatus(StatusOrcamento.PENDENTE);
+    }
+
+    @Test
+    @DisplayName("Deve retornar zero quando não houver orçamentos pendentes")
+    void deveRetornarZeroQuandoNaoHouverOrcamentosPendentes() {
+        // Arrange
+        when(agendamentoRepository.findTopByStatusOrderByDataHoraAsc(StatusAgendamento.PENDENTE))
+                .thenReturn(Optional.empty());
+        when(orcamentoRepository.countByStatus(StatusOrcamento.PENDENTE)).thenReturn(0L);
+        when(agendamentoRepository.findAllByDataHoraBetween(any(), any()))
+                .thenReturn(Collections.emptyList());
+        when(estoqueRepository.findAllByQuantidadeLessThanMinAviso())
+                .thenReturn(Collections.emptyList());
+
+        // Act
+        DashboardOutput resultado = dashboardService.getDashboardKPIs();
+
+        // Assert
+        assertNotNull(resultado);
+        assertEquals(0L, resultado.orcamentosPendentes());
+    }
+
+    @Test
+    @DisplayName("Deve retornar agendamentos do dia atual")
+    void deveRetornarAgendamentosDoDiaAtual() {
+        // Arrange
+        LocalDateTime agora = LocalDateTime.now();
+        List<Agendamento> agendamentosDoDia = Arrays.asList(
+                criarAgendamentoComData(1L, agora.withHour(10).withMinute(0)),
+                criarAgendamentoComData(2L, agora.withHour(14).withMinute(0)),
+                criarAgendamentoComData(3L, agora.withHour(16).withMinute(30))
+        );
+
+        when(agendamentoRepository.findTopByStatusOrderByDataHoraAsc(StatusAgendamento.PENDENTE))
+                .thenReturn(Optional.empty());
+        when(orcamentoRepository.countByStatus(StatusOrcamento.PENDENTE)).thenReturn(0L);
+        when(agendamentoRepository.findAllByDataHoraBetween(any(), any()))
+                .thenReturn(agendamentosDoDia);
+        when(estoqueRepository.findAllByQuantidadeLessThanMinAviso())
+                .thenReturn(Collections.emptyList());
+
+        // Act
+        DashboardOutput resultado = dashboardService.getDashboardKPIs();
+
+        // Assert
+        assertNotNull(resultado);
+        assertEquals(3, resultado.agendamentosDoDia().size());
+        verify(agendamentoRepository, times(1)).findAllByDataHoraBetween(any(), any());
+    }
+
+    @Test
+    @DisplayName("Deve retornar lista vazia quando não houver agendamentos do dia")
+    void deveRetornarListaVaziaQuandoNaoHouverAgendamentosDoDia() {
+        // Arrange
+        when(agendamentoRepository.findTopByStatusOrderByDataHoraAsc(StatusAgendamento.PENDENTE))
+                .thenReturn(Optional.empty());
+        when(orcamentoRepository.countByStatus(StatusOrcamento.PENDENTE)).thenReturn(0L);
+        when(agendamentoRepository.findAllByDataHoraBetween(any(), any()))
+                .thenReturn(Collections.emptyList());
+        when(estoqueRepository.findAllByQuantidadeLessThanMinAviso())
+                .thenReturn(Collections.emptyList());
+
+        // Act
+        DashboardOutput resultado = dashboardService.getDashboardKPIs();
+
+        // Assert
+        assertNotNull(resultado);
+        assertTrue(resultado.agendamentosDoDia().isEmpty());
+    }
+
+    @Test
+    @DisplayName("Deve buscar agendamentos do dia entre início e fim do dia")
+    void deveBuscarAgendamentosEntrInicioEFimDoDia() {
+        // Arrange
+        LocalDate hoje = LocalDate.now();
+        LocalDateTime inicioEsperado = hoje.atStartOfDay();
+        LocalDateTime fimEsperado = hoje.atTime(23, 59, 59);
+
+        when(agendamentoRepository.findTopByStatusOrderByDataHoraAsc(StatusAgendamento.PENDENTE))
+                .thenReturn(Optional.empty());
+        when(orcamentoRepository.countByStatus(StatusOrcamento.PENDENTE)).thenReturn(0L);
+        when(agendamentoRepository.findAllByDataHoraBetween(any(), any()))
+                .thenReturn(Collections.emptyList());
+        when(estoqueRepository.findAllByQuantidadeLessThanMinAviso())
+                .thenReturn(Collections.emptyList());
+
+        // Act
+        dashboardService.getDashboardKPIs();
+
+        // Assert
+        verify(agendamentoRepository, times(1)).findAllByDataHoraBetween(any(), any());
+    }
+
+    @Test
+    @DisplayName("Deve retornar alertas de estoque abaixo do mínimo")
+    void deveRetornarAlertasDeEstoqueAbaixoDoMinimo() {
+        // Arrange
+        List<Estoque> alertas = Arrays.asList(
+                criarEstoque(1L, "Tinta Preta", 5, 10),
+                criarEstoque(2L, "Tinta Vermelha", 3, 15),
+                criarEstoque(3L, "Agulhas", 8, 20)
+        );
+
+        when(agendamentoRepository.findTopByStatusOrderByDataHoraAsc(StatusAgendamento.PENDENTE))
+                .thenReturn(Optional.empty());
+        when(orcamentoRepository.countByStatus(StatusOrcamento.PENDENTE)).thenReturn(0L);
+        when(agendamentoRepository.findAllByDataHoraBetween(any(), any()))
+                .thenReturn(Collections.emptyList());
+        when(estoqueRepository.findAllByQuantidadeLessThanMinAviso())
+                .thenReturn(alertas);
+
+        // Act
+        DashboardOutput resultado = dashboardService.getDashboardKPIs();
+
+        // Assert
+        assertNotNull(resultado);
+        assertEquals(3, resultado.alertasEstoque().size());
+        verify(estoqueRepository, times(1)).findAllByQuantidadeLessThanMinAviso();
+    }
+
+    @Test
+    @DisplayName("Deve retornar lista vazia quando não houver alertas de estoque")
+    void deveRetornarListaVaziaQuandoNaoHouverAlertasDeEstoque() {
+        // Arrange
+        when(agendamentoRepository.findTopByStatusOrderByDataHoraAsc(StatusAgendamento.PENDENTE))
+                .thenReturn(Optional.empty());
+        when(orcamentoRepository.countByStatus(StatusOrcamento.PENDENTE)).thenReturn(0L);
+        when(agendamentoRepository.findAllByDataHoraBetween(any(), any()))
+                .thenReturn(Collections.emptyList());
+        when(estoqueRepository.findAllByQuantidadeLessThanMinAviso())
+                .thenReturn(Collections.emptyList());
+
+        // Act
+        DashboardOutput resultado = dashboardService.getDashboardKPIs();
+
+        // Assert
+        assertNotNull(resultado);
+        assertTrue(resultado.alertasEstoque().isEmpty());
+    }
+
+    @Test
+    @DisplayName("Deve retornar KPIs completos com todos os dados")
+    void deveRetornarKPIsCompletosComTodosDados() {
+        // Arrange
+        Agendamento proximoAgendamento = criarAgendamento(1L, StatusAgendamento.PENDENTE, 1000.0);
+        List<Agendamento> agendamentosDoDia = Arrays.asList(
+                criarAgendamento(2L, StatusAgendamento.CONFIRMADO, 1500.0)
+        );
+        List<Estoque> alertas = Arrays.asList(
+                criarEstoque(1L, "Tinta Preta", 5, 10)
+        );
+
+        when(agendamentoRepository.findTopByStatusOrderByDataHoraAsc(StatusAgendamento.PENDENTE))
+                .thenReturn(Optional.of(proximoAgendamento));
+        when(orcamentoRepository.countByStatus(StatusOrcamento.PENDENTE)).thenReturn(10L);
+        when(agendamentoRepository.findAllByDataHoraBetween(any(), any()))
+                .thenReturn(agendamentosDoDia);
+        when(estoqueRepository.findAllByQuantidadeLessThanMinAviso())
+                .thenReturn(alertas);
+
+        // Act
+        DashboardOutput resultado = dashboardService.getDashboardKPIs();
+
+        // Assert
+        assertNotNull(resultado);
+        assertNotNull(resultado.proximoAgendamento());
+        assertEquals(10L, resultado.orcamentosPendentes());
+        assertEquals(1, resultado.agendamentosDoDia().size());
+        assertEquals(1, resultado.alertasEstoque().size());
+    }
+
+    @Test
+    @DisplayName("Deve garantir que listas não sejam null no DashboardOutput")
+    void deveGarantirQueListasNaoSejamNull() {
+        // Arrange
+        when(agendamentoRepository.findTopByStatusOrderByDataHoraAsc(StatusAgendamento.PENDENTE))
+                .thenReturn(Optional.empty());
+        when(orcamentoRepository.countByStatus(StatusOrcamento.PENDENTE)).thenReturn(0L);
+        when(agendamentoRepository.findAllByDataHoraBetween(any(), any()))
+                .thenReturn(null); // Simular retorno null
+        when(estoqueRepository.findAllByQuantidadeLessThanMinAviso())
+                .thenReturn(null); // Simular retorno null
+
+        // Act
+        DashboardOutput resultado = dashboardService.getDashboardKPIs();
+
+        // Assert
+        assertNotNull(resultado);
+        assertNotNull(resultado.agendamentosDoDia()); // DashboardOutput deve garantir lista vazia
+        assertNotNull(resultado.alertasEstoque()); // DashboardOutput deve garantir lista vazia
+    }
+
+    // ==================== MÉTODOS AUXILIARES ====================
+
+    private Agendamento criarAgendamento(Long id, StatusAgendamento status, Double valorOrcamento) {
+        Agendamento agendamento = new Agendamento();
+        agendamento.setId(id);
+        agendamento.setStatus(status);
+        agendamento.setUsuario(usuario);
+
+        if (valorOrcamento != null) {
+            Orcamento orc = new Orcamento("ORC" + id, 1L, "João Silva", "joao@email.com",
+                    "Tatuagem", 10.0, "Preto", "Braço", null);
+            orc.setValor(valorOrcamento);
+            agendamento.setOrcamento(orc);
+        }
+
+        return agendamento;
+    }
+
+    private Agendamento criarAgendamentoComData(Long id, LocalDateTime dataHora) {
+        Agendamento agendamento = criarAgendamento(id, StatusAgendamento.CONFIRMADO, 1000.0);
+        agendamento.setDataHora(dataHora);
+        return agendamento;
+    }
+
+    private List<Agendamento> criarAgendamentosParaMes(LocalDateTime data, Double... valores) {
+        return Arrays.stream(valores)
+                .map(valor -> {
+                    Agendamento ag = criarAgendamento(1L, StatusAgendamento.CONCLUIDO, valor);
+                    ag.setDataHora(data);
+                    return ag;
+                })
+                .toList();
+    }
+
+    private Estoque criarEstoque(Long id, String nome, int quantidade, int minAviso) {
+        Estoque estoque = new Estoque(nome, (double) quantidade, "unidade", (double) minAviso);
+        estoque.setId(id);
+        return estoque;
+    }
+}
