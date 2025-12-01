@@ -157,28 +157,25 @@ public class    Orcamento {
     
     public StatusOrcamento getStatus() {
         return status;
-
-    public String getStatus() {
-        return email;
     }
 
-    public void setStatus(StatusOrcamento status) {
+    public void setStatus (StatusOrcamento status){
         this.status = status;
     }
 
-    public List<String> getImagemReferencia() { return imagemReferencia;}
+    public List<String> getImagemReferencia () {
+        return imagemReferencia;
+    }
 
-    public void setImagemReferencia(List<String> imagemReferencia) {
+    public void setImagemReferencia (List < String > imagemReferencia) {
         this.imagemReferencia = imagemReferencia;
     }
 
-    public String getLocalCorpo() {
+    public String getLocalCorpo () {
         return localCorpo;
     }
 
-    public void setLocalCorpo(String localCorpo) {
+    public void setLocalCorpo (String localCorpo){
         this.localCorpo = localCorpo;
     }
-}
-
 }
