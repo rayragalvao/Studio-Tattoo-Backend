@@ -66,7 +66,7 @@ public class AgendamentoService {
         }
 
         Agendamento novoAgendamento = AgendamentoMapper.of(agendamento, usuario, orcamento);
-        novoAgendamento.setStatus(StatusAgendamento.AGUARDANDO);
+        novoAgendamento.setStatus(StatusAgendamento.PENDENTE);
         Agendamento salvo = repository.save(novoAgendamento);
 
         return AgendamentoMapper.of(salvo);

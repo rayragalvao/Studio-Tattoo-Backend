@@ -34,7 +34,7 @@ class AgendamentoMapperTest {
         agendamento = new Agendamento();
         agendamento.setId(1L);
         agendamento.setDataHora(dataHora);
-        agendamento.setStatus(StatusAgendamento.AGUARDANDO);
+        agendamento.setStatus(StatusAgendamento.PENDENTE);
         agendamento.setUsuario(usuario);
         agendamento.setOrcamento(orcamento);
     }
@@ -49,7 +49,7 @@ class AgendamentoMapperTest {
         assertNotNull(output);
         assertEquals(1L, output.id());
         assertEquals(dataHora, output.dataHora());
-        assertEquals("AGUARDANDO", output.status());
+        assertEquals("PENDENTE", output.status());
         assertEquals("João Silva", output.nomeUsuario());
         assertEquals("joao@email.com", output.emailUsuario());
         assertEquals("Dragão nas costas", output.ideia());
@@ -66,7 +66,7 @@ class AgendamentoMapperTest {
                 "joao@email.com",
                 "ORC123",
                 dataHora,
-                StatusAgendamento.AGUARDANDO
+                StatusAgendamento.PENDENTE
         );
 
 
@@ -75,13 +75,13 @@ class AgendamentoMapperTest {
 
         assertNotNull(resultado);
         assertEquals(dataHora, resultado.getDataHora());
-        assertEquals(StatusAgendamento.AGUARDANDO, resultado.getStatus());
+        assertEquals(StatusAgendamento.PENDENTE, resultado.getStatus());
         assertEquals(usuario, resultado.getUsuario());
         assertEquals(orcamento, resultado.getOrcamento());
     }
 
     @Test
-    @DisplayName("Deve manter status como AGUARDANDO quando não especificado")
+    @DisplayName("Deve manter status como PENDENTE quando não especificado")
     void deveManterStatusPadraoQuandoNaoEspecificado() {
 
         CadastroAgendamentoInput input = new CadastroAgendamentoInput(
@@ -204,7 +204,7 @@ class AgendamentoMapperTest {
                 "joao@email.com",
                 "ORC123",
                 dataFutura,
-                StatusAgendamento.AGUARDANDO
+                StatusAgendamento.PENDENTE
         );
 
 

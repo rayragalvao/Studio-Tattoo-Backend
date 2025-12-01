@@ -43,7 +43,7 @@ class AgendamentoControllerTest {
         agendamentoOutput = new DetalhesAgendamentoOutput(
                 1L,
                 dataHora,
-                "AGUARDANDO",
+                "PENDENTE",
                 "João Silva",
                 "joao@email.com",
                 "ORC123",
@@ -58,7 +58,7 @@ class AgendamentoControllerTest {
                 "joao@email.com",
                 "ORC123",
                 dataHora,
-                StatusAgendamento.AGUARDANDO
+                StatusAgendamento.PENDENTE
         );
     }
 
@@ -183,19 +183,19 @@ class AgendamentoControllerTest {
     void deveRetornar200ComAgendamentosPorStatus() {
 
         List<DetalhesAgendamentoOutput> agendamentos = Arrays.asList(agendamentoOutput);
-        when(agendamentoService.getAgendamentosByStatus("AGUARDANDO")).thenReturn(agendamentos);
+        when(agendamentoService.getAgendamentosByStatus("PENDENTE")).thenReturn(agendamentos);
 
 
         ResponseEntity<List<DetalhesAgendamentoOutput>> response = 
-                agendamentoController.getAgendamentosByStatus("AGUARDANDO");
+                agendamentoController.getAgendamentosByStatus("PENDENTE");
 
 
         assertNotNull(response);
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertNotNull(response.getBody());
         assertEquals(1, response.getBody().size());
-        assertEquals("AGUARDANDO", response.getBody().get(0).status());
-        verify(agendamentoService, times(1)).getAgendamentosByStatus("AGUARDANDO");
+        assertEquals("PENDENTE", response.getBody().get(0).status());
+        verify(agendamentoService, times(1)).getAgendamentosByStatus("PENDENTE");
     }
 
     @Test
@@ -497,10 +497,10 @@ class AgendamentoControllerTest {
                 "joao@email.com",
                 "ORC123",
                 dataLimite,
-                StatusAgendamento.AGUARDANDO
+                StatusAgendamento.PENDENTE
         );
         DetalhesAgendamentoOutput outputFuturo = new DetalhesAgendamentoOutput(
-                1L, dataLimite, "AGUARDANDO", "João Silva", "joao@email.com",
+                1L, dataLimite, "PENDENTE", "João Silva", "joao@email.com",
                 "ORC123", "Dragão nas costas", 20.5, "Preto e Vermelho", "Costas", null
         );
         when(agendamentoService.postAgendamento(any(CadastroAgendamentoInput.class)))
