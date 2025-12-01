@@ -31,6 +31,13 @@ public interface AgendamentoRepository extends JpaRepository<Agendamento, Long> 
     @Query("SELECT a FROM Agendamento a LEFT JOIN FETCH a.orcamento WHERE a.dataHora BETWEEN :inicio AND :fim")
     List<Agendamento> findAllWithOrcamentoByDataHoraBetween(@Param("inicio") LocalDateTime inicio, @Param("fim") LocalDateTime fim);
 
+    @Query("SELECT DISTINCT a FROM Agendamento a " +
+           "LEFT JOIN FETCH a.usuario u " +
+           "LEFT JOIN FETCH a.orcamento o " +
+           "WHERE a.dataHora BETWEEN :inicio AND :fim " +
+           "ORDER BY a.dataHora ASC")
+    List<Agendamento> findAllWithUsuarioAndOrcamentoByDataHoraBetween(@Param("inicio") LocalDateTime inicio, @Param("fim") LocalDateTime fim);
+
     Optional<Agendamento> findByOrcamentoCodigoOrcamento(String codigoOrcamento);
 
     @Query("SELECT a FROM Agendamento a WHERE FUNCTION('DATE', a.dataHora) = FUNCTION('DATE', :data)")

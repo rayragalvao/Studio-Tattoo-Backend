@@ -59,8 +59,14 @@ public class DashboardService {
     }
 
     public DashboardOutput getDashboardKPIs() {
+        // Busca próximo agendamento futuro (não concluído ou cancelado) com Usuario e Orcamento carregados
+        LocalDateTime agora = LocalDateTime.now();
         Agendamento proximoAgendamento = agendamentoRepository
-                .findTopByStatusOrderByDataHoraAsc(StatusAgendamento.PENDENTE)
+                .findAllWithUsuarioAndOrcamentoByDataHoraBetween(agora, agora.plusYears(1))
+                .stream()
+                .filter(a -> a.getStatus() != StatusAgendamento.CONCLUIDO 
+                          && a.getStatus() != StatusAgendamento.CANCELADO)
+                .findFirst()
                 .orElse(null);
 
         long orcamentosPendentes = orcamentoRepository.countByStatus(StatusOrcamento.PENDENTE);
@@ -68,7 +74,9 @@ public class DashboardService {
         LocalDateTime inicioDoDia = LocalDate.now().atStartOfDay();
         LocalDateTime fimDoDia = LocalDate.now().atTime(23, 59, 59);
 
-        List<Agendamento> agendamentosDoDia = agendamentoRepository.findAllByDataHoraBetween(inicioDoDia, fimDoDia);
+        // Busca agendamentos do dia com Usuario e Orcamento carregados
+        List<Agendamento> agendamentosDoDia = agendamentoRepository
+                .findAllWithUsuarioAndOrcamentoByDataHoraBetween(inicioDoDia, fimDoDia);
         List<Estoque> alertasEstoque = estoqueRepository.findAllByQuantidadeLessThanMinAviso();
 
         return new DashboardOutput(proximoAgendamento, orcamentosPendentes, agendamentosDoDia, alertasEstoque);
