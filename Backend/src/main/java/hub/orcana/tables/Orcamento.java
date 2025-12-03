@@ -13,7 +13,7 @@ import java.util.List;
 @Entity
 @Table(name = "orcamento")
 @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
-public class    Orcamento {
+public class Orcamento {
     @Id
     @Column(name = "codigo_orcamento", unique = true, nullable = false, length = 20)
     private String codigoOrcamento;
@@ -70,7 +70,7 @@ public class    Orcamento {
         this.status = status;
     }
 
-    public Orcamento(String codigoOrcamento, Long id, String nome, String email, String ideia, Double tamanho, String cores, String localCorpo, List<String> imagemReferencia) {
+    public Orcamento(String codigoOrcamento, String nome, String email, String ideia, Double tamanho, String cores, String localCorpo, List<String> imagemReferencia) {
         this.codigoOrcamento = codigoOrcamento;
         this.nome = nome;
         this.email = email;
@@ -79,6 +79,21 @@ public class    Orcamento {
         this.cores = cores;
         this.localCorpo = localCorpo;
         this.imagemReferencia = imagemReferencia;
+    }
+
+    public Orcamento(String codigoOrcamento, String nome, String email, String ideia, Double valor, String cores, String localCorpo, Double tamanho, Time tempo, List<String> imagemReferencia, StatusOrcamento status, Usuario usuario) {
+        this.localCorpo = localCorpo;
+        this.codigoOrcamento = codigoOrcamento;
+        this.nome = nome;
+        this.email = email;
+        this.ideia = ideia;
+        this.valor = valor;
+        this.tamanho = tamanho;
+        this.cores = cores;
+        this.tempo = tempo;
+        this.imagemReferencia = imagemReferencia;
+        this.status = status;
+        this.usuario = usuario;
     }
 
     public Usuario getUsuario() {
@@ -154,12 +169,9 @@ public class    Orcamento {
     public void setEmail(String email) {
         this.email = email;
     }
-    
+
     public StatusOrcamento getStatus() {
         return status;
-
-    public String getStatus() {
-        return email;
     }
 
     public void setStatus(StatusOrcamento status) {
@@ -168,10 +180,6 @@ public class    Orcamento {
 
     public List<String> getImagemReferencia() { return imagemReferencia;}
 
-    public void setImagemReferencia(List<String> imagemReferencia) {
-        this.imagemReferencia = imagemReferencia;
-    }
-
     public String getLocalCorpo() {
         return localCorpo;
     }
@@ -179,6 +187,5 @@ public class    Orcamento {
     public void setLocalCorpo(String localCorpo) {
         this.localCorpo = localCorpo;
     }
-}
 
 }

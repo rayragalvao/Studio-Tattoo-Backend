@@ -18,6 +18,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.sql.Time;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Arrays;
@@ -56,8 +57,8 @@ class DashboardServiceTest {
         usuario.setNome("João Silva");
         usuario.setEmail("joao@email.com");
 
-        orcamento = new Orcamento("ORC123", 1L, "João Silva", "joao@email.com",
-                "Dragão nas costas", 20.5, "Preto e Vermelho", "Costas", 1500.0);
+        orcamento = new Orcamento("ORC123", "João Silva", "joao@email.com",
+                "Dragão nas costas", 1500.0, "Preto e Vermelho", "Costas", 2.0, Time.valueOf("2:00"), null, StatusOrcamento.APROVADO, usuario);
 
         agendamento = new Agendamento();
         agendamento.setId(1L);
@@ -68,9 +69,9 @@ class DashboardServiceTest {
 
         estoque = new Estoque();
         estoque.setId(1L);
-        estoque.setNomeProduto("Tinta Preta");
-        estoque.setQuantidade(5);
-        estoque.setMinAviso(10);
+        estoque.setNome("Tinta Preta");
+        estoque.setQuantidade(5.0);
+        estoque.setMinAviso(10.0);
     }
 
 
@@ -176,13 +177,13 @@ class DashboardServiceTest {
         List<Double> resultado = dashboardService.getFaturamentoUltimos12Meses();
 
         assertNotNull(resultado);
-        assertEquals(0.0, resultado.get(11)); /
+        assertEquals(0.0, resultado.get(11));
     }
 
     @Test
     @DisplayName("Deve tratar agendamentos com valor null no orçamento")
     void deveTratarAgendamentosComValorNullNoOrcamento() {
-        Orcamento orcamentoSemValor = new Orcamento("ORC456", 1L, "João Silva", "joao@email.com",
+        Orcamento orcamentoSemValor = new Orcamento("ORC456", "João Silva", "joao@email.com",
                 "Tatuagem", 10.0, "Preto", "Braço", null);
 
         Agendamento agendamentoComOrcamentoSemValor = criarAgendamento(1L, StatusAgendamento.CONCLUIDO, null);
@@ -400,9 +401,9 @@ class DashboardServiceTest {
     @DisplayName("Deve retornar alertas de estoque abaixo do mínimo")
     void deveRetornarAlertasDeEstoqueAbaixoDoMinimo() {
         List<Estoque> alertas = Arrays.asList(
-                criarEstoque(1L, "Tinta Preta", 5, 10),
-                criarEstoque(2L, "Tinta Vermelha", 3, 15),
-                criarEstoque(3L, "Agulhas", 8, 20)
+                criarEstoque(1L, "Tinta Preta", 5.0, 10.0),
+                criarEstoque(2L, "Tinta Vermelha", 3.0, 15.0),
+                criarEstoque(3L, "Agulhas", 8.0, 20.0)
         );
 
         when(agendamentoRepository.findTopByStatusOrderByDataHoraAsc(StatusAgendamento.PENDENTE))
@@ -445,7 +446,7 @@ class DashboardServiceTest {
                 criarAgendamento(2L, StatusAgendamento.CONFIRMADO, 1500.0)
         );
         List<Estoque> alertas = Arrays.asList(
-                criarEstoque(1L, "Tinta Preta", 5, 10)
+                criarEstoque(1L, "Tinta Preta", 5.0, 10.0)
         );
 
         when(agendamentoRepository.findTopByStatusOrderByDataHoraAsc(StatusAgendamento.PENDENTE))
@@ -491,8 +492,8 @@ class DashboardServiceTest {
         agendamento.setUsuario(usuario);
 
         if (valorOrcamento != null) {
-            Orcamento orc = new Orcamento("ORC" + id, 1L, "João Silva", "joao@email.com",
-                    "Tatuagem", 10.0, "Preto", "Braço", valorOrcamento);
+            Orcamento orc = new Orcamento("ORC" + id, "João Silva", "joao@email.com",
+                    "Tatuagem", valorOrcamento, "Preto", "Braço", 2.0, Time.valueOf("2:00"), null, StatusOrcamento.APROVADO, null);
             agendamento.setOrcamento(orc);
         }
 
@@ -515,10 +516,10 @@ class DashboardServiceTest {
                 .toList();
     }
 
-    private Estoque criarEstoque(Long id, String nome, int quantidade, int minAviso) {
+    private Estoque criarEstoque(Long id, String nome, Double quantidade, Double minAviso) {
         Estoque estoque = new Estoque();
         estoque.setId(id);
-        estoque.setNomeProduto(nome);
+        estoque.setNome(nome);
         estoque.setQuantidade(quantidade);
         estoque.setMinAviso(minAviso);
         return estoque;

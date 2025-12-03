@@ -57,7 +57,7 @@ class AgendamentoServiceTest {
         usuario.setNome("João Silva");
         usuario.setEmail("joao@email.com");
 
-        orcamento = new Orcamento("ORC123", 1L, "João Silva", "joao@email.com",
+        orcamento = new Orcamento("ORC123", "João Silva", "joao@email.com",
                 "Dragão nas costas", 20.5, "Preto e Vermelho", "Costas", null);
 
         agendamento = new Agendamento();
@@ -500,7 +500,7 @@ class AgendamentoServiceTest {
     @DisplayName("Deve atualizar orçamento de um agendamento")
     void deveAtualizarOrcamentoDeAgendamento() {
 
-        Orcamento novoOrcamento = new Orcamento("ORC456", 2L, "João Silva", "joao@email.com",
+        Orcamento novoOrcamento = new Orcamento("ORC456", "João Silva", "joao@email.com",
                 "Leão no braço", 15.0, "Colorido", "Braço", null);
 
         when(agendamentoRepository.findById(1L)).thenReturn(Optional.of(agendamento));

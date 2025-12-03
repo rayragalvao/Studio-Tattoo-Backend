@@ -16,6 +16,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mock.web.MockMultipartFile;
 
+import java.sql.Time;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -134,7 +135,9 @@ class OrcamentoControllerTest {
                 "Preto e vermelho",
                 "Braço direito",
                 List.of("url1.jpg"),
-                "PENDENTE"
+                null,
+                null,
+                StatusOrcamento.PENDENTE
         ));
         orcamentos.add(new DetalhesOrcamentoOutput(
                 "ORC-E5F6G7H8",
@@ -145,7 +148,9 @@ class OrcamentoControllerTest {
                 "Colorido",
                 "Tornozelo",
                 List.of("url2.jpg"),
-                "PENDENTE"
+                null,
+                null,
+                StatusOrcamento.PENDENTE
         ));
 
         when(servico.findAllOrcamentos()).thenReturn(orcamentos);
