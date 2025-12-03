@@ -155,8 +155,8 @@ public class    Orcamento {
         this.email = email;
     }
 
-    public String getStatus() {
-        return email;
+    public StatusOrcamento getStatus() {
+        return status;
     }
 
     public void setStatus(StatusOrcamento status) {
