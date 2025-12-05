@@ -13,7 +13,7 @@ import java.util.List;
 @Entity
 @Table(name = "orcamento")
 @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
-public class    Orcamento {
+public class Orcamento {
     @Id
     @Column(name = "codigo_orcamento", unique = true, nullable = false, length = 20)
     private String codigoOrcamento;
@@ -39,7 +39,7 @@ public class    Orcamento {
     private String localCorpo;
 
     @ElementCollection(fetch = FetchType.EAGER)
-    @CollectionTable(name = "orcamento_imagens", joinColumns = @JoinColumn(name = "orcamento_codigo"))
+    @CollectionTable(name = "orcamento_imagens", joinColumns = @JoinColumn(name = "codigo_orcamento"))
     @Column(name = "imagem_url", length = 500)
     private List<String> imagemReferencia;
 

@@ -35,7 +35,7 @@ INSERT INTO orcamento (codigo_orcamento, nome, email, ideia, valor, tamanho, cor
   ('ORC006', 'Luiza Pompermayer', 'luiza@email.com', 'Tatuagem minimalista', 120.00, 4.0,  'Preto', '01:15:00', 'Tornozelo', 'APROVADO', 2);
 
 -- Inserindo imagens de referência para os orçamentos
-INSERT INTO orcamento_imagens (orcamento_codigo, imagem_url) VALUES
+INSERT INTO orcamento_imagens (codigo_orcamento, imagem_url) VALUES
   ('ORC001', 'https://i.pinimg.com/736x/60/90/60/609060f0c63bc1f05cfba42e06ceb5a8.jpg'),
   ('ORC001', 'https://i.pinimg.com/736x/ac/85/9a/ac859a1c2308be0aaa94b28d9e76ce28.jpg'),
   ('ORC002', 'https://i.pinimg.com/736x/94/99/d4/9499d4c2b1c34ead6a1f7e12c2bfbb3b.jpg'),
