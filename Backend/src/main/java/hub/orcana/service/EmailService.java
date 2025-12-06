@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import hub.orcana.observer.EstoqueObserver;
 import hub.orcana.tables.Orcamento;
 
+import java.sql.Time;
 import java.util.List;
 
 @Service
@@ -24,6 +25,7 @@ public class EmailService implements EstoqueObserver, OrcamentoObserver {
         this.templateEmailRepository = templateEmailRepository;
     }
 
+    // código base para envio de e-mail
     public void enviarTextoSimples(String destinatario, String assunto, String texto) {
         SimpleMailMessage message = new SimpleMailMessage();
         message.setFrom("orcanatechschool@gmail.com"); // e-mail da aplicação Brevo
@@ -34,6 +36,7 @@ public class EmailService implements EstoqueObserver, OrcamentoObserver {
         mailSender.send(message);
     }
 
+    // quando um novo orçamento é criado, envia e-mail para o cliente
     public void enviaEmailNovoOrcamento(String emailCliente, String nomeCliente, String codigoOrcamento) {
         if (emailCliente == null || emailCliente.isBlank()) {
             throw new IllegalArgumentException("Destinatário inválido para envio de e-mail.");
@@ -62,6 +65,7 @@ public class EmailService implements EstoqueObserver, OrcamentoObserver {
         enviaEmailParaTatuador(orcamento, emailTatuador);
     }
 
+    // quando um novo orçamento é criado, envia e-mail para o tatuador (admin)
     private void enviaEmailParaTatuador(Orcamento orcamento, List<String> emailTatuador) {
         String assunto = templateEmailRepository.findByNomeTemplate("orcamento_tatuador")
                 .map(template -> template.getAssunto())
@@ -91,6 +95,7 @@ public class EmailService implements EstoqueObserver, OrcamentoObserver {
 
     }
 
+    // quando o estoque de um material atinge o limite mínimo, envia e-mail de alerta para o tatuador (admin)
     @Override
     public void updateEstoque(String materialNome, Double quantidadeAtual, Double minAviso) {
         if (minAviso == null || quantidadeAtual > minAviso) {
@@ -98,18 +103,45 @@ public class EmailService implements EstoqueObserver, OrcamentoObserver {
         }
 
         List<String> emailTatuador = usuarioRepository.getEmailByIsAdminTrue();
-        String assunto = "ALERTA CRÍTICO DE ESTOQUE: " + materialNome;
-        String texto = String.format(
-                "Atenção! O material '%s' atingiu o limite crítico.\n" +
-                        "Quantidade atual: %.2f %s. O limite mínimo definido é %.2f.\n" +
-                        "Por favor, providencie a reposição imediatamente.",
-                materialNome, quantidadeAtual, "unidades/ml/g", minAviso
-        );
+
+        String assuntoInicial = templateEmailRepository.findByNomeTemplate("estoque_baixo")
+                .map(template -> template.getAssunto())
+                .orElseThrow(() -> new IllegalStateException("Template 'estoque_critico' não encontrado"));
+
+        String assuntoFinal = assuntoInicial.replace("${nomeMaterial}", materialNome);
+
+        String textoInicial = templateEmailRepository.findByNomeTemplate("estoque_baixo")
+                .map(template -> template.getCorpoEmail().toString())
+                .orElseThrow(() -> new IllegalStateException("Template 'estoque_critico' não encontrado"));
+
+        String textoFinal = textoInicial
+                .replace("${nomeMaterial}", materialNome)
+                .replace("${qtdAtual}", String.format("%.2f", quantidadeAtual))
+                .replace("${limite}", String.format("%.2f", minAviso));
 
         emailTatuador.forEach(email -> {
-            enviarTextoSimples(email, assunto, texto);
+            enviarTextoSimples(email, assuntoFinal, textoFinal);
         });
     }
 
+    public void enviaEmailOrcamentoAprovado(String email, String nome, String codigoOrcamento, Double valor, Time tempo) {
+        String assuntoInicial = templateEmailRepository.findByNomeTemplate("orcamento_aprovado")
+                .map(template -> template.getAssunto())
+                .orElseThrow(() -> new IllegalStateException("Template 'orcamento_aprovado' não encontrado"));
+
+        String assuntoFinal = assuntoInicial.replace("${codigoOrcamento}", codigoOrcamento);
+
+        String textoInicial = templateEmailRepository.findByNomeTemplate("orcamento_aprovado")
+                .map(template -> template.getCorpoEmail().toString())
+                .orElseThrow(() -> new IllegalStateException("Template 'orcamento_aprovado' não encontrado"));
+
+        String textoFinal = textoInicial
+                .replace("${nomeCliente}", nome)
+                .replace("${codigoOrcamento}", codigoOrcamento)
+                .replace("${valor}", String.format("R$ %.2f", valor))
+                .replace("${tempo}", tempo.toString());
+
+        enviarTextoSimples(email, assuntoFinal, textoFinal);
+    }
 }
 

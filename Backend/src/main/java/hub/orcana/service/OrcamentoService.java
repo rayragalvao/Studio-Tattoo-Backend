@@ -274,27 +274,18 @@ public class OrcamentoService implements OrcamentoSubject{
         // Enviar email ao cliente informando o orçamento aprovado
         if (dados.containsKey("valor") && dados.containsKey("tempo")) {
             try {
-                log.info("Enviando e-mail de aprovação para: {}", salvo.getEmail());
-                String assunto = "Orçamento Aprovado - Júpiter Frito";
-                String corpo = String.format(
-                        "Olá %s,\n\n" +
-                                "Seu orçamento foi aprovado!\n\n" +
-                                "Código: %s\n" +
-                                "Valor: R$ %.2f\n" +
-                                "Tempo estimado: %s\n\n" +
-                                "Em breve entraremos em contato para agendar sua sessão.\n\n" +
-                                "Atenciosamente,\n" +
-                                "Equipe Júpiter Frito",
+                emailService.enviaEmailOrcamentoAprovado(
+                        salvo.getEmail(),
                         salvo.getNome(),
                         salvo.getCodigoOrcamento(),
                         salvo.getValor(),
                         salvo.getTempo()
                 );
-                emailService.enviarTextoSimples(salvo.getEmail(), assunto, corpo);
+                log.info("Enviando e-mail de aprovação para: {}", salvo.getEmail());
+
                 log.info("E-mail de aprovação enviado com sucesso para: {}", salvo.getEmail());
             } catch (Exception e) {
                 log.error("Erro ao enviar e-mail de aprovação: {}", e.getMessage());
-                // Não lança exceção para não interromper o fluxo
             }
         }
 
