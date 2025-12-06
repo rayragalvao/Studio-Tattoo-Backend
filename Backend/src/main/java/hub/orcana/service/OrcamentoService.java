@@ -169,7 +169,7 @@ public class OrcamentoService implements OrcamentoSubject{
         log.info("Atualizando orçamento: {}", codigo);
         Orcamento orcamento = repository.findByCodigoOrcamento(codigo)
                 .orElseThrow(() -> new RuntimeException("Orçamento não encontrado: " + codigo));
-        
+
         if (tamanho != null) {
             orcamento.setTamanho(tamanho);
         }
@@ -182,7 +182,7 @@ public class OrcamentoService implements OrcamentoSubject{
         if (ideia != null && !ideia.isBlank()) {
             orcamento.setIdeia(ideia);
         }
-        
+
         return repository.save(orcamento);
     }
 

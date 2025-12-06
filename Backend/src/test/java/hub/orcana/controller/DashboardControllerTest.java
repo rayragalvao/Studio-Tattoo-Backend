@@ -52,7 +52,7 @@ class DashboardControllerTest {
         usuario.setNome("João Silva");
         usuario.setEmail("joao@email.com");
 
-        Orcamento orcamento = new Orcamento("ORC123", 1L, "João Silva", "joao@email.com",
+        Orcamento orcamento = new Orcamento("ORC123", "João Silva", "joao@email.com",
                 "Dragão nas costas", 20.5, "Preto e Vermelho", "Costas", null);
         orcamento.setValor(1500.0);
 

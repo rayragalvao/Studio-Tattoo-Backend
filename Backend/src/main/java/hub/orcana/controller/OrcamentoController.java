@@ -100,11 +100,11 @@ public class OrcamentoController {
             description = "Retorna todos os orçamentos associados a um usuário")
     @SecurityRequirement(name = "Bearer")
     @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "Lista de orçamentos retornada com sucesso"),
-        @ApiResponse(responseCode = "204", description = "Nenhum orçamento encontrado para este usuário"),
-        @ApiResponse(responseCode = "401", description = "Token de autenticação inválido ou expirado"),
-        @ApiResponse(responseCode = "404", description = "Usuário não encontrado"),
-        @ApiResponse(responseCode = "500", description = "Erro interno do servidor")
+            @ApiResponse(responseCode = "200", description = "Lista de orçamentos retornada com sucesso"),
+            @ApiResponse(responseCode = "204", description = "Nenhum orçamento encontrado para este usuário"),
+            @ApiResponse(responseCode = "401", description = "Token de autenticação inválido ou expirado"),
+            @ApiResponse(responseCode = "404", description = "Usuário não encontrado"),
+            @ApiResponse(responseCode = "500", description = "Erro interno do servidor")
     })
     public ResponseEntity<List<DetalhesOrcamentoOutput>> getOrcamentosPorUsuario(@PathVariable Long usuarioId) {
         log.info("Iniciando busca por orçamentos do usuário ID: {}", usuarioId);
@@ -128,11 +128,11 @@ public class OrcamentoController {
             description = "Permite atualizar dados do orçamento como tamanho, local do corpo, cores e descrição")
     @SecurityRequirement(name = "Bearer")
     @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "Orçamento atualizado com sucesso"),
-        @ApiResponse(responseCode = "400", description = "Dados inválidos"),
-        @ApiResponse(responseCode = "401", description = "Token de autenticação inválido ou expirado"),
-        @ApiResponse(responseCode = "404", description = "Orçamento não encontrado"),
-        @ApiResponse(responseCode = "500", description = "Erro interno do servidor")
+            @ApiResponse(responseCode = "200", description = "Orçamento atualizado com sucesso"),
+            @ApiResponse(responseCode = "400", description = "Dados inválidos"),
+            @ApiResponse(responseCode = "401", description = "Token de autenticação inválido ou expirado"),
+            @ApiResponse(responseCode = "404", description = "Orçamento não encontrado"),
+            @ApiResponse(responseCode = "500", description = "Erro interno do servidor")
     })
     public ResponseEntity<?> atualizarOrcamento(
             @PathVariable String codigo,
@@ -167,9 +167,9 @@ public class OrcamentoController {
             description = "Retorna se existe um agendamento vinculado ao orçamento")
     @SecurityRequirement(name = "Bearer")
     @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "Verificação realizada com sucesso"),
-        @ApiResponse(responseCode = "401", description = "Token de autenticação inválido ou expirado"),
-        @ApiResponse(responseCode = "500", description = "Erro interno do servidor")
+            @ApiResponse(responseCode = "200", description = "Verificação realizada com sucesso"),
+            @ApiResponse(responseCode = "401", description = "Token de autenticação inválido ou expirado"),
+            @ApiResponse(responseCode = "500", description = "Erro interno do servidor")
     })
     public ResponseEntity<?> verificarSeTemAgendamento(@PathVariable String codigo) {
         log.info("Verificando se orçamento {} possui agendamento", codigo);
@@ -192,10 +192,10 @@ public class OrcamentoController {
             description = "Remove permanentemente um orçamento do sistema e seu agendamento relacionado (se houver)")
     @SecurityRequirement(name = "Bearer")
     @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "Orçamento excluído com sucesso"),
-        @ApiResponse(responseCode = "401", description = "Token de autenticação inválido ou expirado"),
-        @ApiResponse(responseCode = "404", description = "Orçamento não encontrado"),
-        @ApiResponse(responseCode = "500", description = "Erro interno do servidor")
+            @ApiResponse(responseCode = "200", description = "Orçamento excluído com sucesso"),
+            @ApiResponse(responseCode = "401", description = "Token de autenticação inválido ou expirado"),
+            @ApiResponse(responseCode = "404", description = "Orçamento não encontrado"),
+            @ApiResponse(responseCode = "500", description = "Erro interno do servidor")
     })
     public ResponseEntity<?> deletarOrcamento(@PathVariable String codigo) {
         log.info("Deletando orçamento: {}", codigo);
