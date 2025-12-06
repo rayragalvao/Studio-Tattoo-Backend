@@ -24,6 +24,3 @@ public class WebConfig implements WebMvcConfigurer {
                 .allowCredentials(true);
     }
 }
-                .addResourceLocations("file:uploads/");
-    }
-}

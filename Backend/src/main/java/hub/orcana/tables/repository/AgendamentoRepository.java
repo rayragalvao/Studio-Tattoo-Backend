@@ -5,8 +5,8 @@ import hub.orcana.tables.StatusAgendamento;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
-import java.time.LocalDateTime;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -17,6 +17,12 @@ public interface AgendamentoRepository extends JpaRepository<Agendamento, Long> 
     List<Agendamento> findAllByDataHoraBetween(LocalDateTime inicio, LocalDateTime fim);
 
     Optional<Agendamento> findTopByStatusOrderByDataHoraAsc(StatusAgendamento status);
+
+    @Query("SELECT a FROM Agendamento a WHERE a.status = :status AND a.dataHora > :dataAtual ORDER BY a.dataHora ASC LIMIT 1")
+    Optional<Agendamento> findProximoAgendamentoPorStatus(
+            @Param("status") StatusAgendamento status,
+            @Param("dataAtual") LocalDateTime dataAtual
+    );
 
     @Query("SELECT COALESCE(SUM(o.valor), 0.0) " +
             "FROM Agendamento a " +
@@ -29,14 +35,16 @@ public interface AgendamentoRepository extends JpaRepository<Agendamento, Long> 
     );
 
     @Query("SELECT a FROM Agendamento a LEFT JOIN FETCH a.orcamento WHERE a.dataHora BETWEEN :inicio AND :fim")
-    List<Agendamento> findAllWithOrcamentoByDataHoraBetween(@Param("inicio") LocalDateTime inicio, @Param("fim") LocalDateTime fim);
-
-    @Query("SELECT DISTINCT a FROM Agendamento a " +
-           "LEFT JOIN FETCH a.usuario u " +
-           "LEFT JOIN FETCH a.orcamento o " +
-           "WHERE a.dataHora BETWEEN :inicio AND :fim " +
-           "ORDER BY a.dataHora ASC")
-    List<Agendamento> findAllWithUsuarioAndOrcamentoByDataHoraBetween(@Param("inicio") LocalDateTime inicio, @Param("fim") LocalDateTime fim);
+    List<Agendamento> findByDataHoraBetweenWithOrcamento(
+            @Param("inicio") LocalDateTime inicio, 
+            @Param("fim") LocalDateTime fim
+    );
+    
+    List<Agendamento> findByDataHoraBetween(LocalDateTime inicio, LocalDateTime fim);
+    
+    long countByStatus(StatusAgendamento status);
+    
+    List<Agendamento> findByStatus(StatusAgendamento status);
 
     Optional<Agendamento> findByOrcamentoCodigoOrcamento(String codigoOrcamento);
 

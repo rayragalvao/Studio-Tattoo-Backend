@@ -62,7 +62,7 @@ class AgendamentoRepositoryTest {
 
         Agendamento agendamento = new Agendamento();
         agendamento.setDataHora(dataHora);
-        agendamento.setStatus(StatusAgendamento.AGUARDANDO);
+        agendamento.setStatus(StatusAgendamento.PENDENTE);
         agendamento.setUsuario(usuario);
         agendamento.setOrcamento(orcamento);
 
@@ -73,7 +73,7 @@ class AgendamentoRepositoryTest {
         assertNotNull(salvo);
         assertNotNull(salvo.getId());
         assertEquals(dataHora, salvo.getDataHora());
-        assertEquals(StatusAgendamento.AGUARDANDO, salvo.getStatus());
+        assertEquals(StatusAgendamento.PENDENTE, salvo.getStatus());
         assertEquals(usuario.getId(), salvo.getUsuario().getId());
     }
 
@@ -83,7 +83,7 @@ class AgendamentoRepositoryTest {
 
         Agendamento agendamento = new Agendamento();
         agendamento.setDataHora(dataHora);
-        agendamento.setStatus(StatusAgendamento.AGUARDANDO);
+        agendamento.setStatus(StatusAgendamento.PENDENTE);
         agendamento.setUsuario(usuario);
         agendamento.setOrcamento(orcamento);
         Agendamento salvo = agendamentoRepository.save(agendamento);
@@ -113,7 +113,7 @@ class AgendamentoRepositoryTest {
 
         Agendamento agendamento1 = new Agendamento();
         agendamento1.setDataHora(dataHora);
-        agendamento1.setStatus(StatusAgendamento.AGUARDANDO);
+        agendamento1.setStatus(StatusAgendamento.PENDENTE);
         agendamento1.setUsuario(usuario);
         agendamento1.setOrcamento(orcamento);
         agendamentoRepository.save(agendamento1);
@@ -144,7 +144,7 @@ class AgendamentoRepositoryTest {
 
         Agendamento agendamento = new Agendamento();
         agendamento.setDataHora(dataHora);
-        agendamento.setStatus(StatusAgendamento.AGUARDANDO);
+        agendamento.setStatus(StatusAgendamento.PENDENTE);
         agendamento.setUsuario(usuario);
         agendamento.setOrcamento(orcamento);
         agendamentoRepository.save(agendamento);
@@ -179,7 +179,7 @@ class AgendamentoRepositoryTest {
 
         Agendamento agendamento1 = new Agendamento();
         agendamento1.setDataHora(data1);
-        agendamento1.setStatus(StatusAgendamento.AGUARDANDO);
+        agendamento1.setStatus(StatusAgendamento.PENDENTE);
         agendamento1.setUsuario(usuario);
         agendamento1.setOrcamento(orcamento);
         agendamentoRepository.save(agendamento1);
@@ -201,7 +201,7 @@ class AgendamentoRepositoryTest {
 
         Agendamento agendamento3 = new Agendamento();
         agendamento3.setDataHora(data3);
-        agendamento3.setStatus(StatusAgendamento.AGUARDANDO);
+        agendamento3.setStatus(StatusAgendamento.PENDENTE);
         agendamento3.setUsuario(usuario);
         agendamento3.setOrcamento(orcamento3);
         agendamentoRepository.save(agendamento3);
@@ -226,7 +226,7 @@ class AgendamentoRepositoryTest {
 
         Agendamento agendamento1 = new Agendamento();
         agendamento1.setDataHora(amanha);
-        agendamento1.setStatus(StatusAgendamento.AGUARDANDO);
+        agendamento1.setStatus(StatusAgendamento.PENDENTE);
         agendamento1.setUsuario(usuario);
         agendamento1.setOrcamento(orcamento);
         agendamentoRepository.save(agendamento1);
@@ -256,7 +256,7 @@ class AgendamentoRepositoryTest {
 
         Agendamento agendamento = new Agendamento();
         agendamento.setDataHora(dataHora);
-        agendamento.setStatus(StatusAgendamento.AGUARDANDO);
+        agendamento.setStatus(StatusAgendamento.PENDENTE);
         agendamento.setUsuario(usuario);
         agendamento.setOrcamento(orcamento);
         Agendamento salvo = agendamentoRepository.save(agendamento);
@@ -277,7 +277,7 @@ class AgendamentoRepositoryTest {
 
         Agendamento agendamento = new Agendamento();
         agendamento.setDataHora(dataHora);
-        agendamento.setStatus(StatusAgendamento.AGUARDANDO);
+        agendamento.setStatus(StatusAgendamento.PENDENTE);
         agendamento.setUsuario(usuario);
         agendamento.setOrcamento(orcamento);
         Agendamento salvo = agendamentoRepository.save(agendamento);
@@ -296,7 +296,7 @@ class AgendamentoRepositoryTest {
 
         Agendamento agendamento = new Agendamento();
         agendamento.setDataHora(dataHora);
-        agendamento.setStatus(StatusAgendamento.AGUARDANDO);
+        agendamento.setStatus(StatusAgendamento.PENDENTE);
         agendamento.setUsuario(usuario);
         agendamento.setOrcamento(orcamento);
         Agendamento salvo = agendamentoRepository.save(agendamento);
@@ -311,7 +311,7 @@ class AgendamentoRepositoryTest {
 
         Agendamento agendamento1 = new Agendamento();
         agendamento1.setDataHora(dataHora);
-        agendamento1.setStatus(StatusAgendamento.AGUARDANDO);
+        agendamento1.setStatus(StatusAgendamento.PENDENTE);
         agendamento1.setUsuario(usuario);
         agendamento1.setOrcamento(orcamento);
         agendamentoRepository.save(agendamento1);
@@ -341,7 +341,7 @@ class AgendamentoRepositoryTest {
 
         Agendamento agendamento1 = new Agendamento();
         agendamento1.setDataHora(dataHora);
-        agendamento1.setStatus(StatusAgendamento.AGUARDANDO);
+        agendamento1.setStatus(StatusAgendamento.PENDENTE);
         agendamento1.setUsuario(usuario);
         agendamento1.setOrcamento(orcamento);
         agendamentoRepository.save(agendamento1);
@@ -388,7 +388,7 @@ class AgendamentoRepositoryTest {
 
         Agendamento agendamento = new Agendamento();
         agendamento.setDataHora(dataHora);
-        agendamento.setStatus(StatusAgendamento.AGUARDANDO);
+        agendamento.setStatus(StatusAgendamento.PENDENTE);
         agendamento.setUsuario(usuario);
         agendamento.setOrcamento(orcamento);
         Agendamento salvo = agendamentoRepository.save(agendamento);
@@ -410,7 +410,7 @@ class AgendamentoRepositoryTest {
 
         Agendamento agendamento = new Agendamento();
         agendamento.setDataHora(dataHora);
-        agendamento.setStatus(StatusAgendamento.AGUARDANDO);
+        agendamento.setStatus(StatusAgendamento.PENDENTE);
         agendamento.setUsuario(usuario);
         agendamento.setOrcamento(orcamento);
         Agendamento salvo = agendamentoRepository.save(agendamento);

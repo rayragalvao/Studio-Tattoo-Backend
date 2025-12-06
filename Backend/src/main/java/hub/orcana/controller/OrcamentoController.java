@@ -133,37 +133,18 @@ public class OrcamentoController {
         @ApiResponse(responseCode = "401", description = "Token de autenticação inválido ou expirado"),
         @ApiResponse(responseCode = "404", description = "Orçamento não encontrado"),
         @ApiResponse(responseCode = "500", description = "Erro interno do servidor")
-    @PutMapping("/{codigo}")
-    @Operation(summary = "Atualizar orçamento com valor e tempo estimado",
-            description = "Atualiza um orçamento existente com valor da tatuagem e tempo estimado da sessão")
-    @SecurityRequirement(name = "Bearer")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Orçamento atualizado com sucesso"),
-            @ApiResponse(responseCode = "404", description = "Orçamento não encontrado"),
-            @ApiResponse(responseCode = "401", description = "Token de autenticação inválido"),
-            @ApiResponse(responseCode = "500", description = "Erro interno do servidor")
     })
     public ResponseEntity<?> atualizarOrcamento(
             @PathVariable String codigo,
             @RequestBody Map<String, Object> dados) {
         log.info("Atualizando orçamento {}: {}", codigo, dados);
         try {
-            Double tamanho = dados.get("tamanho") != null ? 
-                    ((Number) dados.get("tamanho")).doubleValue() : null;
-            String localCorpo = (String) dados.get("localCorpo");
-            String cores = (String) dados.get("cores");
-            String ideia = (String) dados.get("ideia");
-
-            var orcamentoAtualizado = service.atualizarOrcamento(codigo, tamanho, localCorpo, cores, ideia);
-
-        log.info("Atualizando orçamento: {} com dados: {}", codigo, dados);
-        try {
             var orcamentoAtualizado = service.atualizarOrcamento(codigo, dados);
             log.info("Orçamento {} atualizado com sucesso", codigo);
             return ResponseEntity.ok(Map.of(
                     "success", true,
                     "message", "Orçamento atualizado com sucesso",
-                    "codigo", orcamentoAtualizado.getCodigoOrcamento()
+                    "codigo", orcamentoAtualizado.codigoOrcamento(),
                     "orcamento", orcamentoAtualizado
             ));
         } catch (RuntimeException e) {
@@ -236,15 +217,6 @@ public class OrcamentoController {
             return ResponseEntity.status(500).body(Map.of(
                     "success", false,
                     "message", "Erro ao excluir orçamento"
-            ));
-        }
-    }
-
-}
-            log.error("Erro ao atualizar orçamento {}: {}", codigo, e.getMessage(), e);
-            return ResponseEntity.status(500).body(Map.of(
-                    "success", false,
-                    "message", "Erro ao atualizar orçamento: " + e.getMessage()
             ));
         }
     }

@@ -103,7 +103,7 @@ public class AgendamentoService implements AgendamentoSubject {
         }
 
         Agendamento novoAgendamento = AgendamentoMapper.of(agendamento, usuario, orcamento);
-        novoAgendamento.setStatus(StatusAgendamento.AGUARDANDO);
+        novoAgendamento.setStatus(StatusAgendamento.PENDENTE);
         Agendamento salvo = repository.save(novoAgendamento);
 
         try {

@@ -2,6 +2,7 @@ package hub.orcana.tables;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
+import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
@@ -9,11 +10,14 @@ import java.sql.Time;
 import java.time.LocalTime;
 import java.util.List;
 
+
 @ToString
+@Getter
+@Setter
 @Entity
 @Table(name = "orcamento")
 @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
-public class    Orcamento {
+public class  Orcamento {
     @Id
     @Column(name = "codigo_orcamento", unique = true, nullable = false, length = 20)
     private String codigoOrcamento;
@@ -154,12 +158,9 @@ public class    Orcamento {
     public void setEmail(String email) {
         this.email = email;
     }
-    
+
     public StatusOrcamento getStatus() {
         return status;
-
-    public String getStatus() {
-        return email;
     }
 
     public void setStatus(StatusOrcamento status) {
@@ -168,10 +169,6 @@ public class    Orcamento {
 
     public List<String> getImagemReferencia() { return imagemReferencia;}
 
-    public void setImagemReferencia(List<String> imagemReferencia) {
-        this.imagemReferencia = imagemReferencia;
-    }
-
     public String getLocalCorpo() {
         return localCorpo;
     }
@@ -179,6 +176,5 @@ public class    Orcamento {
     public void setLocalCorpo(String localCorpo) {
         this.localCorpo = localCorpo;
     }
-}
 
 }

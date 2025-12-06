@@ -176,7 +176,7 @@ class DashboardServiceTest {
         List<Double> resultado = dashboardService.getFaturamentoUltimos12Meses();
 
         assertNotNull(resultado);
-        assertEquals(0.0, resultado.get(11)); /
+        assertEquals(0.0, resultado.get(11));
     }
 
     @Test

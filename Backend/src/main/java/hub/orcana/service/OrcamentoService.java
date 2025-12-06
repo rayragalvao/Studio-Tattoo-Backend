@@ -136,6 +136,8 @@ public class OrcamentoService implements OrcamentoSubject{
                         orcamento.getCores(),
                         orcamento.getLocalCorpo(),
                         orcamento.getImagemReferencia(),
+                        orcamento.getValor(),
+                        orcamento.getTempo(),
                         orcamento.getStatus()
                 )
         ).toList(
@@ -192,15 +194,17 @@ public class OrcamentoService implements OrcamentoSubject{
         log.info("Deletando orçamento: {}", codigo);
         Orcamento orcamento = repository.findByCodigoOrcamento(codigo)
                 .orElseThrow(() -> new RuntimeException("Orçamento não encontrado: " + codigo));
-        
+
         agendamentoRepository.findByOrcamentoCodigoOrcamento(codigo).ifPresent(agendamento -> {
             log.info("Deletando agendamento relacionado ao orçamento {}: {}", codigo, agendamento.getId());
             agendamentoRepository.delete(agendamento);
             log.info("Agendamento {} deletado com sucesso", agendamento.getId());
         });
-        
+
         repository.delete(orcamento);
         log.info("Orçamento {} deletado com sucesso", codigo);
+    }
+
     public DetalhesOrcamentoOutput atualizarOrcamento(String codigo, Map<String, Object> dados) {
         log.info("Buscando orçamento com código: {}", codigo);
         Orcamento orcamento = repository.findByCodigoOrcamento(codigo)
@@ -304,6 +308,8 @@ public class OrcamentoService implements OrcamentoSubject{
                 salvo.getCores(),
                 salvo.getLocalCorpo(),
                 salvo.getImagemReferencia(),
+                salvo.getValor(),
+                salvo.getTempo(),
                 salvo.getStatus()
         );
     }
