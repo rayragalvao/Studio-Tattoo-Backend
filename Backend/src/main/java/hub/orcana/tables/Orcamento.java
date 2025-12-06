@@ -17,7 +17,7 @@ import java.util.List;
 @Entity
 @Table(name = "orcamento")
 @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
-public class  Orcamento {
+public class    Orcamento {
     @Id
     @Column(name = "codigo_orcamento", unique = true, nullable = false, length = 20)
     private String codigoOrcamento;
@@ -43,7 +43,7 @@ public class  Orcamento {
     private String localCorpo;
 
     @ElementCollection(fetch = FetchType.EAGER)
-    @CollectionTable(name = "orcamento_imagens", joinColumns = @JoinColumn(name = "orcamento_codigo"))
+    @CollectionTable(name = "orcamento_imagens", joinColumns = @JoinColumn(name = "codigo_orcamento"))
     @Column(name = "imagem_url", length = 500)
     private List<String> imagemReferencia;
 
@@ -161,6 +161,9 @@ public class  Orcamento {
 
     public StatusOrcamento getStatus() {
         return status;
+
+    public String getStatus() {
+        return email;
     }
 
     public void setStatus(StatusOrcamento status) {
@@ -169,6 +172,10 @@ public class  Orcamento {
 
     public List<String> getImagemReferencia() { return imagemReferencia;}
 
+    public void setImagemReferencia(List<String> imagemReferencia) {
+        this.imagemReferencia = imagemReferencia;
+    }
+
     public String getLocalCorpo() {
         return localCorpo;
     }
@@ -176,5 +183,6 @@ public class  Orcamento {
     public void setLocalCorpo(String localCorpo) {
         this.localCorpo = localCorpo;
     }
+}
 
 }
