@@ -107,7 +107,7 @@ public class EmailService implements  EstoqueObserver, OrcamentoObserver, Agenda
 
         String assuntoInicial = templateEmailRepository.findByNomeTemplate("estoque_baixo")
                 .map(template -> template.getAssunto())
-                .orElseThrow(() -> new IllegalStateException("Template 'estoque_critico' não encontrado"));
+                .orElseThrow(() -> new IllegalStateException("Template 'estoque_baixo' não encontrado"));
 
         String assuntoFinal = assuntoInicial.replace("${nomeMaterial}", materialNome);
 
@@ -144,6 +144,55 @@ public class EmailService implements  EstoqueObserver, OrcamentoObserver, Agenda
 
         enviarTextoSimples(email, assuntoFinal, textoFinal);
     }
+
+    public void enviarEmailParaTodosAdminsEstoqueOk(String nomeTemplate) {
+        String assunto = templateEmailRepository.findByNomeTemplate(nomeTemplate)
+                .map(template -> template.getAssunto())
+                .orElseThrow(() -> new IllegalStateException("Template '" + nomeTemplate + "' não encontrado"));
+
+        String textoFinal = templateEmailRepository.findByNomeTemplate(nomeTemplate)
+                .map(template -> template.getCorpoEmail().toString())
+                .orElseThrow(() -> new IllegalStateException("Template '" + nomeTemplate + "' não encontrado"));
+
+        List<String> destinatarios = usuarioRepository.findAllByIsAdmin(true).stream()
+                .map(hub.orcana.tables.Usuario::getEmail)
+                .toList();
+
+        if (destinatarios.isEmpty()) {
+            throw new IllegalStateException("Nenhum administrador encontrado para envio de email.");
+        }
+
+        destinatarios.forEach(destinatario -> {
+            enviarTextoSimples(destinatario, assunto, textoFinal);
+        });
+    }
+
+    public void enviarEmailParaTodosAdminsEstoqueBaixo(String nomeTemplate, String texto) {
+        String assunto = templateEmailRepository.findByNomeTemplate(nomeTemplate)
+                .map(template -> template.getAssunto())
+                .orElseThrow(() -> new IllegalStateException("Template '" + nomeTemplate + "' não encontrado"));
+
+        String textoInicial = templateEmailRepository.findByNomeTemplate(nomeTemplate)
+                .map(template -> template.getCorpoEmail().toString())
+                .orElseThrow(() -> new IllegalStateException("Template '" + nomeTemplate + "' não encontrado"));
+
+        List<String> destinatarios = usuarioRepository.findAllByIsAdmin(true).stream()
+                .map(hub.orcana.tables.Usuario::getEmail)
+                .toList();
+
+        String textoFinal = textoInicial
+                .replace("${nomeAdmin}", "Administrador")
+                .replace("${textoEstoque}", texto);
+
+        if (destinatarios.isEmpty()) {
+            throw new IllegalStateException("Nenhum administrador encontrado para envio de email.");
+        }
+
+        destinatarios.forEach(destinatario -> {
+            enviarTextoSimples(destinatario, assunto, textoFinal);
+        });
+    }
+}
 
     @Override
     public void updateAgendamento(Agendamento agendamento) {
