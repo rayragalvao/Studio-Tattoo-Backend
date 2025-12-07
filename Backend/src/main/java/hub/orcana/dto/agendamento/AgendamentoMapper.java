@@ -4,7 +4,10 @@ import hub.orcana.tables.Agendamento;
 import hub.orcana.tables.Orcamento;
 import hub.orcana.tables.Usuario;
 
+import java.util.ArrayList;
+
 public class AgendamentoMapper {
+
     public static DetalhesAgendamentoOutput of (Agendamento agendamento) {
         DetalhesAgendamentoOutput dto = new DetalhesAgendamentoOutput(
                 agendamento.getId(),
@@ -17,7 +20,11 @@ public class AgendamentoMapper {
                 agendamento.getOrcamento().getTamanho(),
                 agendamento.getOrcamento().getCores(),
                 agendamento.getOrcamento().getLocalCorpo(),
-                null
+                null,
+                agendamento.getImagemReferencia(), // <- pega do agendamento
+                agendamento.getTempoDuracao(),
+                agendamento.getPagamentoFeito(),
+                agendamento.getFormaPagamento()
         );
         return dto;
     }
@@ -29,6 +36,17 @@ public class AgendamentoMapper {
         agendamento.setOrcamento(orcamento);
         agendamento.setDataHora(dto.dataHora());
         agendamento.setStatus(dto.status());
+
+
+        // ⚠️ IMPORTANTE: copiar a lista para evitar erro de Hibernate
+        if (orcamento.getImagemReferencia() != null) {
+            agendamento.setImagemReferencia(
+                    new ArrayList<>(orcamento.getImagemReferencia())
+            );
+        } else {
+            agendamento.setImagemReferencia(null);
+        }
+
         return agendamento;
     }
 }

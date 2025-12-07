@@ -51,6 +51,10 @@ class AgendamentoControllerTest {
                 20.5,
                 "Preto e Vermelho",
                 "Costas",
+                null,
+                List.of(),
+                null,
+                null,
                 null
         );
 
@@ -77,6 +81,10 @@ class AgendamentoControllerTest {
                 10.0,
                 "Rosa e Verde",
                 "Braço",
+                null,
+                List.of(),
+                null,
+                null,
                 null
         );
         List<DetalhesAgendamentoOutput> agendamentos = Arrays.asList(agendamentoOutput, agendamento2);
@@ -439,6 +447,10 @@ class AgendamentoControllerTest {
                 15.0,
                 "Colorido",
                 "Braço",
+                null,
+                List.of(),
+                null,
+                null,
                 null
         );
         List<DetalhesAgendamentoOutput> agendamentos = Arrays.asList(agendamentoOutput, agendamento2);
@@ -501,7 +513,7 @@ class AgendamentoControllerTest {
         );
         DetalhesAgendamentoOutput outputFuturo = new DetalhesAgendamentoOutput(
                 1L, dataLimite, "PENDENTE", "João Silva", "joao@email.com",
-                "ORC123", "Dragão nas costas", 20.5, "Preto e Vermelho", "Costas", null
+                "ORC123", "Dragão nas costas", 20.5, "Preto e Vermelho", "Costas", null, List.of(), null, null, null
         );
         when(agendamentoService.postAgendamento(any(CadastroAgendamentoInput.class)))
                 .thenReturn(outputFuturo);
@@ -527,7 +539,7 @@ class AgendamentoControllerTest {
         );
         DetalhesAgendamentoOutput outputAtualizado = new DetalhesAgendamentoOutput(
                 1L, dataHora.plusHours(2), "CONFIRMADO", "João Silva", "joao@email.com",
-                "ORC123", "Dragão nas costas", 20.5, "Preto e Vermelho", "Costas", null
+                "ORC123", "Dragão nas costas", 20.5, "Preto e Vermelho", "Costas", null, List.of(), null, null, null
         );
         when(agendamentoService.putAgendamentoById(eq(1L), any(CadastroAgendamentoInput.class)))
                 .thenReturn(outputAtualizado);

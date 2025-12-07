@@ -22,8 +22,7 @@ import java.util.Map;
 import java.util.UUID;
 
 @Service
-//@RequiredArgsConstructor comentei devido ao construtor manual, onde implemento o attach do observer
-public class OrcamentoService implements OrcamentoSubject{
+public class OrcamentoService implements OrcamentoSubject {
 
     private static final Logger log = LoggerFactory.getLogger(OrcamentoService.class);
 
@@ -34,7 +33,11 @@ public class OrcamentoService implements OrcamentoSubject{
     private final UsuarioRepository usuarioRepository;
     private final AgendamentoRepository agendamentoRepository;
 
-    public OrcamentoService(OrcamentoRepository repository, GerenciadorDeArquivosService gerenciadorService, EmailService emailService, UsuarioRepository usuarioRepository, AgendamentoRepository agendamentoRepository) {
+    public OrcamentoService(OrcamentoRepository repository,
+                            GerenciadorDeArquivosService gerenciadorService,
+                            EmailService emailService,
+                            UsuarioRepository usuarioRepository,
+                            AgendamentoRepository agendamentoRepository) {
         this.repository = repository;
         this.gerenciadorService = gerenciadorService;
         this.emailService = emailService;
@@ -68,7 +71,6 @@ public class OrcamentoService implements OrcamentoSubject{
                 .orElse(null);
     }
 
-
     private String gerarCodigoOrcamento() {
         String uuid = UUID.randomUUID().toString().substring(0, 8).toUpperCase();
         if (repository.findByCodigoOrcamento("ORC-" + uuid).isPresent()) {
@@ -78,7 +80,6 @@ public class OrcamentoService implements OrcamentoSubject{
     }
 
     public Orcamento postOrcamento(CadastroOrcamentoInput dados) {
-
         List<String> urlImagens = new ArrayList<>();
 
         if (dados.imagemReferencia() != null && !dados.imagemReferencia().isEmpty()) {
@@ -88,7 +89,6 @@ public class OrcamentoService implements OrcamentoSubject{
             }
         }
 
-        // gera codigo unico
         String codigo = gerarCodigoOrcamento();
 
         Usuario usuario = usuarioRepository.findByEmail(dados.email()).orElse(null);
@@ -122,7 +122,6 @@ public class OrcamentoService implements OrcamentoSubject{
         }
 
         return salvo;
-
     }
 
     public List<DetalhesOrcamentoOutput> findAllOrcamentos() {
@@ -140,8 +139,7 @@ public class OrcamentoService implements OrcamentoSubject{
                         orcamento.getTempo(),
                         orcamento.getStatus()
                 )
-        ).toList(
-        );
+        ).toList();
     }
 
     public List<DetalhesOrcamentoOutput> findOrcamentosByUsuarioId(Long usuarioId) {
@@ -169,20 +167,12 @@ public class OrcamentoService implements OrcamentoSubject{
         log.info("Atualizando orçamento: {}", codigo);
         Orcamento orcamento = repository.findByCodigoOrcamento(codigo)
                 .orElseThrow(() -> new RuntimeException("Orçamento não encontrado: " + codigo));
-        
-        if (tamanho != null) {
-            orcamento.setTamanho(tamanho);
-        }
-        if (localCorpo != null && !localCorpo.isBlank()) {
-            orcamento.setLocalCorpo(localCorpo);
-        }
-        if (cores != null && !cores.isBlank()) {
-            orcamento.setCores(cores);
-        }
-        if (ideia != null && !ideia.isBlank()) {
-            orcamento.setIdeia(ideia);
-        }
-        
+
+        if (tamanho != null) orcamento.setTamanho(tamanho);
+        if (localCorpo != null && !localCorpo.isBlank()) orcamento.setLocalCorpo(localCorpo);
+        if (cores != null && !cores.isBlank()) orcamento.setCores(cores);
+        if (ideia != null && !ideia.isBlank()) orcamento.setIdeia(ideia);
+
         return repository.save(orcamento);
     }
 
@@ -210,55 +200,33 @@ public class OrcamentoService implements OrcamentoSubject{
         Orcamento orcamento = repository.findByCodigoOrcamento(codigo)
                 .orElseThrow(() -> new RuntimeException("Orçamento não encontrado: " + codigo));
 
-        log.info("Orçamento encontrado: {}. Atualizando campos...", codigo);
-
-        // Atualizar valor se fornecido
         if (dados.containsKey("valor")) {
             Object valorObj = dados.get("valor");
             if (valorObj instanceof Number) {
-                Double valor = ((Number) valorObj).doubleValue();
-                log.info("Atualizando valor: {}", valor);
-                orcamento.setValor(valor);
+                orcamento.setValor(((Number) valorObj).doubleValue());
             }
         }
 
-        // Atualizar tempo se fornecido
         if (dados.containsKey("tempo")) {
             Object tempoObj = dados.get("tempo");
             if (tempoObj instanceof String) {
-                String tempoStr = (String) tempoObj;
-                log.info("Atualizando tempo: {}", tempoStr);
                 try {
-                    orcamento.setTempo(java.time.LocalTime.parse(tempoStr));
+                    orcamento.setTempo(java.time.LocalTime.parse((String) tempoObj));
                 } catch (Exception e) {
-                    log.error("Erro ao parsear tempo: {}", tempoStr, e);
                     throw new RuntimeException("Formato de tempo inválido. Use HH:mm:ss");
                 }
             }
         }
 
-        // Atualizar outros campos se fornecidos
-        if (dados.containsKey("nome") && dados.get("nome") != null) {
-            orcamento.setNome((String) dados.get("nome"));
-        }
-        if (dados.containsKey("email") && dados.get("email") != null) {
-            orcamento.setEmail((String) dados.get("email"));
-        }
-        if (dados.containsKey("ideia") && dados.get("ideia") != null) {
-            orcamento.setIdeia((String) dados.get("ideia"));
-        }
+        if (dados.containsKey("nome") && dados.get("nome") != null) orcamento.setNome((String) dados.get("nome"));
+        if (dados.containsKey("email") && dados.get("email") != null) orcamento.setEmail((String) dados.get("email"));
+        if (dados.containsKey("ideia") && dados.get("ideia") != null) orcamento.setIdeia((String) dados.get("ideia"));
         if (dados.containsKey("tamanho") && dados.get("tamanho") != null) {
             Object tamanhoObj = dados.get("tamanho");
-            if (tamanhoObj instanceof Number) {
-                orcamento.setTamanho(((Number) tamanhoObj).doubleValue());
-            }
+            if (tamanhoObj instanceof Number) orcamento.setTamanho(((Number) tamanhoObj).doubleValue());
         }
-        if (dados.containsKey("cores") && dados.get("cores") != null) {
-            orcamento.setCores((String) dados.get("cores"));
-        }
-        if (dados.containsKey("localCorpo") && dados.get("localCorpo") != null) {
-            orcamento.setLocalCorpo((String) dados.get("localCorpo"));
-        }
+        if (dados.containsKey("cores") && dados.get("cores") != null) orcamento.setCores((String) dados.get("cores"));
+        if (dados.containsKey("localCorpo") && dados.get("localCorpo") != null) orcamento.setLocalCorpo((String) dados.get("localCorpo"));
         if (dados.containsKey("status") && dados.get("status") != null) {
             String statusStr = (String) dados.get("status");
             try {
@@ -268,37 +236,24 @@ public class OrcamentoService implements OrcamentoSubject{
             }
         }
 
-        log.info("Salvando orçamento atualizado no banco de dados");
         Orcamento salvo = repository.save(orcamento);
 
-        // Enviar email ao cliente informando o orçamento aprovado
         if (dados.containsKey("valor") && dados.containsKey("tempo")) {
             try {
-                log.info("Enviando e-mail de aprovação para: {}", salvo.getEmail());
                 String assunto = "Orçamento Aprovado - Júpiter Frito";
                 String corpo = String.format(
-                        "Olá %s,\n\n" +
-                                "Seu orçamento foi aprovado!\n\n" +
-                                "Código: %s\n" +
-                                "Valor: R$ %.2f\n" +
-                                "Tempo estimado: %s\n\n" +
-                                "Em breve entraremos em contato para agendar sua sessão.\n\n" +
-                                "Atenciosamente,\n" +
-                                "Equipe Júpiter Frito",
+                        "Olá %s,\n\nSeu orçamento foi aprovado!\n\nCódigo: %s\nValor: R$ %.2f\nTempo estimado: %s\n\nEm breve entraremos em contato para agendar sua sessão.\n\nAtenciosamente,\nEquipe Júpiter Frito",
                         salvo.getNome(),
                         salvo.getCodigoOrcamento(),
                         salvo.getValor(),
                         salvo.getTempo()
                 );
                 emailService.enviarTextoSimples(salvo.getEmail(), assunto, corpo);
-                log.info("E-mail de aprovação enviado com sucesso para: {}", salvo.getEmail());
             } catch (Exception e) {
                 log.error("Erro ao enviar e-mail de aprovação: {}", e.getMessage());
-                // Não lança exceção para não interromper o fluxo
             }
         }
 
-        log.info("Orçamento {} salvo com sucesso", codigo);
         return new DetalhesOrcamentoOutput(
                 salvo.getCodigoOrcamento(),
                 salvo.getNome(),
@@ -314,4 +269,23 @@ public class OrcamentoService implements OrcamentoSubject{
         );
     }
 
+    public DetalhesOrcamentoOutput findByCodigo(String codigo) {
+        log.info("Buscando orçamento com código: {}", codigo);
+        Orcamento orcamento = repository.findByCodigoOrcamento(codigo)
+                .orElseThrow(() -> new RuntimeException("Orçamento não encontrado: " + codigo));
+
+        return new DetalhesOrcamentoOutput(
+                orcamento.getCodigoOrcamento(),
+                orcamento.getNome(),
+                orcamento.getEmail(),
+                orcamento.getIdeia(),
+                orcamento.getTamanho(),
+                orcamento.getCores(),
+                orcamento.getLocalCorpo(),
+                orcamento.getImagemReferencia(),
+                orcamento.getValor(),
+                orcamento.getTempo(),
+                orcamento.getStatus()
+        );
+    }
 }
