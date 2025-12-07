@@ -1,5 +1,6 @@
 package hub.orcana.service;
 
+import hub.orcana.dto.agendamento.CompletarAgendamentoInput;
 import hub.orcana.dto.agendamento.DetalhesAgendamentoOutput;
 import hub.orcana.dto.agendamento.AgendamentoMapper;
 import hub.orcana.dto.agendamento.CadastroAgendamentoInput;
