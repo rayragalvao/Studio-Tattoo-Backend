@@ -1,24 +1,19 @@
 package hub.orcana.service;
 
-import hub.orcana.observer.AgendamentoObserver;
-import hub.orcana.observer.EstoqueObserver;
 import hub.orcana.observer.OrcamentoObserver;
 import hub.orcana.tables.repository.TemplateEmailRepository;
 import hub.orcana.tables.repository.UsuarioRepository;
-import hub.orcana.tables.Agendamento;
-import hub.orcana.tables.Orcamento;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
 import hub.orcana.observer.EstoqueObserver;
 import hub.orcana.tables.Orcamento;
 
-import java.time.format.DateTimeFormatter;
 import java.sql.Time;
 import java.util.List;
 
 @Service
-public class EmailService implements EstoqueObserver, OrcamentoObserver, AgendamentoObserver {
+public class EmailService implements  EstoqueObserver, OrcamentoObserver {
 
     private final JavaMailSender mailSender;
     private final UsuarioRepository usuarioRepository;
@@ -30,11 +25,10 @@ public class EmailService implements EstoqueObserver, OrcamentoObserver, Agendam
         this.templateEmailRepository = templateEmailRepository;
     }
 
-//    private String templateEmail = "<!DOCTYPE html><html lang=\"pt-br\"><head><meta charset=\"UTF-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\"><title>[ASSUNTO DO SEU E-MAIL]</title><link rel=\"preconnect\" href=\"https://fonts.googleapis.com\"><link rel=\"preconnect\" href=\"https://fonts.gstatic.com\" crossorigin>";
-
+    // código base para envio de e-mail
     public void enviarTextoSimples(String destinatario, String assunto, String texto) {
         SimpleMailMessage message = new SimpleMailMessage();
-        message.setFrom("orcanatechschool@gmail.com");
+        message.setFrom("orcanatechschool@gmail.com"); // e-mail da aplicação Brevo
         message.setTo(destinatario);
         message.setSubject(assunto);
         message.setText(texto);
@@ -62,10 +56,13 @@ public class EmailService implements EstoqueObserver, OrcamentoObserver, Agendam
         enviarTextoSimples(emailCliente, assunto, textoFinal);
     }
 
+
     @Override
     public void updateOrcamento(Orcamento orcamento) {
-        enviaEmailNovoOrcamento(orcamento.getEmail(), orcamento.getCodigoOrcamento(), orcamento.getNome());
-        enviaEmailParaTatuador(orcamento, usuarioRepository.getEmailByIsAdminTrue());
+        List<String> emailTatuador = usuarioRepository.getEmailByIsAdminTrue();
+
+        enviaEmailNovoOrcamento(orcamento.getEmail(), orcamento.getNome(), orcamento.getCodigoOrcamento());
+        enviaEmailParaTatuador(orcamento, emailTatuador);
     }
 
     // quando um novo orçamento é criado, envia e-mail para o tatuador (admin)
@@ -147,4 +144,3 @@ public class EmailService implements EstoqueObserver, OrcamentoObserver, Agendam
         enviarTextoSimples(email, assuntoFinal, textoFinal);
     }
 }
-
