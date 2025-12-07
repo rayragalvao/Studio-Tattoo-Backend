@@ -51,7 +51,7 @@ class AgendamentoRepositoryTest {
         usuario.setSenha("senha123");
         usuario = usuarioRepository.save(usuario);
 
-        orcamento = new Orcamento("ORC-TEST-123", null, "João Silva", "joao@test.com",
+        orcamento = new Orcamento("ORC-TEST-123", "João Silva", "joao@test.com",
                 "Dragão nas costas", 20.5, "Preto e Vermelho", "Costas", null);
         orcamento = orcamentoRepository.save(orcamento);
     }
@@ -118,7 +118,7 @@ class AgendamentoRepositoryTest {
         agendamento1.setOrcamento(orcamento);
         agendamentoRepository.save(agendamento1);
 
-        Orcamento orcamento2 = new Orcamento("ORC-TEST-456", null, "João Silva", "joao@test.com",
+        Orcamento orcamento2 = new Orcamento("ORC-TEST-456", "João Silva", "joao@test.com",
                 "Rosa no braço", 10.0, "Rosa e Verde", "Braço", null);
         orcamento2 = orcamentoRepository.save(orcamento2);
 
@@ -184,7 +184,7 @@ class AgendamentoRepositoryTest {
         agendamento1.setOrcamento(orcamento);
         agendamentoRepository.save(agendamento1);
 
-        Orcamento orcamento2 = new Orcamento("ORC-TEST-456", null, "João Silva", "joao@test.com",
+        Orcamento orcamento2 = new Orcamento("ORC-TEST-456", "João Silva", "joao@test.com",
                 "Rosa no braço", 10.0, "Rosa e Verde", "Braço", null);
         orcamento2 = orcamentoRepository.save(orcamento2);
 
@@ -195,7 +195,7 @@ class AgendamentoRepositoryTest {
         agendamento2.setOrcamento(orcamento2);
         agendamentoRepository.save(agendamento2);
 
-        Orcamento orcamento3 = new Orcamento("ORC-TEST-789", null, "João Silva", "joao@test.com",
+        Orcamento orcamento3 = new Orcamento("ORC-TEST-789", "João Silva", "joao@test.com",
                 "Leão", 15.0, "Amarelo", "Perna", null);
         orcamento3 = orcamentoRepository.save(orcamento3);
 
@@ -231,7 +231,7 @@ class AgendamentoRepositoryTest {
         agendamento1.setOrcamento(orcamento);
         agendamentoRepository.save(agendamento1);
 
-        Orcamento orcamento2 = new Orcamento("ORC-TEST-456", null, "João Silva", "joao@test.com",
+        Orcamento orcamento2 = new Orcamento("ORC-TEST-456", "João Silva", "joao@test.com",
                 "Rosa", 10.0, "Rosa", "Braço", null);
         orcamento2 = orcamentoRepository.save(orcamento2);
 
@@ -316,7 +316,7 @@ class AgendamentoRepositoryTest {
         agendamento1.setOrcamento(orcamento);
         agendamentoRepository.save(agendamento1);
 
-        Orcamento orcamento2 = new Orcamento("ORC-TEST-456", null, "João Silva", "joao@test.com",
+        Orcamento orcamento2 = new Orcamento("ORC-TEST-456", "João Silva", "joao@test.com",
                 "Rosa", 10.0, "Rosa", "Braço", null);
         orcamento2 = orcamentoRepository.save(orcamento2);
 
@@ -346,7 +346,7 @@ class AgendamentoRepositoryTest {
         agendamento1.setOrcamento(orcamento);
         agendamentoRepository.save(agendamento1);
 
-        Orcamento orcamento2 = new Orcamento("ORC-TEST-456", null, "João Silva", "joao@test.com",
+        Orcamento orcamento2 = new Orcamento("ORC-TEST-456", "João Silva", "joao@test.com",
                 "Rosa", 10.0, "Rosa", "Braço", null);
         orcamento2 = orcamentoRepository.save(orcamento2);
 

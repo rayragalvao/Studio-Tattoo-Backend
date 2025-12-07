@@ -2,6 +2,7 @@ package hub.orcana.tables;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
+import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
@@ -9,7 +10,10 @@ import java.sql.Time;
 import java.time.LocalTime;
 import java.util.List;
 
+
 @ToString
+@Getter
+@Setter
 @Entity
 @Table(name = "orcamento")
 @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
@@ -70,7 +74,7 @@ public class Orcamento {
         this.status = status;
     }
 
-    public Orcamento(String codigoOrcamento, Long id, String nome, String email, String ideia, Double tamanho, String cores, String localCorpo, List<String> imagemReferencia) {
+    public Orcamento(String codigoOrcamento, String nome, String email, String ideia, Double tamanho, String cores, String localCorpo, List<String> imagemReferencia) {
         this.codigoOrcamento = codigoOrcamento;
         this.nome = nome;
         this.email = email;
@@ -79,6 +83,21 @@ public class Orcamento {
         this.cores = cores;
         this.localCorpo = localCorpo;
         this.imagemReferencia = imagemReferencia;
+    }
+
+    public Orcamento(String codigoOrcamento, String nome, String email, String ideia, Double valor, String cores, String localCorpo, Double tamanho, Time tempo, List<String> imagemReferencia, StatusOrcamento status, Usuario usuario) {
+        this.localCorpo = localCorpo;
+        this.codigoOrcamento = codigoOrcamento;
+        this.nome = nome;
+        this.email = email;
+        this.ideia = ideia;
+        this.valor = valor;
+        this.tamanho = tamanho;
+        this.cores = cores;
+        this.tempo = tempo;
+        this.imagemReferencia = imagemReferencia;
+        this.status = status;
+        this.usuario = usuario;
     }
 
     public Usuario getUsuario() {
