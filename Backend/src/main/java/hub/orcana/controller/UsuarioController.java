@@ -164,6 +164,35 @@ public class UsuarioController {
         }
     }
 
+    @PatchMapping("/{id}/perfil")
+    @Operation(summary = "Atualizar perfil do usuário (nome, telefone e data de nascimento)",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Perfil atualizado com sucesso"),
+                    @ApiResponse(responseCode = "400", description = "Dados inválidos",
+                            content = @Content(schema = @Schema(example = "{\"message\": \"Dados inválidos\", \"errors\": {\"nome\": \"Nome é obrigatório\"}}"))),
+                    @ApiResponse(responseCode = "401", description = "Token não fornecido ou inválido",
+                            content = @Content(schema = @Schema(example = "{\"message\": \"Erro de autenticação\", \"error\": \"AUTHENTICATION_ERROR\"}"))),
+                    @ApiResponse(responseCode = "403", description = "Token expirado ou sem permissões",
+                            content = @Content(schema = @Schema(example = "{\"message\": \"Acesso negado\", \"status\": 403}"))),
+                    @ApiResponse(responseCode = "404", description = "Usuário não encontrado",
+                            content = @Content(schema = @Schema(example = "{\"timestamp\": \"2025-11-13T10:30:00Z\", \"status\": 404, \"error\": \"Not Found\", \"message\": \"Usuário não encontrado(a) no sistema\", \"path\": \"/usuario/999/perfil\"}")))
+            })
+    @SecurityRequirement(name = "Bearer")
+    public ResponseEntity<ListarUsuarios> atualizarPerfil(
+            @PathVariable Long id,
+            @RequestBody @Valid hub.orcana.dto.usuario.AtualizarPerfilUsuario perfilUsuario
+    ) {
+        log.info("Iniciando atualização do perfil do usuário ID: {}", id);
+        try {
+            var usuarioAtualizado = service.atualizarPerfil(id, perfilUsuario);
+            log.info("Perfil do usuário ID {} atualizado com sucesso", id);
+            return ResponseEntity.ok(usuarioAtualizado);
+        } catch (Exception e) {
+            log.error("Erro ao atualizar perfil do usuário ID {}: {}", id, e.getMessage(), e);
+            throw e;
+        }
+    }
+
     // Deleta um usuário pelo ID
     @DeleteMapping("/{id}")
     @Operation(summary = "Deletar um usuário existente por ID",

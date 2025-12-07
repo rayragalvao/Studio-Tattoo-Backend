@@ -17,4 +17,8 @@ public interface UsuarioRepository extends JpaRepository<Usuario, Long> {
 
     @Query("SELECT u.email FROM Usuario u WHERE u.isAdmin = true")
     List<String> getEmailByIsAdminTrue();
+
+    @Query("SELECT u.nome FROM Usuario u WHERE u.isAdmin = true")
+    List<String> getNomeByIsAdminTrue();
+
 }

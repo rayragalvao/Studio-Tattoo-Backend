@@ -47,6 +47,7 @@ public class UsuarioMapper {
                 usuario.getNome(),
                 usuario.getEmail(),
                 usuario.getTelefone(),
+                usuario.getDtNasc(),
                 usuario.isAdmin()
         );
 

@@ -1,5 +1,6 @@
 package hub.orcana.service;
 
+import hub.orcana.dto.agendamento.CompletarAgendamentoInput;
 import hub.orcana.dto.agendamento.DetalhesAgendamentoOutput;
 import hub.orcana.dto.agendamento.AgendamentoMapper;
 import hub.orcana.dto.agendamento.CadastroAgendamentoInput;
@@ -66,7 +67,7 @@ public class AgendamentoService {
         }
 
         Agendamento novoAgendamento = AgendamentoMapper.of(agendamento, usuario, orcamento);
-        novoAgendamento.setStatus(StatusAgendamento.AGUARDANDO);
+        novoAgendamento.setStatus(StatusAgendamento.PENDENTE);
         Agendamento salvo = repository.save(novoAgendamento);
 
         return AgendamentoMapper.of(salvo);
@@ -139,6 +140,20 @@ public class AgendamentoService {
         Orcamento orcamento = orcamentoRepository.findByCodigoOrcamento(codigoOrcamento)
                 .orElseThrow(() -> new IllegalArgumentException("Orçamento não encontrado."));
         agendamento.setOrcamento(orcamento);
+        Agendamento salvo = repository.save(agendamento);
+        return AgendamentoMapper.of(salvo);
+    }
+
+    public DetalhesAgendamentoOutput completarAgendamento(Long id, CompletarAgendamentoInput dados) {
+        Agendamento agendamento = repository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Agendamento não encontrado."));
+
+        // Atualiza os campos de conclusão
+        agendamento.setTempoDuracao(dados.tempoDuracao());
+        agendamento.setPagamentoFeito(dados.pagamentoFeito());
+        agendamento.setFormaPagamento(dados.formaPagamento());
+        agendamento.setStatus(StatusAgendamento.CONCLUIDO);
+
         Agendamento salvo = repository.save(agendamento);
         return AgendamentoMapper.of(salvo);
     }
