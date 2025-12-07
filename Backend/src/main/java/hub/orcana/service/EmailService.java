@@ -1,7 +1,9 @@
 package hub.orcana.service;
 
-import hub.orcana.dto.estoque.DetalhesMaterialOutput;
+import hub.orcana.observer.AgendamentoObserver;
 import hub.orcana.observer.OrcamentoObserver;
+import hub.orcana.tables.Agendamento;
+import hub.orcana.tables.TemplateEmail;
 import hub.orcana.tables.repository.TemplateEmailRepository;
 import hub.orcana.tables.repository.UsuarioRepository;
 import org.springframework.mail.SimpleMailMessage;
@@ -14,7 +16,7 @@ import java.sql.Time;
 import java.util.List;
 
 @Service
-public class EmailService implements EstoqueObserver, OrcamentoObserver {
+public class EmailService implements  EstoqueObserver, OrcamentoObserver, AgendamentoObserver {
 
     private final JavaMailSender mailSender;
     private final UsuarioRepository usuarioRepository;
@@ -33,7 +35,6 @@ public class EmailService implements EstoqueObserver, OrcamentoObserver {
         message.setTo(destinatario);
         message.setSubject(assunto);
         message.setText(texto);
-
         mailSender.send(message);
     }
 
@@ -58,6 +59,7 @@ public class EmailService implements EstoqueObserver, OrcamentoObserver {
         enviarTextoSimples(emailCliente, assunto, textoFinal);
     }
 
+
     @Override
     public void updateOrcamento(Orcamento orcamento) {
         List<String> emailTatuador = usuarioRepository.getEmailByIsAdminTrue();
@@ -66,7 +68,6 @@ public class EmailService implements EstoqueObserver, OrcamentoObserver {
         enviaEmailParaTatuador(orcamento, emailTatuador);
     }
 
-    // quando um novo orçamento é criado, envia e-mail para o tatuador (admin)
     private void enviaEmailParaTatuador(Orcamento orcamento, List<String> emailTatuador) {
         String assunto = templateEmailRepository.findByNomeTemplate("orcamento_tatuador")
                 .map(template -> template.getAssunto())
@@ -96,7 +97,6 @@ public class EmailService implements EstoqueObserver, OrcamentoObserver {
 
     }
 
-    // quando o estoque de um material atinge o limite mínimo, envia e-mail de alerta para o tatuador (admin)
     @Override
     public void updateEstoque(String materialNome, Double quantidadeAtual, Double minAviso) {
         if (minAviso == null || quantidadeAtual > minAviso) {
@@ -194,3 +194,68 @@ public class EmailService implements EstoqueObserver, OrcamentoObserver {
     }
 }
 
+    @Override
+    public void updateAgendamento(Agendamento agendamento) {
+        List<String> emailTatuador = usuarioRepository.getEmailByIsAdminTrue();
+
+        enviaEmailNovoAgendamentoCliente(agendamento);
+        enviaEmailNovoAgendamentoTatuador(agendamento, emailTatuador);
+    }
+
+    private void enviaEmailNovoAgendamentoCliente(Agendamento agendamento) {
+        String emailCliente = agendamento.getUsuario().getEmail();
+        String nomeCliente = agendamento.getUsuario().getNome();
+        String codigoOrcamento = agendamento.getOrcamento().getCodigoOrcamento();
+        String dataHora = agendamento.getDataHora().toString().replace("T", " às ");
+        String status = agendamento.getStatus().toString();
+
+        if (emailCliente == null || emailCliente.isBlank()) {
+            throw new IllegalArgumentException("Destinatário inválido para envio de e-mail.");
+        }
+
+        String assunto = templateEmailRepository.findByNomeTemplate("agendamento_cliente")
+                .map(TemplateEmail::getAssunto)
+                .orElseThrow(() -> new IllegalStateException("Template 'agendamento_cliente' não encontrado"));
+
+        String textoInicial = templateEmailRepository.findByNomeTemplate("agendamento_cliente")
+                .map(TemplateEmail::getCorpoEmail)
+                .orElseThrow(() -> new IllegalStateException("Template 'agendamento_cliente' não encontrado"));
+
+        String textoFinal = textoInicial
+                .replace("${nomeCliente}", nomeCliente)
+                .replace("${codigoOrcamento}", codigoOrcamento)
+                .replace("${dataHora}", dataHora)
+                .replace("${status}", status);
+
+        enviarTextoSimples(emailCliente, assunto, textoFinal);
+    }
+
+    private void enviaEmailNovoAgendamentoTatuador(Agendamento agendamento, List<String> emailTatuador) {
+        String nomeCliente = agendamento.getUsuario().getNome();
+        String emailCliente = agendamento.getUsuario().getEmail();
+        String codigoOrcamento = agendamento.getOrcamento().getCodigoOrcamento();
+        String dataHora = agendamento.getDataHora().toString().replace("T", " às ");
+        String status = agendamento.getStatus().toString();
+
+        String assuntoInicial = templateEmailRepository.findByNomeTemplate("agendamento_tatuador")
+                .map(TemplateEmail::getAssunto)
+                .orElseThrow(() -> new IllegalStateException("Template 'agendamento_tatuador' não encontrado"));
+
+        String assuntoFinal = assuntoInicial.replace("${codigoOrcamento}", codigoOrcamento);
+
+        String textoInicial = templateEmailRepository.findByNomeTemplate("agendamento_tatuador")
+                .map(TemplateEmail::getCorpoEmail)
+                .orElseThrow(() -> new IllegalStateException("Template 'agendamento_tatuador' não encontrado"));
+
+        String textoFinal = textoInicial
+                .replace("${nomeCliente}", nomeCliente)
+                .replace("${emailCliente}", emailCliente)
+                .replace("${codigoOrcamento}", codigoOrcamento)
+                .replace("${dataHora}", dataHora)
+                .replace("${status}", status);
+
+        emailTatuador.forEach(email -> {
+            enviarTextoSimples(email, assuntoFinal, textoFinal);
+        });
+    }
+}

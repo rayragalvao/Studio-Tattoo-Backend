@@ -155,12 +155,20 @@ public class OrcamentoService implements OrcamentoSubject {
 
     public Orcamento atualizarOrcamento(String codigo, Double tamanho, String localCorpo, String cores, String ideia) {
         Orcamento orcamento = repository.findByCodigoOrcamento(codigo)
-                .orElseThrow(() -> new RuntimeException("Orçamento não encontrado"));
+                .orElseThrow(() -> new RuntimeException("Orçamento não encontrado: " + codigo));
 
-        if (tamanho != null) orcamento.setTamanho(tamanho);
-        if (localCorpo != null && !localCorpo.isBlank()) orcamento.setLocalCorpo(localCorpo);
-        if (cores != null && !cores.isBlank()) orcamento.setCores(cores);
-        if (ideia != null && !ideia.isBlank()) orcamento.setIdeia(ideia);
+        if (tamanho != null) {
+            orcamento.setTamanho(tamanho);
+        }
+        if (localCorpo != null && !localCorpo.isBlank()) {
+            orcamento.setLocalCorpo(localCorpo);
+        }
+        if (cores != null && !cores.isBlank()) {
+            orcamento.setCores(cores);
+        }
+        if (ideia != null && !ideia.isBlank()) {
+            orcamento.setIdeia(ideia);
+        }
 
         return repository.save(orcamento);
     }

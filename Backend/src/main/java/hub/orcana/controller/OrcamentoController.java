@@ -167,6 +167,11 @@ public class OrcamentoController {
     @GetMapping("/{codigo}/tem-agendamento")
     @Operation(summary = "Verificar se orçamento possui agendamento")
     @SecurityRequirement(name = "Bearer")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Verificação realizada com sucesso"),
+            @ApiResponse(responseCode = "401", description = "Token de autenticação inválido ou expirado"),
+            @ApiResponse(responseCode = "500", description = "Erro interno do servidor")
+    })
     public ResponseEntity<?> verificarSeTemAgendamento(@PathVariable String codigo) {
         log.info("Verificando se orçamento {} possui agendamento", codigo);
         try {
@@ -184,6 +189,12 @@ public class OrcamentoController {
     @DeleteMapping("/{codigo}")
     @Operation(summary = "Excluir um orçamento")
     @SecurityRequirement(name = "Bearer")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Orçamento excluído com sucesso"),
+            @ApiResponse(responseCode = "401", description = "Token de autenticação inválido ou expirado"),
+            @ApiResponse(responseCode = "404", description = "Orçamento não encontrado"),
+            @ApiResponse(responseCode = "500", description = "Erro interno do servidor")
+    })
     public ResponseEntity<?> deletarOrcamento(@PathVariable String codigo) {
         log.info("Deletando orçamento: {}", codigo);
         try {

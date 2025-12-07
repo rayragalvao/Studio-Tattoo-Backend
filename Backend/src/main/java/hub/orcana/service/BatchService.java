@@ -19,7 +19,8 @@ public class BatchService {
     EmailService emailService;
     UsuarioRepository usuarioRepository;
 
-   @Scheduled(cron = "0 0 7 * * *", zone = "America/Sao_Paulo")
+    @Scheduled(cron = "0 0 7 * * *", zone = "America/Sao_Paulo")
+    //@Scheduled(cron = "0 38 19 * * *", zone = "America/Sao_Paulo")
     public void verificarEstoque() {
         log.info("Iniciando verificação automática de estoque baixo");
 
