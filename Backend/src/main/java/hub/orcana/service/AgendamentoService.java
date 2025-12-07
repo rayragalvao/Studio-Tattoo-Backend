@@ -3,6 +3,8 @@ package hub.orcana.service;
 import hub.orcana.dto.agendamento.DetalhesAgendamentoOutput;
 import hub.orcana.dto.agendamento.AgendamentoMapper;
 import hub.orcana.dto.agendamento.CadastroAgendamentoInput;
+import hub.orcana.observer.AgendamentoObserver;
+import hub.orcana.observer.AgendamentoSubject;
 import hub.orcana.tables.Agendamento;
 import hub.orcana.tables.Orcamento;
 import hub.orcana.tables.StatusAgendamento;
@@ -10,27 +12,55 @@ import hub.orcana.tables.Usuario;
 import hub.orcana.tables.repository.AgendamentoRepository;
 import hub.orcana.tables.repository.OrcamentoRepository;
 import hub.orcana.tables.repository.UsuarioRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
 @Service
-public class AgendamentoService {
+public class AgendamentoService implements AgendamentoSubject {
+
+    private static final Logger log = LoggerFactory.getLogger(AgendamentoService.class);
 
     private final AgendamentoRepository repository;
     private final UsuarioRepository usuarioRepository;
     private final OrcamentoRepository orcamentoRepository;
+    private final EmailService emailService;
+    private final List<AgendamentoObserver> observers = new ArrayList<>();
 
     public AgendamentoService(
             AgendamentoRepository repository,
             UsuarioRepository usuarioRepository,
-            OrcamentoRepository orcamentoRepository) {
+            OrcamentoRepository orcamentoRepository,
+            EmailService emailService) {
         this.repository = repository;
         this.usuarioRepository = usuarioRepository;
         this.orcamentoRepository = orcamentoRepository;
+        this.emailService = emailService;
+        this.attach(emailService);
+    }
+
+    @Override
+    public void attach(AgendamentoObserver observer) {
+        if (!observers.contains(observer)) {
+            observers.add(observer);
+        }
+    }
+
+    @Override
+    public void detach(AgendamentoObserver observer) {
+        observers.remove(observer);
+    }
+
+    @Override
+    public void notifyObservers(Agendamento agendamento) {
+        for (AgendamentoObserver observer : observers) {
+            observer.updateAgendamento(agendamento);
+        }
     }
 
     // ------------------ CRUD BÁSICO ------------------
@@ -68,6 +98,12 @@ public class AgendamentoService {
         Agendamento novoAgendamento = AgendamentoMapper.of(agendamento, usuario, orcamento);
         novoAgendamento.setStatus(StatusAgendamento.PENDENTE);
         Agendamento salvo = repository.save(novoAgendamento);
+
+        try {
+            notifyObservers(salvo);
+        } catch (Exception e) {
+            log.error("Falha ao notificar Observers de novo agendamento ID {}: {}", salvo.getId(), e.getMessage());
+        }
 
         return AgendamentoMapper.of(salvo);
     }
