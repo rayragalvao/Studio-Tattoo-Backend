@@ -84,7 +84,7 @@ class DashboardServiceTest {
         List<Agendamento> agendamentosMes2 = criarAgendamentosParaMes(hoje.minusMonths(1), 2000.0);
         List<Agendamento> agendamentosMes3 = criarAgendamentosParaMes(hoje.minusMonths(2), 1500.0, 800.0);
 
-        when(agendamentoRepository.findAllWithOrcamentoByDataHoraBetween(any(), any()))
+        when(agendamentoRepository.findByDataHoraBetween(any(), any()))
                 .thenReturn(agendamentosMes1)
                 .thenReturn(agendamentosMes2)
                 .thenReturn(agendamentosMes3)
@@ -102,7 +102,7 @@ class DashboardServiceTest {
 
         assertNotNull(resultado);
         assertEquals(12, resultado.size());
-        verify(agendamentoRepository, times(12)).findAllWithOrcamentoByDataHoraBetween(any(), any());
+        verify(agendamentoRepository, times(12)).findByDataHoraBetween(any(), any());
     }
 
     @Test
@@ -118,7 +118,7 @@ class DashboardServiceTest {
                 agendamentoCancelado
         );
 
-        when(agendamentoRepository.findAllWithOrcamentoByDataHoraBetween(any(), any()))
+        when(agendamentoRepository.findByDataHoraBetween(any(), any()))
                 .thenReturn(agendamentos)
                 .thenReturn(Collections.emptyList())
                 .thenReturn(Collections.emptyList())
@@ -142,7 +142,7 @@ class DashboardServiceTest {
     @Test
     @DisplayName("Deve retornar zero quando não houver agendamentos no mês")
     void deveRetornarZeroQuandoNaoHouverAgendamentos() {
-        when(agendamentoRepository.findAllWithOrcamentoByDataHoraBetween(any(), any()))
+        when(agendamentoRepository.findByDataHoraBetween(any(), any()))
                 .thenReturn(Collections.emptyList());
 
         List<Double> resultado = dashboardService.getFaturamentoUltimos12Meses();
@@ -160,7 +160,7 @@ class DashboardServiceTest {
         agendamentoSemOrcamento.setStatus(StatusAgendamento.CONCLUIDO);
         agendamentoSemOrcamento.setOrcamento(null);
 
-        when(agendamentoRepository.findAllWithOrcamentoByDataHoraBetween(any(), any()))
+        when(agendamentoRepository.findByDataHoraBetween(any(), any()))
                 .thenReturn(Arrays.asList(agendamentoSemOrcamento))
                 .thenReturn(Collections.emptyList())
                 .thenReturn(Collections.emptyList())
@@ -189,7 +189,7 @@ class DashboardServiceTest {
         Agendamento agendamentoComOrcamentoSemValor = criarAgendamento(1L, StatusAgendamento.CONCLUIDO, null);
         agendamentoComOrcamentoSemValor.setOrcamento(orcamentoSemValor);
 
-        when(agendamentoRepository.findAllWithOrcamentoByDataHoraBetween(any(), any()))
+        when(agendamentoRepository.findByDataHoraBetween(any(), any()))
                 .thenReturn(Arrays.asList(agendamentoComOrcamentoSemValor))
                 .thenReturn(Collections.emptyList())
                 .thenReturn(Collections.emptyList())
@@ -217,7 +217,7 @@ class DashboardServiceTest {
                 criarAgendamento(3L, StatusAgendamento.CONCLUIDO, 2000.0)
         );
 
-        when(agendamentoRepository.findAllWithOrcamentoByDataHoraBetween(any(), any()))
+        when(agendamentoRepository.findByDataHoraBetween(any(), any()))
                 .thenReturn(agendamentos)
                 .thenReturn(Collections.emptyList())
                 .thenReturn(Collections.emptyList())
@@ -240,7 +240,7 @@ class DashboardServiceTest {
     @Test
     @DisplayName("Deve reverter a ordem dos meses para cronológico")
     void deveReverterOrdemDosMesesParaCronologico() {
-        when(agendamentoRepository.findAllWithOrcamentoByDataHoraBetween(any(), any()))
+        when(agendamentoRepository.findByDataHoraBetween(any(), any()))
                 .thenReturn(criarAgendamentosParaMes(LocalDate.now().atTime(23, 59, 59), 100.0))
                 .thenReturn(criarAgendamentosParaMes(LocalDate.now().atTime(23, 59, 59), 200.0))
                 .thenReturn(criarAgendamentosParaMes(LocalDate.now().atTime(23, 59, 59), 300.0))

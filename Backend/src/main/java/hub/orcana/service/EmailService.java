@@ -192,7 +192,6 @@ public class EmailService implements  EstoqueObserver, OrcamentoObserver, Agenda
             enviarTextoSimples(destinatario, assunto, textoFinal);
         });
     }
-}
 
     @Override
     public void updateAgendamento(Agendamento agendamento) {
