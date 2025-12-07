@@ -1,5 +1,6 @@
 package hub.orcana.service;
 
+import hub.orcana.dto.estoque.DetalhesMaterialOutput;
 import hub.orcana.observer.OrcamentoObserver;
 import hub.orcana.tables.repository.TemplateEmailRepository;
 import hub.orcana.tables.repository.UsuarioRepository;
@@ -106,7 +107,7 @@ public class EmailService implements EstoqueObserver, OrcamentoObserver {
 
         String assuntoInicial = templateEmailRepository.findByNomeTemplate("estoque_baixo")
                 .map(template -> template.getAssunto())
-                .orElseThrow(() -> new IllegalStateException("Template 'estoque_critico' não encontrado"));
+                .orElseThrow(() -> new IllegalStateException("Template 'estoque_baixo' não encontrado"));
 
         String assuntoFinal = assuntoInicial.replace("${nomeMaterial}", materialNome);
 
@@ -142,6 +143,54 @@ public class EmailService implements EstoqueObserver, OrcamentoObserver {
                 .replace("${tempo}", tempo.toString());
 
         enviarTextoSimples(email, assuntoFinal, textoFinal);
+    }
+
+    public void enviarEmailParaTodosAdminsEstoqueOk(String nomeTemplate) {
+        String assunto = templateEmailRepository.findByNomeTemplate(nomeTemplate)
+                .map(template -> template.getAssunto())
+                .orElseThrow(() -> new IllegalStateException("Template '" + nomeTemplate + "' não encontrado"));
+
+        String textoFinal = templateEmailRepository.findByNomeTemplate(nomeTemplate)
+                .map(template -> template.getCorpoEmail().toString())
+                .orElseThrow(() -> new IllegalStateException("Template '" + nomeTemplate + "' não encontrado"));
+
+        List<String> destinatarios = usuarioRepository.findAllByIsAdmin(true).stream()
+                .map(hub.orcana.tables.Usuario::getEmail)
+                .toList();
+
+        if (destinatarios.isEmpty()) {
+            throw new IllegalStateException("Nenhum administrador encontrado para envio de email.");
+        }
+
+        destinatarios.forEach(destinatario -> {
+            enviarTextoSimples(destinatario, assunto, textoFinal);
+        });
+    }
+
+    public void enviarEmailParaTodosAdminsEstoqueBaixo(String nomeTemplate, String texto) {
+        String assunto = templateEmailRepository.findByNomeTemplate(nomeTemplate)
+                .map(template -> template.getAssunto())
+                .orElseThrow(() -> new IllegalStateException("Template '" + nomeTemplate + "' não encontrado"));
+
+        String textoInicial = templateEmailRepository.findByNomeTemplate(nomeTemplate)
+                .map(template -> template.getCorpoEmail().toString())
+                .orElseThrow(() -> new IllegalStateException("Template '" + nomeTemplate + "' não encontrado"));
+
+        List<String> destinatarios = usuarioRepository.findAllByIsAdmin(true).stream()
+                .map(hub.orcana.tables.Usuario::getEmail)
+                .toList();
+
+        String textoFinal = textoInicial
+                .replace("${nomeAdmin}", "Administrador")
+                .replace("${textoEstoque}", texto);
+
+        if (destinatarios.isEmpty()) {
+            throw new IllegalStateException("Nenhum administrador encontrado para envio de email.");
+        }
+
+        destinatarios.forEach(destinatario -> {
+            enviarTextoSimples(destinatario, assunto, textoFinal);
+        });
     }
 }
 
