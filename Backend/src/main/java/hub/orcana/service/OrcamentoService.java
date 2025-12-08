@@ -17,7 +17,6 @@ import hub.orcana.observer.OrcamentoObserver;
 import hub.orcana.observer.OrcamentoSubject;
 
 import java.sql.Time;
-import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -198,8 +197,15 @@ public class OrcamentoService implements OrcamentoSubject {
             orcamento.setValor(valor.doubleValue());
         }
 
+        // ✅ USAR Time.valueOf para converter string "HH:mm:ss" para Time
         if (dados.containsKey("tempo") && dados.get("tempo") instanceof String tempoStr) {
-            orcamento.setTempo(Time.valueOf(tempoStr));
+            try {
+                orcamento.setTempo(Time.valueOf(tempoStr));
+                log.info("Tempo convertido e definido: {}", tempoStr);
+            } catch (IllegalArgumentException e) {
+                log.error("Erro ao converter tempo '{}': {}", tempoStr, e.getMessage());
+                throw new RuntimeException("Formato de tempo inválido. Use HH:mm:ss");
+            }
         }
 
         if (dados.containsKey("nome")) orcamento.setNome((String) dados.get("nome"));
@@ -218,19 +224,25 @@ public class OrcamentoService implements OrcamentoSubject {
             } catch (Exception ignored) {}
         }
 
+        // ✅ SALVAR PRIMEIRO
         Orcamento salvo = repository.save(orcamento);
+        log.info("Orçamento salvo: código={}, valor={}, tempo={}", salvo.getCodigoOrcamento(), salvo.getValor(), salvo.getTempo());
 
-        // ✅ ENVIA O E-MAIL CERTO
+        // ✅ ENVIAR E-MAIL DEPOIS (verificando se os campos não são null)
         if (dados.containsKey("valor") && dados.containsKey("tempo")) {
             try {
-                emailService.enviaEmailOrcamentoAprovado(
-                        salvo.getEmail(),
-                        salvo.getNome(),
-                        salvo.getCodigoOrcamento(),
-                        salvo.getValor(),
-                        salvo.getTempo()
-                );
-                log.info("E-mail de aprovação enviado para {}", salvo.getEmail());
+                if (salvo.getTempo() != null && salvo.getValor() != null) {
+                    emailService.enviaEmailOrcamentoAprovado(
+                            salvo.getEmail(),
+                            salvo.getNome(),
+                            salvo.getCodigoOrcamento(),
+                            salvo.getValor(),
+                            salvo.getTempo()
+                    );
+                    log.info("E-mail de aprovação enviado para {}", salvo.getEmail());
+                } else {
+                    log.warn("E-mail não enviado: valor={}, tempo={}", salvo.getValor(), salvo.getTempo());
+                }
             } catch (Exception e) {
                 log.error("Erro ao enviar e-mail de aprovação: {}", e.getMessage());
             }

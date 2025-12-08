@@ -160,12 +160,6 @@ public class Orcamento {
         this.tempo = tempo;
     }
 
-    public void setTempo(LocalTime localTime) {
-        if (localTime != null) {
-            this.tempo = Time.valueOf(localTime);
-        }
-    }
-
     public String getEmail() {
         return email;
     }
