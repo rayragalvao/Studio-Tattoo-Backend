@@ -106,98 +106,98 @@ INSERT INTO orcamento (codigo_orcamento, nome, email, ideia, valor, tamanho, cor
 -- Inserindo imagens de referência para os orçamentos
 INSERT INTO orcamento_imagens (codigo_orcamento, imagem_url) VALUES
   -- ORC001 - Tatuagem de dragão no braço
-  ('ORC001', 'https://lh3.googleusercontent.com/proxy/Fg7mEaE3q7XJwRTYXvRgJ8ZwFFDgUCo4z0LRJKwZhN5jHgEpJ7RDBb8sDBD6xJ5tC4TJ5xFBftGMOdUKViDLJCkJMWzxj7qRO6OvCdWXpDzEPA'),
-  ('ORC001', 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRU7WXsKL4gKqF8j-MCnB7gvHMqGgKxDzLNTg&s'),
+  ('ORC001', 'uploads/181c1aa6-8ea3-44d9-bc19-8e9d76840c25_oldschool.jpg'),
+  ('ORC001', 'uploads/18bb8f71-adc3-47af-bf5a-9e3534684749_oldschool.jpg'),
 
   -- ORC002 - Rosa pequena no punho
-  ('ORC002', 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSQKu4xCpf3rJ8h9L6YzFNgvE7RMhN5TzJsOw&s'),
+  ('ORC002', 'uploads/0c8fe331-0cae-4ac3-bd52-855443747530_portfolio-image-0.jpg'),
 
 
 
   -- ORC004 - Borboleta colorida
-  ('ORC004', 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRJh7kL9XsP2qF8mYzN6TgR4jKvLgJxVzDsQw&s'),
+  ('ORC004', 'uploads/1acdd99b-0a7e-4ef3-a4c8-fc9a56f3cf30_oldschool.jpg'),
 
   -- ORC005 - Frase inspiracional
-  ('ORC005', 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSMp3qR7YjF5gK8zNxL4TvRmHsJqKjVzPnOw&s'),
+  ('ORC005', 'uploads/1c85c18a-1578-4bc5-8228-4d7bc10f38d3_oldschool.jpg'),
 
   -- ORC006 - Tatuagem minimalista
-  ('ORC006', 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTLr5mK8NjG6hP9zXyM3QsF7vRjKgJxVzLnPg&s'),
+  ('ORC006', 'uploads/224e2b06-c1eb-4941-bb10-8207c0ab5b7c_oldschool.jpg'),
 
   -- ORC007 - Leão realista no braço
-  ('ORC007', 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRg8kL5XsP2qF8mYzN6TgR4jKvLgJxVzDsQw&s'),
-  ('ORC007', 'https://lh3.googleusercontent.com/proxy/VfE8mKj3rL9XpQ2YsF7gNzM6TvRmHsJqKjVzPnOwGg&s'),
+  ('ORC007', 'uploads/24d9abd6-7505-4315-8bc5-afea79110e90_oldschool.jpg'),
+  ('ORC007', 'uploads/2f2a8feb-bad2-4c5a-a280-37023c0231b8_oldschool.jpg'),
 
   -- ORC008 - Tribal no ombro
-  ('ORC008', 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSPq3rK8NjG6hP9zXyM3QsF7vRjKgJxVzLnPg&s'),
+  ('ORC008', 'uploads/3317ee95-91d1-49dd-ad49-78e1517528b3_oldschool.jpg'),
 
   -- ORC009 - Flores aquareladas
-  ('ORC009', 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRMp5kL9XsP2qF8mYzN6TgR4jKvLgJxVzDsQw&s'),
+  ('ORC009', 'uploads/43ac0284-8354-48c4-aa3d-218349a596d7_oldschool.jpg'),
 
 
 
   -- ORC011 - Anchor oldschool
-  ('ORC011', 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRJh5kL9XsP2qF8mYzN6TgR4jKvLgJxVzDsQw&s'),
+  ('ORC011', 'uploads/48127ce8-8481-4315-8a56-b04381407646_portfolio-image-0.jpg'),
 
   -- ORC012 - Geométrica abstrata
-  ('ORC012', 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSLp3qK8NjG6hP9zXyM3QsF7vRjKgJxVzLnPg&s'),
+  ('ORC012', 'uploads/53dc5b04-e690-4f53-af22-f27451ba3fba_oldschool.jpg'),
 
   -- ORC013 - Pássaro voando
-  ('ORC013', 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRNr7mL9XsP2qF8mYzN6TgR4jKvLgJxVzDsQw&s'),
+  ('ORC013', 'uploads/586d8f24-d18b-4272-8b7a-ead779748e38_oldschool.jpg'),
 
   -- ORC014 - Nome da filha
-  ('ORC014', 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTMq5kK8NjG6hP9zXyM3QsF7vRjKgJxVzLnPg&s'),
+  ('ORC014', 'uploads/59035e61-0154-401e-9d3c-f6343c4a6cc7_oldschool.jpg'),
 
   -- ORC015 - Lua e estrelas
-  ('ORC015', 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRLh3rL9XsP2qF8mYzN6TgR4jKvLgJxVzDsQw&s'),
+  ('ORC015', 'uploads/659078aa-5970-430d-a912-df4c402de404_oldschool.jpg'),
 
   -- ORC016 - Lobo uivando
-  ('ORC016', 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSNp7qK8NjG6hP9zXyM3QsF7vRjKgJxVzLnPg&s'),
+  ('ORC016', 'uploads/6ea543f4-c809-4ba3-9682-0f69f7adf0d4_oldschool.jpg'),
 
   -- ORC017 - Mandala colorida
-  ('ORC017', 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRKr5mL9XsP2qF8mYzN6TgR4jKvLgJxVzDsQw&s'),
+  ('ORC017', 'uploads/7451dad3-49b9-4fc2-88a2-6b50f9a2fefb_oldschool.jpg'),
 
 
 
   -- ORC019 - Pena transformando em pássaros
-  ('ORC019', 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRMh7rL9XsP2qF8mYzN6TgR4jKvLgJxVzDsQw&s'),
+  ('ORC019', 'uploads/75399b62-579a-4b8f-92a5-d926df700cfa_oldschool.jpg'),
 
   -- ORC020 - Samurai japonês
-  ('ORC020', 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSKp5qK8NjG6hP9zXyM3QsF7vRjKgJxVzLnPg&s'),
+  ('ORC020', 'uploads/7b94066c-5e24-470c-b12c-63458789e697_oldschool.jpg'),
 
   -- ORC021 - Infinito com nomes
-  ('ORC021', 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRJr3mL9XsP2qF8mYzN6TgR4jKvLgJxVzDsQw&s'),
+  ('ORC021', 'uploads/7cdb9748-6b82-4a3e-a859-f7e487140c82_oldschool.jpg'),
 
   -- ORC022 - Engrenagens steampunk
-  ('ORC022', 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTLq7kK8NjG6hP9zXyM3QsF7vRjKgJxVzLnPg&s'),
+  ('ORC022', 'uploads/8718c452-d13f-4c87-9cd4-59eedb53c957_oldschool.jpg'),
 
   -- ORC023 - Borboleta realista
-  ('ORC023', 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRNh5rL9XsP2qF8mYzN6TgR4jKvLgJxVzDsQw&s'),
+  ('ORC023', 'uploads/8fda027f-0477-4233-a034-84e244ebfa2b_oldschool.jpg'),
 
   -- ORC024 - Texto em lettering
-  ('ORC024', 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSMp3qK8NjG6hP9zXyM3QsF7vRjKgJxVzLnPg&s'),
+  ('ORC024', 'uploads/9348395a-1ad2-4f29-a123-27adbb3a15cd_oldschool.jpg'),
 
   -- ORC025 - Constelação personalizada
-  ('ORC025', 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRKr7mL9XsP2qF8mYzN6TgR4jKvLgJxVzDsQw&s'),
+  ('ORC025', 'uploads/935a42f2-45ca-471a-96e7-dd393a6c6589_oldschool.jpg'),
 
   -- ORC026 - Flor de lótus
-  ('ORC026', 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTJq5kK8NjG6hP9zXyM3QsF7vRjKgJxVzLnPg&s'),
+  ('ORC026', 'uploads/9ebaabbd-f3c9-4fd3-bc6f-694623c8c580_oldschool.jpg'),
 
 
 
   -- ORC028 - Gato geométrico
-  ('ORC028', 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSLp7qK8NjG6hP9zXyM3QsF7vRjKgJxVzLnPg&s'),
+  ('ORC028', 'uploads/a694208c-6bfa-4430-bd39-9e87304b32b1_portfolio-image-0.jpg'),
 
   -- ORC029 - Âncora com corda
-  ('ORC029', 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRJr5mL9XsP2qF8mYzN6TgR4jKvLgJxVzDsQw&s'),
+  ('ORC029', 'uploads/a258bee8-572c-48fe-8f7c-425ff7cc9b50_oldschool.jpg'),
 
   -- ORC030 - Dreamcatcher delicado
-  ('ORC030', 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTKq3kK8NjG6hP9zXyM3QsF7vRjKgJxVzLnPg&s'),
+  ('ORC030', 'uploads/a530631d-520f-4206-82c2-0cec5abef191_oldschool.jpg'),
 
   -- ORC031 - Tigre rugindo
-  ('ORC031', 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRNh7rL9XsP2qF8mYzN6TgR4jKvLgJxVzDsQw&s'),
+  ('ORC031', 'uploads/a73a4d2c-a98c-45ac-b254-d2a4ed3b1d27_oldschool.jpg'),
 
   -- ORC032 - Frase motivacional
-  ('ORC032', 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSMp5qK8NjG6hP9zXyM3QsF7vRjKgJxVzLnPg&s');
+  ('ORC032', 'uploads/aad895c9-b0ae-417f-baa1-cbb9aed328d5_oldschool.jpg');
 
 -- Inserindo agendamentos - apenas um por dia, datas passadas como CONCLUIDO
 INSERT INTO agendamento (data_hora, status, usuario_id, codigo_orcamento, forma_pagamento, pagamento_feito, tempo_duracao) VALUES
