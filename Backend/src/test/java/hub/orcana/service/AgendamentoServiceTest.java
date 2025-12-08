@@ -71,7 +71,10 @@ class AgendamentoServiceTest {
                 "joao@email.com",
                 "ORC123",
                 dataHora,
-                StatusAgendamento.PENDENTE
+                StatusAgendamento.PENDENTE,
+                null,
+                null,
+                null
         );
     }
 
@@ -265,7 +268,10 @@ class AgendamentoServiceTest {
                 "joao@email.com",
                 "ORC123",
                 novaDataHora,
-                StatusAgendamento.CONFIRMADO
+                StatusAgendamento.CONFIRMADO,
+                null,
+                null,
+                null
         );
 
         when(agendamentoRepository.findById(1L)).thenReturn(Optional.of(agendamento));

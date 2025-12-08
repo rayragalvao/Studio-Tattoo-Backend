@@ -16,6 +16,7 @@ import hub.orcana.tables.repository.UsuarioRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -109,6 +110,7 @@ public class AgendamentoService implements AgendamentoSubject {
         return AgendamentoMapper.of(salvo);
     }
 
+    @Transactional
     public DetalhesAgendamentoOutput putAgendamentoById(Long id, CadastroAgendamentoInput agendamento) {
         Agendamento existente = repository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Agendamento não encontrado."));
@@ -123,6 +125,17 @@ public class AgendamentoService implements AgendamentoSubject {
         Orcamento orcamento = orcamentoRepository.findByCodigoOrcamento(agendamento.codigoOrcamento())
                 .orElseThrow(() -> new IllegalArgumentException("Orçamento não encontrado."));
         existente.setOrcamento(orcamento);
+
+        // ✅ ATUALIZAR CAMPOS DE PAGAMENTO E TEMPO
+        if (agendamento.tempoDuracao() != null) {
+            existente.setTempoDuracao(agendamento.tempoDuracao());
+        }
+        if (agendamento.pagamentoFeito() != null) {
+            existente.setPagamentoFeito(agendamento.pagamentoFeito());
+        }
+        if (agendamento.formaPagamento() != null) {
+            existente.setFormaPagamento(agendamento.formaPagamento());
+        }
 
         Agendamento salvo = repository.save(existente);
         return AgendamentoMapper.of(salvo);

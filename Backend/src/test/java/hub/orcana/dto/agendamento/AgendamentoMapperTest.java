@@ -66,7 +66,10 @@ class AgendamentoMapperTest {
                 "joao@email.com",
                 "ORC123",
                 dataHora,
-                StatusAgendamento.PENDENTE
+                StatusAgendamento.PENDENTE,
+                null,
+                null,
+                null
         );
 
 
@@ -88,6 +91,9 @@ class AgendamentoMapperTest {
                 "joao@email.com",
                 "ORC123",
                 dataHora,
+                null,
+                null,
+                null,
                 null
         );
 
@@ -204,7 +210,10 @@ class AgendamentoMapperTest {
                 "joao@email.com",
                 "ORC123",
                 dataFutura,
-                StatusAgendamento.PENDENTE
+                StatusAgendamento.PENDENTE,
+                null,
+                null,
+                null
         );
 
 
@@ -223,7 +232,10 @@ class AgendamentoMapperTest {
                 "joao@email.com",
                 "ORC123",
                 dataHora,
-                StatusAgendamento.CONFIRMADO
+                StatusAgendamento.CONFIRMADO,
+                null,
+                null,
+                null
         );
 
 
