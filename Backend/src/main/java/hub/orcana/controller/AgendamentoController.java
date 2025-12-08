@@ -1,5 +1,6 @@
 package hub.orcana.controller;
 
+import hub.orcana.dto.agendamento.AdicionarMateriaisRequest;
 import hub.orcana.dto.agendamento.DetalhesAgendamentoOutput;
 import hub.orcana.dto.agendamento.CadastroAgendamentoInput;
 import io.swagger.v3.oas.annotations.Operation;
@@ -350,6 +351,38 @@ public class AgendamentoController {
         } catch (Exception e) {
             log.error("Erro ao buscar datas ocupadas: {}", e.getMessage(), e);
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
+        }
+    }
+
+    @PostMapping("/{id}/materiais")
+    @Operation(summary = "Adicionar materiais usados ao agendamento",
+            description = "Registra os materiais/equipamentos utilizados em um agendamento concluído")
+    @SecurityRequirement(name = "Bearer")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Materiais registrados com sucesso"),
+            @ApiResponse(responseCode = "400", description = "Dados inválidos ou agendamento não encontrado",
+                    content = @Content(schema = @Schema(implementation = String.class))),
+            @ApiResponse(responseCode = "404", description = "Agendamento não encontrado",
+                    content = @Content(schema = @Schema(implementation = String.class))),
+            @ApiResponse(responseCode = "401", description = "Token de autenticação inválido ou expirado"),
+            @ApiResponse(responseCode = "403", description = "Acesso negado - permissões insuficientes"),
+            @ApiResponse(responseCode = "500", description = "Erro interno do servidor")
+    })
+    public ResponseEntity<String> adicionarMateriaisUsados(
+            @PathVariable Long id,
+            @RequestBody @Valid AdicionarMateriaisRequest request) {
+        log.info("Adicionando {} materiais ao agendamento ID: {}", request.materiais().size(), id);
+        try {
+            service.adicionarMateriaisUsados(id, request);
+            log.info("Materiais adicionados com sucesso ao agendamento ID: {}", id);
+            return ResponseEntity.ok("Materiais registrados com sucesso");
+        } catch (IllegalArgumentException e) {
+            log.warn("Erro ao adicionar materiais ao agendamento ID {}: {}", id, e.getMessage());
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
+        } catch (Exception e) {
+            log.error("Erro inesperado ao adicionar materiais ao agendamento ID {}: {}", id, e.getMessage(), e);
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR,
+                    "Erro ao registrar materiais: " + e.getMessage());
         }
     }
 }

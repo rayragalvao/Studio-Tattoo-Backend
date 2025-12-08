@@ -34,4 +34,16 @@ public class EquipamentoUso {
     public Relatorio getRelatorio() {
         return relatorio;
     }
+
+    public void setEquipamento(Estoque equipamento) {
+        this.equipamento = equipamento;
+    }
+
+    public void setQuantidade(int quantidade) {
+        this.quantidade = quantidade;
+    }
+
+    public void setRelatorio(Relatorio relatorio) {
+        this.relatorio = relatorio;
+    }
 }
