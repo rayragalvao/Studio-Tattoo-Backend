@@ -16,6 +16,8 @@ import org.springframework.web.multipart.MultipartFile;
 import hub.orcana.observer.OrcamentoObserver;
 import hub.orcana.observer.OrcamentoSubject;
 
+import java.sql.Time;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -197,7 +199,7 @@ public class OrcamentoService implements OrcamentoSubject {
         }
 
         if (dados.containsKey("tempo") && dados.get("tempo") instanceof String tempoStr) {
-            orcamento.setTempo(java.time.LocalTime.parse(tempoStr));
+            orcamento.setTempo(Time.valueOf(tempoStr));
         }
 
         if (dados.containsKey("nome")) orcamento.setNome((String) dados.get("nome"));
