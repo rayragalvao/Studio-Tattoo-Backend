@@ -135,8 +135,8 @@ class OrcamentoControllerTest {
                 "Preto e vermelho",
                 "Braço direito",
                 List.of("url1.jpg"),
-                100.0,
-                Time.valueOf("2"),
+                null,
+                null,
                 StatusOrcamento.PENDENTE
         ));
         orcamentos.add(new DetalhesOrcamentoOutput(
@@ -148,8 +148,8 @@ class OrcamentoControllerTest {
                 "Colorido",
                 "Tornozelo",
                 List.of("url2.jpg"),
-                80.0,
-                Time.valueOf("1:30"),
+                null,
+                null,
                 StatusOrcamento.PENDENTE
         ));
 

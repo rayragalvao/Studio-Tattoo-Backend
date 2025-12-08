@@ -36,17 +36,17 @@ public class AgendamentoController {
 
     @GetMapping
     @Operation(summary = "Listar todos os agendamentos",
-               description = "Retorna uma lista com todos os agendamentos cadastrados no sistema")
+            description = "Retorna uma lista com todos os agendamentos cadastrados no sistema")
     @SecurityRequirement(name = "Bearer")
     @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "Lista de agendamentos retornada com sucesso",
+            @ApiResponse(responseCode = "200", description = "Lista de agendamentos retornada com sucesso",
                     content = @Content(schema = @Schema(implementation = Agendamento.class))),
-        @ApiResponse(responseCode = "204", description = "Nenhum agendamento encontrado"),
-        @ApiResponse(responseCode = "400", description = "Erro interno do servidor ou parâmetros inválidos",
+            @ApiResponse(responseCode = "204", description = "Nenhum agendamento encontrado"),
+            @ApiResponse(responseCode = "400", description = "Erro interno do servidor ou parâmetros inválidos",
                     content = @Content(schema = @Schema(implementation = String.class))),
-        @ApiResponse(responseCode = "401", description = "Token de autenticação inválido ou expirado"),
-        @ApiResponse(responseCode = "403", description = "Acesso negado - permissões insuficientes"),
-        @ApiResponse(responseCode = "500", description = "Erro interno do servidor")
+            @ApiResponse(responseCode = "401", description = "Token de autenticação inválido ou expirado"),
+            @ApiResponse(responseCode = "403", description = "Acesso negado - permissões insuficientes"),
+            @ApiResponse(responseCode = "500", description = "Erro interno do servidor")
     })
     public ResponseEntity<List<DetalhesAgendamentoOutput>> getAgendamento() {
         log.info("Iniciando busca por todos os agendamentos");
@@ -67,18 +67,18 @@ public class AgendamentoController {
 
     @GetMapping("/{id}")
     @Operation(summary = "Listar agendamento por ID",
-               description = "Retorna um agendamento específico baseado no ID fornecido")
+            description = "Retorna um agendamento específico baseado no ID fornecido")
     @SecurityRequirement(name = "Bearer")
     @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "Agendamento encontrado com sucesso",
+            @ApiResponse(responseCode = "200", description = "Agendamento encontrado com sucesso",
                     content = @Content(schema = @Schema(implementation = Agendamento.class))),
-        @ApiResponse(responseCode = "404", description = "Agendamento não encontrado com o ID fornecido",
+            @ApiResponse(responseCode = "404", description = "Agendamento não encontrado com o ID fornecido",
                     content = @Content(schema = @Schema(implementation = String.class))),
-        @ApiResponse(responseCode = "400", description = "ID inválido ou parâmetros incorretos",
+            @ApiResponse(responseCode = "400", description = "ID inválido ou parâmetros incorretos",
                     content = @Content(schema = @Schema(implementation = String.class))),
-        @ApiResponse(responseCode = "401", description = "Token de autenticação inválido ou expirado"),
-        @ApiResponse(responseCode = "403", description = "Acesso negado - permissões insuficientes"),
-        @ApiResponse(responseCode = "500", description = "Erro interno do servidor")
+            @ApiResponse(responseCode = "401", description = "Token de autenticação inválido ou expirado"),
+            @ApiResponse(responseCode = "403", description = "Acesso negado - permissões insuficientes"),
+            @ApiResponse(responseCode = "500", description = "Erro interno do servidor")
     })
     public ResponseEntity<DetalhesAgendamentoOutput> getAgendamentoPorId(@PathVariable Long id) {
         log.info("Buscando agendamento por ID: {}", id);
@@ -94,17 +94,17 @@ public class AgendamentoController {
 
     @GetMapping("/statusAtual/{status}")
     @Operation(summary = "Listar agendamentos por status",
-               description = "Retorna uma lista de agendamentos filtrados pelo status fornecido")
+            description = "Retorna uma lista de agendamentos filtrados pelo status fornecido")
     @SecurityRequirement(name = "Bearer")
     @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "Lista de agendamentos com o status especificado",
+            @ApiResponse(responseCode = "200", description = "Lista de agendamentos com o status especificado",
                     content = @Content(schema = @Schema(implementation = Agendamento.class))),
-        @ApiResponse(responseCode = "204", description = "Nenhum agendamento encontrado com o status especificado"),
-        @ApiResponse(responseCode = "400", description = "Status inválido ou erro nos parâmetros",
+            @ApiResponse(responseCode = "204", description = "Nenhum agendamento encontrado com o status especificado"),
+            @ApiResponse(responseCode = "400", description = "Status inválido ou erro nos parâmetros",
                     content = @Content(schema = @Schema(implementation = String.class))),
-        @ApiResponse(responseCode = "401", description = "Token de autenticação inválido ou expirado"),
-        @ApiResponse(responseCode = "403", description = "Acesso negado - permissões insuficientes"),
-        @ApiResponse(responseCode = "500", description = "Erro interno do servidor")
+            @ApiResponse(responseCode = "401", description = "Token de autenticação inválido ou expirado"),
+            @ApiResponse(responseCode = "403", description = "Acesso negado - permissões insuficientes"),
+            @ApiResponse(responseCode = "500", description = "Erro interno do servidor")
     })
     public ResponseEntity<List<DetalhesAgendamentoOutput>> getAgendamentosByStatus(@PathVariable String status) {
         log.info("Buscando agendamentos por status: {}", status);
@@ -124,19 +124,19 @@ public class AgendamentoController {
 
     @PostMapping
     @Operation(summary = "Inserir novo agendamento",
-               description = "Cria um novo agendamento no sistema com os dados fornecidos")
+            description = "Cria um novo agendamento no sistema com os dados fornecidos")
     @SecurityRequirement(name = "Bearer")
     @ApiResponses(value = {
-        @ApiResponse(responseCode = "201", description = "Agendamento criado com sucesso",
+            @ApiResponse(responseCode = "201", description = "Agendamento criado com sucesso",
                     content = @Content(schema = @Schema(implementation = Agendamento.class))),
-        @ApiResponse(responseCode = "400", description = "Dados de entrada inválidos ou malformados",
+            @ApiResponse(responseCode = "400", description = "Dados de entrada inválidos ou malformados",
                     content = @Content(schema = @Schema(implementation = String.class))),
-        @ApiResponse(responseCode = "409", description = "Conflito - agendamento já existe ou horário indisponível",
+            @ApiResponse(responseCode = "409", description = "Conflito - agendamento já existe ou horário indisponível",
                     content = @Content(schema = @Schema(implementation = String.class))),
-        @ApiResponse(responseCode = "401", description = "Token de autenticação inválido ou expirado"),
-        @ApiResponse(responseCode = "403", description = "Acesso negado - permissões insuficientes"),
-        @ApiResponse(responseCode = "422", description = "Dados não processáveis - validação falhou"),
-        @ApiResponse(responseCode = "500", description = "Erro interno do servidor")
+            @ApiResponse(responseCode = "401", description = "Token de autenticação inválido ou expirado"),
+            @ApiResponse(responseCode = "403", description = "Acesso negado - permissões insuficientes"),
+            @ApiResponse(responseCode = "422", description = "Dados não processáveis - validação falhou"),
+            @ApiResponse(responseCode = "500", description = "Erro interno do servidor")
     })
     public ResponseEntity<DetalhesAgendamentoOutput> postAgendamento(@RequestBody CadastroAgendamentoInput agendamento) {
         log.info("Iniciando criação de novo agendamento: {}", agendamento);
@@ -155,26 +155,29 @@ public class AgendamentoController {
 
     @PutMapping("/{id}")
     @Operation(summary = "Atualizar agendamento pelo ID",
-               description = "Atualiza completamente um agendamento existente baseado no ID fornecido")
+            description = "Atualiza completamente um agendamento existente baseado no ID fornecido")
     @SecurityRequirement(name = "Bearer")
     @ApiResponses(value = {
-        @ApiResponse(responseCode = "204", description = "Agendamento atualizado com sucesso"),
-        @ApiResponse(responseCode = "400", description = "Dados de entrada inválidos ou malformados",
+            @ApiResponse(responseCode = "200", description = "Agendamento atualizado com sucesso",
+                    content = @Content(schema = @Schema(implementation = DetalhesAgendamentoOutput.class))),
+            @ApiResponse(responseCode = "400", description = "Dados de entrada inválidos ou malformados",
                     content = @Content(schema = @Schema(implementation = String.class))),
-        @ApiResponse(responseCode = "404", description = "Agendamento não encontrado com o ID fornecido",
+            @ApiResponse(responseCode = "404", description = "Agendamento não encontrado com o ID fornecido",
                     content = @Content(schema = @Schema(implementation = String.class))),
-        @ApiResponse(responseCode = "401", description = "Token de autenticação inválido ou expirado"),
-        @ApiResponse(responseCode = "403", description = "Acesso negado - permissões insuficientes"),
-        @ApiResponse(responseCode = "409", description = "Conflito - horário indisponível ou dados conflitantes"),
-        @ApiResponse(responseCode = "422", description = "Dados não processáveis - validação falhou"),
-        @ApiResponse(responseCode = "500", description = "Erro interno do servidor")
+            @ApiResponse(responseCode = "401", description = "Token de autenticação inválido ou expirado"),
+            @ApiResponse(responseCode = "403", description = "Acesso negado - permissões insuficientes"),
+            @ApiResponse(responseCode = "409", description = "Conflito - horário indisponível ou dados conflitantes"),
+            @ApiResponse(responseCode = "422", description = "Dados não processáveis - validação falhou"),
+            @ApiResponse(responseCode = "500", description = "Erro interno do servidor")
     })
-    public ResponseEntity<DetalhesAgendamentoOutput> putAgendamento(@PathVariable Long id, @RequestBody @Valid CadastroAgendamentoInput agendamento) {
+    public ResponseEntity<DetalhesAgendamentoOutput> putAgendamento(
+            @PathVariable Long id,
+            @RequestBody @Valid CadastroAgendamentoInput agendamento) {
         log.info("Iniciando atualização do agendamento ID: {}", id);
         try {
-            service.putAgendamentoById(id, agendamento);
+            DetalhesAgendamentoOutput atualizado = service.putAgendamentoById(id, agendamento);
             log.info("Agendamento ID {} atualizado com sucesso", id);
-            return ResponseEntity.status(204).body(null);
+            return ResponseEntity.status(200).body(atualizado);
         } catch (IllegalArgumentException e) {
             log.warn("Agendamento não encontrado para atualização. ID: {} - Erro: {}", id, e.getMessage());
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage());
@@ -186,18 +189,18 @@ public class AgendamentoController {
 
     @DeleteMapping("/{id}")
     @Operation(summary = "Deletar agendamento pelo ID",
-               description = "Remove permanentemente um agendamento do sistema baseado no ID fornecido")
+            description = "Remove permanentemente um agendamento do sistema baseado no ID fornecido")
     @SecurityRequirement(name = "Bearer")
     @ApiResponses(value = {
-        @ApiResponse(responseCode = "204", description = "Agendamento deletado com sucesso"),
-        @ApiResponse(responseCode = "400", description = "ID inválido ou erro nos parâmetros",
+            @ApiResponse(responseCode = "204", description = "Agendamento deletado com sucesso"),
+            @ApiResponse(responseCode = "400", description = "ID inválido ou erro nos parâmetros",
                     content = @Content(schema = @Schema(implementation = String.class))),
-        @ApiResponse(responseCode = "404", description = "Agendamento não encontrado com o ID fornecido",
+            @ApiResponse(responseCode = "404", description = "Agendamento não encontrado com o ID fornecido",
                     content = @Content(schema = @Schema(implementation = String.class))),
-        @ApiResponse(responseCode = "401", description = "Token de autenticação inválido ou expirado"),
-        @ApiResponse(responseCode = "403", description = "Acesso negado - permissões insuficientes"),
-        @ApiResponse(responseCode = "409", description = "Conflito - agendamento não pode ser deletado devido a dependências"),
-        @ApiResponse(responseCode = "500", description = "Erro interno do servidor")
+            @ApiResponse(responseCode = "401", description = "Token de autenticação inválido ou expirado"),
+            @ApiResponse(responseCode = "403", description = "Acesso negado - permissões insuficientes"),
+            @ApiResponse(responseCode = "409", description = "Conflito - agendamento não pode ser deletado devido a dependências"),
+            @ApiResponse(responseCode = "500", description = "Erro interno do servidor")
     })
     public ResponseEntity<String> deleteAgendamento(@PathVariable Long id) {
         log.info("Iniciando exclusão do agendamento ID: {}", id);
@@ -218,18 +221,18 @@ public class AgendamentoController {
 
     @GetMapping("/detalhado/{id}")
     @Operation(summary = "Retorna agendamento com dados do usuário e orçamento",
-               description = "Retorna um agendamento completo com informações detalhadas do usuário e orçamento associado")
+            description = "Retorna um agendamento completo com informações detalhadas do usuário e orçamento associado")
     @SecurityRequirement(name = "Bearer")
     @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "Agendamento detalhado retornado com sucesso",
+            @ApiResponse(responseCode = "200", description = "Agendamento detalhado retornado com sucesso",
                     content = @Content(schema = @Schema(implementation = Agendamento.class))),
-        @ApiResponse(responseCode = "404", description = "Agendamento não encontrado com o ID fornecido",
+            @ApiResponse(responseCode = "404", description = "Agendamento não encontrado com o ID fornecido",
                     content = @Content(schema = @Schema(implementation = String.class))),
-        @ApiResponse(responseCode = "400", description = "ID inválido ou erro nos parâmetros",
+            @ApiResponse(responseCode = "400", description = "ID inválido ou erro nos parâmetros",
                     content = @Content(schema = @Schema(implementation = String.class))),
-        @ApiResponse(responseCode = "401", description = "Token de autenticação inválido ou expirado"),
-        @ApiResponse(responseCode = "403", description = "Acesso negado - permissões insuficientes"),
-        @ApiResponse(responseCode = "500", description = "Erro interno do servidor")
+            @ApiResponse(responseCode = "401", description = "Token de autenticação inválido ou expirado"),
+            @ApiResponse(responseCode = "403", description = "Acesso negado - permissões insuficientes"),
+            @ApiResponse(responseCode = "500", description = "Erro interno do servidor")
     })
     public ResponseEntity<?> getAgendamentoCompleto(@PathVariable Long id) {
         log.info("Buscando agendamento completo com ID: {}", id);
@@ -245,19 +248,19 @@ public class AgendamentoController {
 
     @GetMapping("/usuario/{usuarioId}")
     @Operation(summary = "Listar todos os agendamentos de um usuário",
-               description = "Retorna uma lista com todos os agendamentos associados ao usuário especificado")
+            description = "Retorna uma lista com todos os agendamentos associados ao usuário especificado")
     @SecurityRequirement(name = "Bearer")
     @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "Lista de agendamentos do usuário retornada com sucesso",
+            @ApiResponse(responseCode = "200", description = "Lista de agendamentos do usuário retornada com sucesso",
                     content = @Content(schema = @Schema(implementation = Agendamento.class))),
-        @ApiResponse(responseCode = "204", description = "Nenhum agendamento encontrado para o usuário especificado"),
-        @ApiResponse(responseCode = "404", description = "Usuário não encontrado com o ID fornecido",
+            @ApiResponse(responseCode = "204", description = "Nenhum agendamento encontrado para o usuário especificado"),
+            @ApiResponse(responseCode = "404", description = "Usuário não encontrado com o ID fornecido",
                     content = @Content(schema = @Schema(implementation = String.class))),
-        @ApiResponse(responseCode = "400", description = "ID de usuário inválido ou erro nos parâmetros",
+            @ApiResponse(responseCode = "400", description = "ID de usuário inválido ou erro nos parâmetros",
                     content = @Content(schema = @Schema(implementation = String.class))),
-        @ApiResponse(responseCode = "401", description = "Token de autenticação inválido ou expirado"),
-        @ApiResponse(responseCode = "403", description = "Acesso negado - permissões insuficientes"),
-        @ApiResponse(responseCode = "500", description = "Erro interno do servidor")
+            @ApiResponse(responseCode = "401", description = "Token de autenticação inválido ou expirado"),
+            @ApiResponse(responseCode = "403", description = "Acesso negado - permissões insuficientes"),
+            @ApiResponse(responseCode = "500", description = "Erro interno do servidor")
     })
     public ResponseEntity<List<DetalhesAgendamentoOutput>> getAgendamentosPorUsuario(@PathVariable Long usuarioId) {
         log.info("Buscando agendamentos para usuário ID: {}", usuarioId);
@@ -278,20 +281,20 @@ public class AgendamentoController {
 
     @PutMapping("/{id}/orcamento/{orcamentoId}")
     @Operation(summary = "Atualiza o orçamento de um agendamento existente",
-               description = "Associa um orçamento específico a um agendamento existente no sistema")
+            description = "Associa um orçamento específico a um agendamento existente no sistema")
     @SecurityRequirement(name = "Bearer")
     @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "Orçamento do agendamento atualizado com sucesso",
+            @ApiResponse(responseCode = "200", description = "Orçamento do agendamento atualizado com sucesso",
                     content = @Content(schema = @Schema(implementation = Agendamento.class))),
-        @ApiResponse(responseCode = "400", description = "IDs inválidos ou erro nos parâmetros",
+            @ApiResponse(responseCode = "400", description = "IDs inválidos ou erro nos parâmetros",
                     content = @Content(schema = @Schema(implementation = String.class))),
-        @ApiResponse(responseCode = "404", description = "Agendamento ou orçamento não encontrado com os IDs fornecidos",
+            @ApiResponse(responseCode = "404", description = "Agendamento ou orçamento não encontrado com os IDs fornecidos",
                     content = @Content(schema = @Schema(implementation = String.class))),
-        @ApiResponse(responseCode = "401", description = "Token de autenticação inválido ou expirado"),
-        @ApiResponse(responseCode = "403", description = "Acesso negado - permissões insuficientes"),
-        @ApiResponse(responseCode = "409", description = "Conflito - orçamento já associado a outro agendamento"),
-        @ApiResponse(responseCode = "422", description = "Dados não processáveis - validação falhou"),
-        @ApiResponse(responseCode = "500", description = "Erro interno do servidor")
+            @ApiResponse(responseCode = "401", description = "Token de autenticação inválido ou expirado"),
+            @ApiResponse(responseCode = "403", description = "Acesso negado - permissões insuficientes"),
+            @ApiResponse(responseCode = "409", description = "Conflito - orçamento já associado a outro agendamento"),
+            @ApiResponse(responseCode = "422", description = "Dados não processáveis - validação falhou"),
+            @ApiResponse(responseCode = "500", description = "Erro interno do servidor")
     })
     public ResponseEntity<DetalhesAgendamentoOutput> atualizarOrcamentoDoAgendamento(
             @PathVariable Long id,
@@ -309,13 +312,13 @@ public class AgendamentoController {
 
     @GetMapping("/validar-codigo/{codigoOrcamento}")
     @Operation(summary = "Valida código de orçamento",
-               description = "Verifica se um código de orçamento existe e está disponível para agendamento")
+            description = "Verifica se um código de orçamento existe e está disponível para agendamento")
     @SecurityRequirement(name = "Bearer")
     @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "Código validado com sucesso"),
-        @ApiResponse(responseCode = "400", description = "Erro na validação"),
-        @ApiResponse(responseCode = "401", description = "Token de autenticação inválido ou expirado"),
-        @ApiResponse(responseCode = "500", description = "Erro interno do servidor")
+            @ApiResponse(responseCode = "200", description = "Código validado com sucesso"),
+            @ApiResponse(responseCode = "400", description = "Erro na validação"),
+            @ApiResponse(responseCode = "401", description = "Token de autenticação inválido ou expirado"),
+            @ApiResponse(responseCode = "500", description = "Erro interno do servidor")
     })
     public ResponseEntity<Boolean> validarCodigoOrcamento(@PathVariable String codigoOrcamento) {
         log.info("Validando código de orçamento: {}", codigoOrcamento);
@@ -331,12 +334,12 @@ public class AgendamentoController {
 
     @GetMapping("/datas-ocupadas")
     @Operation(summary = "Busca datas com agendamentos",
-               description = "Retorna todas as datas que já possuem agendamentos")
+            description = "Retorna todas as datas que já possuem agendamentos")
     @SecurityRequirement(name = "Bearer")
     @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "Lista de datas retornada com sucesso"),
-        @ApiResponse(responseCode = "401", description = "Token de autenticação inválido ou expirado"),
-        @ApiResponse(responseCode = "500", description = "Erro interno do servidor")
+            @ApiResponse(responseCode = "200", description = "Lista de datas retornada com sucesso"),
+            @ApiResponse(responseCode = "401", description = "Token de autenticação inválido ou expirado"),
+            @ApiResponse(responseCode = "500", description = "Erro interno do servidor")
     })
     public ResponseEntity<List<String>> getDatasOcupadas() {
         log.info("Buscando datas com agendamentos");

@@ -28,7 +28,7 @@ class AgendamentoMapperTest {
         usuario.setNome("João Silva");
         usuario.setEmail("joao@email.com");
 
-        orcamento = new Orcamento("ORC123", 1L, "João Silva", "joao@email.com",
+        orcamento = new Orcamento("ORC123", "João Silva", "joao@email.com",
                 "Dragão nas costas", 20.5, "Preto e Vermelho", "Costas", null);
 
         agendamento = new Agendamento();
@@ -66,7 +66,10 @@ class AgendamentoMapperTest {
                 "joao@email.com",
                 "ORC123",
                 dataHora,
-                StatusAgendamento.PENDENTE
+                StatusAgendamento.PENDENTE,
+                null,
+                null,
+                null
         );
 
 
@@ -88,6 +91,9 @@ class AgendamentoMapperTest {
                 "joao@email.com",
                 "ORC123",
                 dataHora,
+                null,
+                null,
+                null,
                 null
         );
 
@@ -164,7 +170,7 @@ class AgendamentoMapperTest {
     @DisplayName("Deve preservar todos os campos do orçamento na conversão")
     void devePreservarCamposOrcamento() {
 
-        Orcamento orcamentoCompleto = new Orcamento("ORC456", 2L, "João Silva", "joao@email.com",
+        Orcamento orcamentoCompleto = new Orcamento("ORC456", "João Silva", "joao@email.com",
                 "Leão no braço", 15.0, "Colorido", "Braço", null);
         agendamento.setOrcamento(orcamentoCompleto);
 
@@ -183,7 +189,7 @@ class AgendamentoMapperTest {
     @DisplayName("Deve converter agendamento com tamanho decimal preciso")
     void deveConverterAgendamentoComTamanhoDecimal() {
 
-        Orcamento orcamentoComTamanho = new Orcamento("ORC123", 1L, "João Silva", "joao@email.com",
+        Orcamento orcamentoComTamanho = new Orcamento("ORC123", "João Silva", "joao@email.com",
                 "Dragão nas costas", 12.75, "Preto e Vermelho", "Costas", null);
         agendamento.setOrcamento(orcamentoComTamanho);
 
@@ -204,7 +210,10 @@ class AgendamentoMapperTest {
                 "joao@email.com",
                 "ORC123",
                 dataFutura,
-                StatusAgendamento.PENDENTE
+                StatusAgendamento.PENDENTE,
+                null,
+                null,
+                null
         );
 
 
@@ -223,7 +232,10 @@ class AgendamentoMapperTest {
                 "joao@email.com",
                 "ORC123",
                 dataHora,
-                StatusAgendamento.CONFIRMADO
+                StatusAgendamento.CONFIRMADO,
+                null,
+                null,
+                null
         );
 
 
@@ -264,7 +276,7 @@ class AgendamentoMapperTest {
     @DisplayName("Deve converter agendamento com cores complexas")
     void deveConverterAgendamentoComCoresComplexas() {
 
-        Orcamento orcamentoComCores = new Orcamento("ORC123", 1L, "João Silva", "joao@email.com",
+        Orcamento orcamentoComCores = new Orcamento("ORC123", "João Silva", "joao@email.com",
                 "Dragão nas costas", 20.5, "Preto, Vermelho, Azul, Verde, Amarelo", "Costas", null);
         agendamento.setOrcamento(orcamentoComCores);
 
@@ -282,7 +294,7 @@ class AgendamentoMapperTest {
 
         String ideiaLonga = "Dragão oriental nas costas completas com detalhes em nuvens, " +
                            "flores de cerejeira e elementos tradicionais japoneses";
-        Orcamento orcamentoComIdeiaLonga = new Orcamento("ORC123", 1L, "João Silva", "joao@email.com",
+        Orcamento orcamentoComIdeiaLonga = new Orcamento("ORC123", "João Silva", "joao@email.com",
                 ideiaLonga, 20.5, "Preto e Vermelho", "Costas", null);
         agendamento.setOrcamento(orcamentoComIdeiaLonga);
 

@@ -12,6 +12,9 @@ public record CadastroAgendamentoInput(
     String codigoOrcamento,
     @NotNull
     LocalDateTime dataHora,
-    StatusAgendamento status
+    StatusAgendamento status,
+    Integer tempoDuracao,
+    Boolean pagamentoFeito,
+    String formaPagamento
 ) {
 }

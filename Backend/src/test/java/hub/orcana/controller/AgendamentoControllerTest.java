@@ -62,7 +62,10 @@ class AgendamentoControllerTest {
                 "joao@email.com",
                 "ORC123",
                 dataHora,
-                StatusAgendamento.PENDENTE
+                StatusAgendamento.PENDENTE,
+                null,
+                null,
+                null
         );
     }
 
@@ -419,6 +422,9 @@ class AgendamentoControllerTest {
                 "joao@email.com",
                 "ORC123",
                 dataHora,
+                null,
+                null,
+                null,
                 null
         );
         when(agendamentoService.postAgendamento(any(CadastroAgendamentoInput.class)))
@@ -509,7 +515,10 @@ class AgendamentoControllerTest {
                 "joao@email.com",
                 "ORC123",
                 dataLimite,
-                StatusAgendamento.PENDENTE
+                StatusAgendamento.PENDENTE,
+                null,
+                null,
+                null
         );
         DetalhesAgendamentoOutput outputFuturo = new DetalhesAgendamentoOutput(
                 1L, dataLimite, "PENDENTE", "João Silva", "joao@email.com",
@@ -535,7 +544,10 @@ class AgendamentoControllerTest {
                 "joao@email.com",
                 "ORC123",
                 dataHora.plusHours(2),
-                StatusAgendamento.CONFIRMADO
+                StatusAgendamento.CONFIRMADO,
+                null,
+                null,
+                null
         );
         DetalhesAgendamentoOutput outputAtualizado = new DetalhesAgendamentoOutput(
                 1L, dataHora.plusHours(2), "CONFIRMADO", "João Silva", "joao@email.com",
