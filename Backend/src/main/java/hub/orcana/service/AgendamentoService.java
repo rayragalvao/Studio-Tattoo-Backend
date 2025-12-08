@@ -1,18 +1,10 @@
 package hub.orcana.service;
 
-import hub.orcana.dto.agendamento.CompletarAgendamentoInput;
-import hub.orcana.dto.agendamento.DetalhesAgendamentoOutput;
-import hub.orcana.dto.agendamento.AgendamentoMapper;
-import hub.orcana.dto.agendamento.CadastroAgendamentoInput;
+import hub.orcana.dto.agendamento.*;
 import hub.orcana.observer.AgendamentoObserver;
 import hub.orcana.observer.AgendamentoSubject;
-import hub.orcana.tables.Agendamento;
-import hub.orcana.tables.Orcamento;
-import hub.orcana.tables.StatusAgendamento;
-import hub.orcana.tables.Usuario;
-import hub.orcana.tables.repository.AgendamentoRepository;
-import hub.orcana.tables.repository.OrcamentoRepository;
-import hub.orcana.tables.repository.UsuarioRepository;
+import hub.orcana.tables.*;
+import hub.orcana.tables.repository.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -33,16 +25,25 @@ public class AgendamentoService implements AgendamentoSubject {
     private final OrcamentoRepository orcamentoRepository;
     private final EmailService emailService;
     private final List<AgendamentoObserver> observers = new ArrayList<>();
+    private final RelatorioRepository relatorioRepository;
+    private final EquipamentoUsoRepository equipamentoUsoRepository;
+    private final EstoqueRepository estoqueRepository;
 
     public AgendamentoService(
             AgendamentoRepository repository,
             UsuarioRepository usuarioRepository,
             OrcamentoRepository orcamentoRepository,
-            EmailService emailService) {
+            EmailService emailService,
+            RelatorioRepository relatorioRepository,
+            EquipamentoUsoRepository equipamentoUsoRepository,
+            EstoqueRepository estoqueRepository) {
         this.repository = repository;
         this.usuarioRepository = usuarioRepository;
         this.orcamentoRepository = orcamentoRepository;
         this.emailService = emailService;
+        this.relatorioRepository = relatorioRepository;
+        this.equipamentoUsoRepository = equipamentoUsoRepository;
+        this.estoqueRepository = estoqueRepository;
         this.attach(emailService);
     }
 
@@ -191,5 +192,57 @@ public class AgendamentoService implements AgendamentoSubject {
         agendamento.setOrcamento(orcamento);
         Agendamento salvo = repository.save(agendamento);
         return AgendamentoMapper.of(salvo);
+    }
+
+    @Transactional
+    public void adicionarMateriaisUsados(Long agendamentoId, AdicionarMateriaisRequest request) {
+        log.info("Adicionando materiais usados ao agendamento ID: {}", agendamentoId);
+
+        // 1. Buscar o agendamento
+        Agendamento agendamento = repository.findById(agendamentoId)
+                .orElseThrow(() -> new IllegalArgumentException("Agendamento não encontrado."));
+
+        // 2. Buscar ou criar o relatório
+        Relatorio relatorio = relatorioRepository.findByAgendamentoId(agendamentoId)
+                .orElseGet(() -> {
+                    log.info("Criando novo relatório para agendamento ID: {}", agendamentoId);
+                    Relatorio novoRelatorio = new Relatorio();
+                    novoRelatorio.setAgendamento(agendamento);
+                    novoRelatorio.setUsuario(agendamento.getUsuario());
+                    return relatorioRepository.save(novoRelatorio);
+                });
+
+        // 3. Remover materiais antigos (se existirem)
+        equipamentoUsoRepository.deleteByRelatorioId(relatorio.getId());
+        log.info("Materiais antigos removidos do relatório ID: {}", relatorio.getId());
+
+        // 4. Adicionar novos materiais e atualizar estoque
+        for (MaterialUsadoRequest material : request.materiais()) {
+            Estoque equipamento = estoqueRepository.findById(material.materialId())
+                    .orElseThrow(() -> new IllegalArgumentException(
+                            "Material não encontrado: " + material.materialId()));
+
+            // Verificar se há estoque suficiente
+            if (equipamento.getQuantidade() < material.quantidade()) {
+                throw new IllegalArgumentException(
+                        String.format("Estoque insuficiente para %s. Disponível: %d, Solicitado: %d",
+                                equipamento.getNome(), equipamento.getQuantidade(), material.quantidade()));
+            }
+
+            // Criar registro de uso
+            EquipamentoUso equipamentoUso = new EquipamentoUso();
+            equipamentoUso.setEquipamento(equipamento);
+            equipamentoUso.setQuantidade(material.quantidade());
+            equipamentoUso.setRelatorio(relatorio);
+            equipamentoUsoRepository.save(equipamentoUso);
+
+            // Atualizar estoque (diminuir quantidade)
+            equipamento.setQuantidade(equipamento.getQuantidade() - material.quantidade());
+            estoqueRepository.save(equipamento);
+
+            log.info("Material '{}' (qtd: {}) adicionado ao relatório ID: {}. Estoque atualizado: {}",
+                    equipamento.getNome(), material.quantidade(), relatorio.getId(),
+                    equipamento.getQuantidade());
+        }
     }
 }
