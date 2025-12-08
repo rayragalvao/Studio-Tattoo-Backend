@@ -25,64 +25,83 @@ INSERT INTO usuario (nome, email, telefone, senha, dt_nasc, is_admin) VALUES
   ('admin', 'admin@gmail.com', '(11) 99999-9999', '$2a$10$mLZ3Uq7mYdoZZuO8OnBGmeeZ5eMG2sslJiJunOtylsjr.yU9jw1bC', '1990-01-01', TRUE),
   ('user', 'user@gmail.com', '(11) 98888-8888', '$2a$10$Vh8y2vflQWGG/VEqjaC1yOfZQhoGYDEZruob3lngf3Rfnh7wwTH66', '1995-05-15', FALSE),
   ('Julia Tatuadora', 'julia@jupiterfrito.com', '(11) 97777-7777', '$2a$10$Vh8y2vflQWGG/VEqjaC1yOfZQhoGYDEZruob3lngf3Rfnh7wwTH66', '1988-03-20', TRUE),
-  ('Marcos Silva', 'marcos.silva@email.com', '(11) 96666-6666', '$2a$10$Vh8y2vflQWGG/VEqjaC1yOfZQhoGYDEZruob3lngf3Rfnh7wwTH66', '1992-07-12', FALSE),
-  ('Carla Santos', 'carla.santos@email.com', '(11) 95555-5555', '$2a$10$Vh8y2vflQWGG/VEqjaC1yOfZQhoGYDEZruob3lngf3Rfnh7wwTH66', '1987-11-30', FALSE),
-  ('Rafael Oliveira', 'rafael.oliveira@email.com', '(11) 94444-4444', '$2a$10$Vh8y2vflQWGG/VEqjaC1yOfZQhoGYDEZruob3lngf3Rfnh7wwTH66', '1993-09-18', FALSE),
-  ('Amanda Costa', 'amanda.costa@email.com', '(11) 93333-3333', '$2a$10$Vh8y2vflQWGG/VEqjaC1yOfZQhoGYDEZruob3lngf3Rfnh7wwTH66', '1990-12-05', FALSE),
-  ('Diego Mendes', 'diego.mendes@email.com', '(11) 92222-2222', '$2a$10$Vh8y2vflQWGG/VEqjaC1yOfZQhoGYDEZruob3lngf3Rfnh7wwTH66', '1985-04-22', FALSE),
-  ('Fernanda Lima', 'fernanda.lima@email.com', '(11) 91111-1111', '$2a$10$Vh8y2vflQWGG/VEqjaC1yOfZQhoGYDEZruob3lngf3Rfnh7wwTH66', '1994-08-14', FALSE),
-  ('Bruno Alves', 'bruno.alves@email.com', '(11) 90000-0000', '$2a$10$Vh8y2vflQWGG/VEqjaC1yOfZQhoGYDEZruob3lngf3Rfnh7wwTH66', '1991-06-03', FALSE);
 
--- Inserindo orçamentos de exemplo para diversos usuários
+  -- Usuários clientes que fazem orçamentos
+  ('João Silva', 'joao@email.com', '(11) 96666-6666', '$2a$10$Vh8y2vflQWGG/VEqjaC1yOfZQhoGYDEZruob3lngf3Rfnh7wwTH66', '1992-07-12', FALSE),
+  ('Maria Santos', 'maria@email.com', '(11) 95555-5555', '$2a$10$Vh8y2vflQWGG/VEqjaC1yOfZQhoGYDEZruob3lngf3Rfnh7wwTH66', '1987-11-30', FALSE),
+  ('Pedro Oliveira', 'pedro@email.com', '(11) 94444-4444', '$2a$10$Vh8y2vflQWGG/VEqjaC1yOfZQhoGYDEZruob3lngf3Rfnh7wwTH66', '1993-09-18', FALSE),
+  ('Ana Costa', 'ana@email.com', '(11) 93333-3333', '$2a$10$Vh8y2vflQWGG/VEqjaC1yOfZQhoGYDEZruob3lngf3Rfnh7wwTH66', '1990-12-05', FALSE),
+  ('Carlos Mendes', 'carlos@email.com', '(11) 92222-2222', '$2a$10$Vh8y2vflQWGG/VEqjaC1yOfZQhoGYDEZruob3lngf3Rfnh7wwTH66', '1985-04-22', FALSE),
+  ('Luiza Pompermayer', 'luiza@email.com', '(11) 91111-1111', '$2a$10$Vh8y2vflQWGG/VEqjaC1yOfZQhoGYDEZruob3lngf3Rfnh7wwTH66', '1994-08-14', FALSE),
+  ('Gabriela Ferreira', 'gabriela@email.com', '(11) 90000-0000', '$2a$10$Vh8y2vflQWGG/VEqjaC1yOfZQhoGYDEZruob3lngf3Rfnh7wwTH66', '1991-06-03', FALSE),
+  ('Lucas Rodrigues', 'lucas@email.com', '(11) 89999-9999', '$2a$10$Vh8y2vflQWGG/VEqjaC1yOfZQhoGYDEZruob3lngf3Rfnh7wwTH66', '1989-01-25', FALSE),
+  ('Beatriz Almeida', 'beatriz@email.com', '(11) 88888-8888', '$2a$10$Vh8y2vflQWGG/VEqjaC1yOfZQhoGYDEZruob3lngf3Rfnh7wwTH66', '1996-02-28', FALSE),
+  ('Thiago Martins', 'thiago@email.com', '(11) 87777-7777', '$2a$10$Vh8y2vflQWGG/VEqjaC1yOfZQhoGYDEZruob3lngf3Rfnh7wwTH66', '1990-03-15', FALSE),
+  ('Juliana Pereira', 'juliana@email.com', '(11) 86666-6666', '$2a$10$Vh8y2vflQWGG/VEqjaC1yOfZQhoGYDEZruob3lngf3Rfnh7wwTH66', '1993-04-10', FALSE),
+  ('André Souza', 'andre@email.com', '(11) 85555-5555', '$2a$10$Vh8y2vflQWGG/VEqjaC1yOfZQhoGYDEZruob3lngf3Rfnh7wwTH66', '1988-05-20', FALSE),
+  ('Camila Rocha', 'camila@email.com', '(11) 84444-4444', '$2a$10$Vh8y2vflQWGG/VEqjaC1yOfZQhoGYDEZruob3lngf3Rfnh7wwTH66', '1991-06-08', FALSE),
+  ('Felipe Nascimento', 'felipe@email.com', '(11) 83333-3333', '$2a$10$Vh8y2vflQWGG/VEqjaC1yOfZQhoGYDEZruob3lngf3Rfnh7wwTH66', '1994-07-12', FALSE),
+  ('Renata Silva', 'renata@email.com', '(11) 82222-2222', '$2a$10$Vh8y2vflQWGG/VEqjaC1yOfZQhoGYDEZruob3lngf3Rfnh7wwTH66', '1987-08-18', FALSE),
+  ('João Pedro', 'joaopedro@email.com', '(11) 81111-1111', '$2a$10$Vh8y2vflQWGG/VEqjaC1yOfZQhoGYDEZruob3lngf3Rfnh7wwTH66', '1992-09-22', FALSE),
+  ('Isabella Castro', 'isabella@email.com', '(11) 80000-0000', '$2a$10$Vh8y2vflQWGG/VEqjaC1yOfZQhoGYDEZruob3lngf3Rfnh7wwTH66', '1995-10-30', FALSE),
+  ('Gustavo Lima', 'gustavo@email.com', '(11) 79999-9999', '$2a$10$Vh8y2vflQWGG/VEqjaC1yOfZQhoGYDEZruob3lngf3Rfnh7wwTH66', '1989-11-14', FALSE),
+  ('Larissa Melo', 'larissa@email.com', '(11) 78888-8888', '$2a$10$Vh8y2vflQWGG/VEqjaC1yOfZQhoGYDEZruob3lngf3Rfnh7wwTH66', '1993-12-05', FALSE),
+  ('Daniel Santos', 'daniel@email.com', '(11) 77777-7777', '$2a$10$Vh8y2vflQWGG/VEqjaC1yOfZQhoGYDEZruob3lngf3Rfnh7wwTH66', '1986-01-18', FALSE),
+  ('Ana Paula', 'anapaula@email.com', '(11) 76666-6666', '$2a$10$Vh8y2vflQWGG/VEqjaC1yOfZQhoGYDEZruob3lngf3Rfnh7wwTH66', '1991-02-25', FALSE),
+  ('Ricardo Ferreira', 'ricardo@email.com', '(11) 75555-5555', '$2a$10$Vh8y2vflQWGG/VEqjaC1yOfZQhoGYDEZruob3lngf3Rfnh7wwTH66', '1994-03-08', FALSE),
+  ('Patrícia Oliveira', 'patricia@email.com', '(11) 74444-4444', '$2a$10$Vh8y2vflQWGG/VEqjaC1yOfZQhoGYDEZruob3lngf3Rfnh7wwTH66', '1988-04-12', FALSE),
+  ('Rodrigo Alves', 'rodrigo@email.com', '(11) 73333-3333', '$2a$10$Vh8y2vflQWGG/VEqjaC1yOfZQhoGYDEZruob3lngf3Rfnh7wwTH66', '1992-05-20', FALSE),
+  ('Mariana Costa', 'mariana@email.com', '(11) 72222-2222', '$2a$10$Vh8y2vflQWGG/VEqjaC1yOfZQhoGYDEZruob3lngf3Rfnh7wwTH66', '1990-06-15', FALSE),
+  ('Natália Reis', 'natalia@email.com', '(11) 71111-1111', '$2a$10$Vh8y2vflQWGG/VEqjaC1yOfZQhoGYDEZruob3lngf3Rfnh7wwTH66', '1995-07-22', FALSE),
+  ('Bruno Silva', 'brunosilva@email.com', '(11) 70000-0000', '$2a$10$Vh8y2vflQWGG/VEqjaC1yOfZQhoGYDEZruob3lngf3Rfnh7wwTH66', '1987-08-30', FALSE),
+  ('Carolina Mendes', 'carolina@email.com', '(11) 69999-9999', '$2a$10$Vh8y2vflQWGG/VEqjaC1yOfZQhoGYDEZruob3lngf3Rfnh7wwTH66', '1993-09-10', FALSE),
+  ('Paulo Henrique', 'paulo@email.com', '(11) 68888-8888', '$2a$10$Vh8y2vflQWGG/VEqjaC1yOfZQhoGYDEZruob3lngf3Rfnh7wwTH66', '1989-10-18', FALSE),
+  ('Sophia Martins', 'sophia@email.com', '(11) 67777-7777', '$2a$10$Vh8y2vflQWGG/VEqjaC1yOfZQhoGYDEZruob3lngf3Rfnh7wwTH66', '1994-11-25', FALSE),
+  ('Vitor Souza', 'vitor@email.com', '(11) 66666-6666', '$2a$10$Vh8y2vflQWGG/VEqjaC1yOfZQhoGYDEZruob3lngf3Rfnh7wwTH66', '1991-12-08', FALSE),
+  ('Letícia Rocha', 'leticia@email.com', '(11) 65555-5555', '$2a$10$Vh8y2vflQWGG/VEqjaC1yOfZQhoGYDEZruob3lngf3Rfnh7wwTH66', '1996-01-15', FALSE);
+
+-- Inserindo orçamentos de exemplo - o usuario_id é do cliente que faz o orçamento
 INSERT INTO orcamento (codigo_orcamento, nome, email, ideia, valor, tamanho, cores, tempo, local_corpo, status, usuario_id) VALUES
-  ('ORC001', 'João Silva', 'joao@email.com', 'Tatuagem de dragão no braço', NULL, 15.5, 'Preto, Vermelho', NULL, 'Braço direito', 'PENDENTE', 2),
-  ('ORC002', 'Maria Santos', 'maria@email.com', 'Rosa pequena no punho', 150.00, 5.0,  'Vermelho, Preto', '01:30:00', 'Punho esquerdo', 'APROVADO', 2),
-  ('ORC003', 'Pedro Oliveira', 'pedro@email.com', 'Mandala nas costas', 500.00, 25.0,  'Preto', '04:00:00', 'Costas', 'REJEITADO', 2),
-  ('ORC004', 'Ana Costa', 'ana@email.com', 'Borboleta colorida', 200.00, 8.0,  'Vermelho, Preto', '02:00:00', 'Ombro', 'APROVADO', 2),
-  ('ORC005', 'Carlos Mendes', 'carlos@email.com', 'Frase inspiracional', NULL, 3.0,  'Preto', NULL, 'Antebraço', 'PENDENTE', 2),
-  ('ORC006', 'Luiza Pompermayer', 'luiza@email.com', 'Tatuagem minimalista', 120.00, 4.0,  'Preto', '01:15:00', 'Tornozelo', 'APROVADO', 2),
+  ('ORC001', 'João Silva', 'joao@email.com', 'Tatuagem de dragão no braço', NULL, 15.5, 'Preto, Vermelho', NULL, 'Braço direito', 'PENDENTE', 4),
+  ('ORC002', 'Maria Santos', 'maria@email.com', 'Rosa pequena no punho', 150.00, 5.0,  'Vermelho, Preto', '01:30:00', 'Punho esquerdo', 'APROVADO', 5),
 
-  -- Orçamentos para Julia Tatuadora (id = 3)
-  ('ORC007', 'Gabriela Ferreira', 'gabriela@email.com', 'Leão realista no braço', 800.00, 20.0, 'Preto', '05:00:00', 'Braço esquerdo', 'APROVADO', 3),
-  ('ORC008', 'Lucas Rodrigues', 'lucas@email.com', 'Tribal no ombro', NULL, 12.0, 'Preto', NULL, 'Ombro direito', 'PENDENTE', 3),
-  ('ORC009', 'Beatriz Almeida', 'beatriz@email.com', 'Flores aquareladas', 400.00, 15.0, 'Preto, Vermelho', '03:30:00', 'Costela', 'APROVADO', 3),
-  ('ORC010', 'Thiago Martins', 'thiago@email.com', 'Caveira mexicana', 600.00, 18.0, 'Preto, Vermelho', '04:00:00', 'Perna', 'REJEITADO', 3),
+  ('ORC004', 'Ana Costa', 'ana@email.com', 'Borboleta colorida', 200.00, 8.0,  'Vermelho, Preto', '02:00:00', 'Ombro', 'APROVADO', 7),
+  ('ORC005', 'Carlos Mendes', 'carlos@email.com', 'Frase inspiracional', NULL, 3.0,  'Preto', NULL, 'Antebraço', 'PENDENTE', 8),
+  ('ORC006', 'Luiza Pompermayer', 'luiza@email.com', 'Tatuagem minimalista', 120.00, 4.0,  'Preto', '01:15:00', 'Tornozelo', 'APROVADO', 9),
 
-  -- Orçamentos para Marcos Silva (id = 4)
-  ('ORC011', 'Juliana Pereira', 'juliana@email.com', 'Anchor oldschool', 300.00, 10.0, 'Preto, Vermelho', '02:00:00', 'Antebraço', 'APROVADO', 4),
-  ('ORC012', 'André Souza', 'andre@email.com', 'Geométrica abstrata', NULL, 14.0, 'Preto', NULL, 'Costas', 'PENDENTE', 4),
-  ('ORC013', 'Camila Rocha', 'camila@email.com', 'Pássaro voando', 220.00, 8.0, 'Preto', '01:45:00', 'Nuca', 'APROVADO', 4),
-  ('ORC014', 'Felipe Nascimento', 'felipe@email.com', 'Nome da filha', 100.00, 3.0, 'Preto', '00:45:00', 'Pulso', 'APROVADO', 4),
+  ('ORC007', 'Gabriela Ferreira', 'gabriela@email.com', 'Leão realista no braço', 800.00, 20.0, 'Preto', '05:00:00', 'Braço esquerdo', 'APROVADO', 10),
+  ('ORC008', 'Lucas Rodrigues', 'lucas@email.com', 'Tribal no ombro', NULL, 12.0, 'Preto', NULL, 'Ombro direito', 'PENDENTE', 11),
+  ('ORC009', 'Beatriz Almeida', 'beatriz@email.com', 'Flores aquareladas', 400.00, 15.0, 'Preto, Vermelho', '03:30:00', 'Costela', 'APROVADO', 12),
 
-  -- Orçamentos para Carla Santos (id = 5)
-  ('ORC015', 'Renata Silva', 'renata@email.com', 'Lua e estrelas', 180.00, 6.0, 'Preto', '01:30:00', 'Tornozelo', 'APROVADO', 5),
-  ('ORC016', 'João Pedro', 'joaopedro@email.com', 'Lobo uivando', NULL, 16.0, 'Preto', NULL, 'Braço completo', 'PENDENTE', 5),
-  ('ORC017', 'Isabella Castro', 'isabella@email.com', 'Mandala colorida', 320.00, 11.0, 'Vermelho', '02:30:00', 'Coxa', 'APROVADO', 5),
-  ('ORC018', 'Gustavo Lima', 'gustavo@email.com', 'Bússola vintage', 280.00, 9.0, 'Preto', '02:00:00', 'Peito', 'REJEITADO', 5),
 
-  -- Orçamentos para Rafael Oliveira (id = 6)
-  ('ORC019', 'Larissa Melo', 'larissa@email.com', 'Pena transformando em pássaros', 380.00, 13.0, 'Preto', '03:00:00', 'Costela', 'APROVADO', 6),
-  ('ORC020', 'Daniel Santos', 'daniel@email.com', 'Samurai japonês', NULL, 22.0, 'Preto, Vermelho', NULL, 'Costas completas', 'PENDENTE', 6),
-  ('ORC021', 'Ana Paula', 'anapaula@email.com', 'Infinito com nomes', 150.00, 4.0, 'Preto', '01:00:00', 'Punho', 'APROVADO', 6),
-  ('ORC022', 'Ricardo Ferreira', 'ricardo@email.com', 'Engrenagens steampunk', 480.00, 17.0, 'Preto, Vermelho', '04:00:00', 'Braço', 'APROVADO', 6),
+  ('ORC011', 'Juliana Pereira', 'juliana@email.com', 'Anchor oldschool', 300.00, 10.0, 'Preto, Vermelho', '02:00:00', 'Antebraço', 'APROVADO', 14),
+  ('ORC012', 'André Souza', 'andre@email.com', 'Geométrica abstrata', NULL, 14.0, 'Preto', NULL, 'Costas', 'PENDENTE', 15),
+  ('ORC013', 'Camila Rocha', 'camila@email.com', 'Pássaro voando', 220.00, 8.0, 'Preto', '01:45:00', 'Nuca', 'APROVADO', 16),
+  ('ORC014', 'Felipe Nascimento', 'felipe@email.com', 'Nome da filha', 100.00, 3.0, 'Preto', '00:45:00', 'Pulso', 'APROVADO', 17),
 
-  -- Orçamentos para Amanda Costa (id = 7)
-  ('ORC023', 'Patrícia Oliveira', 'patricia@email.com', 'Borboleta realista', 260.00, 7.0, 'Vermelho', '02:00:00', 'Ombro', 'APROVADO', 7),
-  ('ORC024', 'Rodrigo Alves', 'rodrigo@email.com', 'Texto em lettering', NULL, 5.0, 'Preto', NULL, 'Antebraço', 'PENDENTE', 7),
-  ('ORC025', 'Mariana Costa', 'mariana@email.com', 'Constelação personalizada', 300.00, 10.0, 'Preto', '02:30:00', 'Costas', 'APROVADO', 7),
+  ('ORC015', 'Renata Silva', 'renata@email.com', 'Lua e estrelas', 180.00, 6.0, 'Preto', '01:30:00', 'Tornozelo', 'APROVADO', 18),
+  ('ORC016', 'João Pedro', 'joaopedro@email.com', 'Lobo uivando', NULL, 16.0, 'Preto', NULL, 'Braço completo', 'PENDENTE', 19),
+  ('ORC017', 'Isabella Castro', 'isabella@email.com', 'Mandala colorida', 320.00, 11.0, 'Vermelho', '02:30:00', 'Coxa', 'APROVADO', 20),
 
-  -- Orçamentos para Diego Mendes (id = 8)
-  ('ORC026', 'Natália Reis', 'natalia@email.com', 'Flor de lótus', 190.00, 6.0, 'Vermelho', '01:45:00', 'Tornozelo', 'APROVADO', 8),
-  ('ORC027', 'Bruno Silva', 'brunosilva@email.com', 'Crânio com rosas', 420.00, 14.0, 'Preto, Vermelho', '03:30:00', 'Perna', 'REJEITADO', 8),
-  ('ORC028', 'Carolina Mendes', 'carolina@email.com', 'Gato geométrico', NULL, 8.0, 'Preto', NULL, 'Braço', 'PENDENTE', 8),
 
-  -- Orçamentos para Fernanda Lima (id = 9)
-  ('ORC029', 'Paulo Henrique', 'paulo@email.com', 'Âncora com corda', 290.00, 9.0, 'Preto, Vermelho', '02:15:00', 'Antebraço', 'APROVADO', 9),
-  ('ORC030', 'Sophia Martins', 'sophia@email.com', 'Dreamcatcher delicado', 210.00, 7.0, 'Preto', '01:45:00', 'Costela', 'APROVADO', 9),
+  ('ORC019', 'Larissa Melo', 'larissa@email.com', 'Pena transformando em pássaros', 380.00, 13.0, 'Preto', '03:00:00', 'Costela', 'APROVADO', 22),
+  ('ORC020', 'Daniel Santos', 'daniel@email.com', 'Samurai japonês', NULL, 22.0, 'Preto, Vermelho', NULL, 'Costas completas', 'PENDENTE', 23),
+  ('ORC021', 'Ana Paula', 'anapaula@email.com', 'Infinito com nomes', 150.00, 4.0, 'Preto', '01:00:00', 'Punho', 'APROVADO', 24),
+  ('ORC022', 'Ricardo Ferreira', 'ricardo@email.com', 'Engrenagens steampunk', 480.00, 17.0, 'Preto, Vermelho', '04:00:00', 'Braço', 'APROVADO', 25),
 
-  -- Orçamentos para Bruno Alves (id = 10)
-  ('ORC031', 'Vitor Souza', 'vitor@email.com', 'Tigre rugindo', NULL, 19.0, 'Preto, Vermelho', NULL, 'Costas', 'PENDENTE', 10),
-  ('ORC032', 'Letícia Rocha', 'leticia@email.com', 'Frase motivacional', 160.00, 4.0, 'Preto', '01:00:00', 'Costela', 'APROVADO', 10);
+  ('ORC023', 'Patrícia Oliveira', 'patricia@email.com', 'Borboleta realista', 260.00, 7.0, 'Vermelho', '02:00:00', 'Ombro', 'APROVADO', 26),
+  ('ORC024', 'Rodrigo Alves', 'rodrigo@email.com', 'Texto em lettering', NULL, 5.0, 'Preto', NULL, 'Antebraço', 'PENDENTE', 27),
+  ('ORC025', 'Mariana Costa', 'mariana@email.com', 'Constelação personalizada', 300.00, 10.0, 'Preto', '02:30:00', 'Costas', 'APROVADO', 28),
+
+  ('ORC026', 'Natália Reis', 'natalia@email.com', 'Flor de lótus', 190.00, 6.0, 'Vermelho', '01:45:00', 'Tornozelo', 'APROVADO', 29),
+
+  ('ORC028', 'Carolina Mendes', 'carolina@email.com', 'Gato geométrico', NULL, 8.0, 'Preto', NULL, 'Braço', 'PENDENTE', 31),
+
+  ('ORC029', 'Paulo Henrique', 'paulo@email.com', 'Âncora com corda', 290.00, 9.0, 'Preto, Vermelho', '02:15:00', 'Antebraço', 'APROVADO', 32),
+  ('ORC030', 'Sophia Martins', 'sophia@email.com', 'Dreamcatcher delicado', 210.00, 7.0, 'Preto', '01:45:00', 'Costela', 'APROVADO', 33),
+
+  ('ORC031', 'Vitor Souza', 'vitor@email.com', 'Tigre rugindo', NULL, 19.0, 'Preto, Vermelho', NULL, 'Costas', 'PENDENTE', 34),
+  ('ORC032', 'Letícia Rocha', 'leticia@email.com', 'Frase motivacional', 160.00, 4.0, 'Preto', '01:00:00', 'Costela', 'APROVADO', 35);
 
 -- Inserindo imagens de referência para os orçamentos
 INSERT INTO orcamento_imagens (codigo_orcamento, imagem_url) VALUES
@@ -93,8 +112,7 @@ INSERT INTO orcamento_imagens (codigo_orcamento, imagem_url) VALUES
   -- ORC002 - Rosa pequena no punho
   ('ORC002', 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSQKu4xCpf3rJ8h9L6YzFNgvE7RMhN5TzJsOw&s'),
 
-  -- ORC003 - Mandala nas costas
-  ('ORC003', 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQvJk8N5mLKrF4zGxH2QsT6pL9WjYx3VzMnPg&s'),
+
 
   -- ORC004 - Borboleta colorida
   ('ORC004', 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRJh7kL9XsP2qF8mYzN6TgR4jKvLgJxVzDsQw&s'),
@@ -115,8 +133,7 @@ INSERT INTO orcamento_imagens (codigo_orcamento, imagem_url) VALUES
   -- ORC009 - Flores aquareladas
   ('ORC009', 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRMp5kL9XsP2qF8mYzN6TgR4jKvLgJxVzDsQw&s'),
 
-  -- ORC010 - Caveira mexicana
-  ('ORC010', 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTKr7mK8NjG6hP9zXyM3QsF7vRjKgJxVzLnPg&s'),
+
 
   -- ORC011 - Anchor oldschool
   ('ORC011', 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRJh5kL9XsP2qF8mYzN6TgR4jKvLgJxVzDsQw&s'),
@@ -139,8 +156,7 @@ INSERT INTO orcamento_imagens (codigo_orcamento, imagem_url) VALUES
   -- ORC017 - Mandala colorida
   ('ORC017', 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRKr5mL9XsP2qF8mYzN6TgR4jKvLgJxVzDsQw&s'),
 
-  -- ORC018 - Bússola vintage
-  ('ORC018', 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTJq3kK8NjG6hP9zXyM3QsF7vRjKgJxVzLnPg&s'),
+
 
   -- ORC019 - Pena transformando em pássaros
   ('ORC019', 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRMh7rL9XsP2qF8mYzN6TgR4jKvLgJxVzDsQw&s'),
@@ -166,8 +182,7 @@ INSERT INTO orcamento_imagens (codigo_orcamento, imagem_url) VALUES
   -- ORC026 - Flor de lótus
   ('ORC026', 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTJq5kK8NjG6hP9zXyM3QsF7vRjKgJxVzLnPg&s'),
 
-  -- ORC027 - Crânio com rosas
-  ('ORC027', 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRMh3rL9XsP2qF8mYzN6TgR4jKvLgJxVzDsQw&s'),
+
 
   -- ORC028 - Gato geométrico
   ('ORC028', 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSLp7qK8NjG6hP9zXyM3QsF7vRjKgJxVzLnPg&s'),
@@ -184,81 +199,40 @@ INSERT INTO orcamento_imagens (codigo_orcamento, imagem_url) VALUES
   -- ORC032 - Frase motivacional
   ('ORC032', 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSMp5qK8NjG6hP9zXyM3QsF7vRjKgJxVzLnPg&s');
 
--- Inserindo agendamentos variados com diferentes datas, usuários e status
+-- Inserindo agendamentos - apenas um por dia, datas passadas como CONCLUIDO
 INSERT INTO agendamento (data_hora, status, usuario_id, codigo_orcamento, forma_pagamento, pagamento_feito, tempo_duracao) VALUES
-  -- Agendamentos de janeiro 2025 (concluídos com forma de pagamento)
-  ('2025-01-15 09:00:00', 'CONCLUIDO', 2, 'ORC002', 'PIX', true, 90), -- Rosa no punho
-  ('2025-01-22 14:00:00', 'CONCLUIDO', 3, 'ORC007', 'CARTAO_CREDITO', true, 300), -- Leão realista
-  ('2025-01-28 10:30:00', 'CONCLUIDO', 4, 'ORC011', 'DINHEIRO', true, 120), -- Anchor oldschool
+  -- Agendamentos concluídos (datas anteriores a 8 de dezembro de 2025)
+  ('2025-01-15 09:00:00', 'CONCLUIDO', 5, 'ORC002', 'PIX', true, 90), -- Rosa no punho (Maria Santos)
+  ('2025-02-12 11:00:00', 'CONCLUIDO', 10, 'ORC007', 'CARTAO_CREDITO', true, 300), -- Leão realista (Gabriela Ferreira)
+  ('2025-03-18 16:30:00', 'CONCLUIDO', 14, 'ORC011', 'DINHEIRO', true, 120), -- Anchor oldschool (Juliana Pereira)
+  ('2025-04-10 09:30:00', 'CONCLUIDO', 18, 'ORC015', 'PIX', true, 90), -- Lua e estrelas (Renata Silva)
+  ('2025-05-08 10:00:00', 'CONCLUIDO', 22, 'ORC019', 'CARTAO_DEBITO', true, 180), -- Pena transformando em pássaros (Larissa Melo)
+  ('2025-06-12 11:30:00', 'CONCLUIDO', 26, 'ORC023', 'DINHEIRO', true, 120), -- Borboleta realista (Patrícia Oliveira)
+  ('2025-07-15 09:00:00', 'CONCLUIDO', 29, 'ORC026', 'PIX', true, 105), -- Flor de lótus (Natália Reis)
+  ('2025-08-10 10:30:00', 'CONCLUIDO', 32, 'ORC029', 'CARTAO_CREDITO', true, 135), -- Âncora com corda (Paulo Henrique)
+  ('2025-09-05 14:00:00', 'CONCLUIDO', 16, 'ORC013', 'PIX', true, 105), -- Pássaro voando (Camila Rocha)
+  ('2025-10-12 15:30:00', 'CONCLUIDO', 20, 'ORC017', 'CARTAO_DEBITO', true, 150), -- Mandala colorida (Isabella Castro)
+  ('2025-11-08 09:00:00', 'CONCLUIDO', 24, 'ORC021', 'PIX', true, 60), -- Infinito com nomes (Ana Paula)
+  ('2025-12-05 14:00:00', 'CONCLUIDO', 28, 'ORC025', 'CARTAO_CREDITO', true, 150), -- Constelação personalizada (Mariana Costa)
+  ('2025-12-06 10:30:00', 'CONCLUIDO', 33, 'ORC030', 'PIX', true, 105), -- Dreamcatcher delicado (Sophia Martins)
+  ('2025-12-07 14:30:00', 'CONCLUIDO', 17, 'ORC014', 'DINHEIRO', true, 45), -- Nome da filha (Felipe Nascimento)
 
-  -- Agendamentos de fevereiro 2025 (concluídos com forma de pagamento)
-  ('2025-02-05 15:00:00', 'CONCLUIDO', 5, 'ORC015', 'PIX', true, 90), -- Lua e estrelas
-  ('2025-02-12 11:00:00', 'CONCLUIDO', 6, 'ORC019', 'CARTAO_DEBITO', true, 180), -- Pena transformando em pássaros
+  -- Agendamentos futuros (a partir de 9 de dezembro de 2025)
+  ('2025-12-09 09:00:00', 'CONFIRMADO', 25, 'ORC022', NULL, false, NULL), -- Engrenagens steampunk (Ricardo Ferreira)
+  ('2025-12-10 14:00:00', 'CONFIRMADO', 12, 'ORC009', NULL, false, NULL), -- Flores aquareladas (Beatriz Almeida)
+  ('2025-12-11 11:00:00', 'CONFIRMADO', 27, 'ORC024', NULL, false, NULL), -- Texto em lettering (Rodrigo Alves)
+  ('2025-12-12 15:30:00', 'CONFIRMADO', 31, 'ORC028', NULL, false, NULL), -- Gato geométrico (Carolina Mendes)
+  ('2025-12-13 10:00:00', 'PENDENTE', 11, 'ORC008', NULL, false, NULL), -- Tribal no ombro (Lucas Rodrigues - PENDENTE)
+  ('2025-12-16 15:00:00', 'CONFIRMADO', 34, 'ORC031', NULL, false, NULL), -- Tigre rugindo (Vitor Souza)
+  ('2025-12-18 11:30:00', 'CONFIRMADO', 15, 'ORC012', NULL, false, NULL), -- Geométrica abstrata (André Souza)
+  ('2025-12-20 09:30:00', 'CONFIRMADO', 23, 'ORC020', NULL, false, NULL), -- Samurai japonês (Daniel Santos)
+  ('2025-12-23 14:00:00', 'CONFIRMADO', 7, 'ORC004', NULL, false, NULL), -- Borboleta colorida (Ana Costa)
+  ('2025-12-27 16:00:00', 'CONFIRMADO', 9, 'ORC006', NULL, false, NULL), -- Tatuagem minimalista (Luiza Pompermayer)
+  ('2025-12-30 10:00:00', 'CONFIRMADO', 35, 'ORC032', NULL, false, NULL), -- Frase motivacional (Letícia Rocha)
 
-  -- Agendamentos de março 2025 (concluídos com forma de pagamento)
-  ('2025-03-18 16:30:00', 'CONCLUIDO', 7, 'ORC023', 'DINHEIRO', true, 120), -- Borboleta realista
-  ('2025-03-25 13:30:00', 'CONCLUIDO', 8, 'ORC026', 'PIX', true, 105), -- Flor de lótus
-
-  -- Agendamentos de abril 2025 (concluídos com forma de pagamento)
-  ('2025-04-10 09:30:00', 'CONCLUIDO', 9, 'ORC029', 'CARTAO_CREDITO', true, 135), -- Âncora com corda
-  ('2025-04-18 14:00:00', 'CONCLUIDO', 4, 'ORC013', 'PIX', true, 105), -- Pássaro voando
-
-  -- Agendamentos de maio 2025 (concluídos com forma de pagamento)
-  ('2025-05-08 10:00:00', 'CONCLUIDO', 5, 'ORC017', 'CARTAO_DEBITO', true, 150), -- Mandala colorida
-  ('2025-05-22 15:30:00', 'CONCLUIDO', 10, 'ORC032', 'DINHEIRO', true, 60), -- Frase motivacional
-
-  -- Agendamentos de junho 2025 (concluídos com forma de pagamento)
-  ('2025-06-12 11:30:00', 'CONCLUIDO', 6, 'ORC021', 'PIX', true, 60), -- Infinito com nomes
-  ('2025-06-25 16:00:00', 'CONCLUIDO', 7, 'ORC025', 'CARTAO_CREDITO', true, 150), -- Constelação personalizada
-
-  -- Agendamentos de julho 2025 (concluídos com forma de pagamento)
-  ('2025-07-15 09:00:00', 'CONCLUIDO', 9, 'ORC030', 'PIX', true, 105), -- Dreamcatcher delicado
-  ('2025-07-28 14:30:00', 'CONCLUIDO', 4, 'ORC014', 'DINHEIRO', true, 45), -- Nome da filha
-
-  -- Agendamentos de agosto 2025 (concluídos com forma de pagamento)
-  ('2025-08-10 10:30:00', 'CONCLUIDO', 6, 'ORC022', 'CARTAO_CREDITO', true, 240), -- Engrenagens steampunk
-
-  -- Agendamentos de setembro 2025 (concluídos com forma de pagamento)
-  ('2025-09-05 14:00:00', 'CONCLUIDO', 3, 'ORC009', 'PIX', true, 210), -- Flores aquareladas
-  ('2025-09-18 11:00:00', 'CONCLUIDO', 7, 'ORC024', 'CARTAO_DEBITO', true, 90), -- Texto em lettering
-
-  -- Agendamentos de outubro 2025 (concluídos com forma de pagamento)
-  ('2025-10-12 15:30:00', 'CONCLUIDO', 8, 'ORC028', 'DINHEIRO', true, 120), -- Gato geométrico
-  ('2025-10-25 10:00:00', 'CONCLUIDO', 10, 'ORC031', 'PIX', true, 270), -- Tigre rugindo
-
-  -- Agendamentos de novembro 2025 (concluídos com forma de pagamento)
-  ('2025-11-08 09:00:00', 'CONCLUIDO', 4, 'ORC012', 'CARTAO_CREDITO', true, 180), -- Geométrica abstrata
-  ('2025-11-15 14:30:00', 'CONCLUIDO', 6, 'ORC020', 'PIX', true, 330), -- Samurai japonês
-  ('2025-11-22 11:00:00', 'CONCLUIDO', 2, 'ORC004', 'DINHEIRO', true, 120), -- Borboleta colorida
-  ('2025-11-28 16:00:00', 'CONCLUIDO', 2, 'ORC006', 'CARTAO_DEBITO', true, 75), -- Tatuagem minimalista
-
-  -- Agendamentos cancelados (meses anteriores)
-  ('2025-03-15 14:00:00', 'CANCELADO', 2, 'ORC003', NULL, false, NULL), -- Mandala nas costas (rejeitado)
-  ('2025-05-22 10:00:00', 'CANCELADO', 3, 'ORC010', NULL, false, NULL), -- Caveira mexicana (rejeitado)
-  ('2025-07-20 15:00:00', 'CANCELADO', 5, 'ORC018', NULL, false, NULL), -- Bússola vintage (rejeitado)
-  ('2025-09-23 11:00:00', 'CANCELADO', 8, 'ORC027', NULL, false, NULL), -- Crânio com rosas (rejeitado)
-
-  -- Agendamentos para amanhã - 8 de dezembro 2025 (futuros - sem forma de pagamento)
-  ('2025-12-08 09:00:00', 'CONFIRMADO', 2, 'ORC002', NULL, false, NULL), -- Rosa no punho (reagendamento - APROVADO)
-  ('2025-12-08 14:30:00', 'CONFIRMADO', 3, 'ORC009', NULL, false, NULL), -- Flores aquareladas (APROVADO)
-  ('2025-12-08 16:00:00', 'CONFIRMADO', 4, 'ORC011', NULL, false, NULL), -- Anchor oldschool (reagendamento - APROVADO)
-
-  -- Agendamentos para terça-feira - 10 de dezembro 2025 (futuros - sem forma de pagamento)
-  ('2025-12-10 10:00:00', 'CONFIRMADO', 5, 'ORC015', NULL, false, NULL), -- Lua e estrelas (reagendamento - APROVADO)
-  ('2025-12-10 13:30:00', 'CONFIRMADO', 6, 'ORC019', NULL, false, NULL), -- Pena transformando em pássaros (reagendamento - APROVADO)
-  ('2025-12-10 15:30:00', 'CONFIRMADO', 7, 'ORC023', NULL, false, NULL), -- Borboleta realista (reagendamento - APROVADO)
-
-  -- Outros agendamentos de dezembro 2025 (futuros - orçamentos PENDENTES mantidos como PENDENTE)
-  ('2025-12-12 14:00:00', 'PENDENTE', 2, 'ORC005', NULL, false, NULL), -- Frase inspiracional (PENDENTE - correto)
-  ('2025-12-13 10:00:00', 'PENDENTE', 3, 'ORC008', NULL, false, NULL), -- Tribal no ombro (PENDENTE - correto)
-  ('2025-12-16 15:00:00', 'CONFIRMADO', 8, 'ORC026', NULL, false, NULL), -- Flor de lótus (reagendamento - APROVADO)
-  ('2025-12-18 11:30:00', 'CONFIRMADO', 9, 'ORC029', NULL, false, NULL), -- Âncora com corda (reagendamento - APROVADO)
-  ('2025-12-20 09:30:00', 'CONFIRMADO', 4, 'ORC013', NULL, false, NULL), -- Pássaro voando (reagendamento - APROVADO)
-  ('2025-12-23 14:00:00', 'CONFIRMADO', 10, 'ORC032', NULL, false, NULL), -- Frase motivacional (reagendamento - APROVADO)
-
-  -- Agendamentos para janeiro 2026 (futuro - orçamentos PENDENTES mantidos como PENDENTE)
-  ('2026-01-07 09:00:00', 'PENDENTE', 2, 'ORC001', NULL, false, NULL), -- Dragão no braço (PENDENTE - correto)
-  ('2026-01-14 10:30:00', 'PENDENTE', 5, 'ORC016', NULL, false, NULL); -- Lobo uivando (PENDENTE - correto)
+  -- Agendamentos para janeiro 2026 (futuros - orçamentos PENDENTES mantidos como PENDENTE)
+  ('2026-01-07 09:00:00', 'PENDENTE', 4, 'ORC001', NULL, false, NULL), -- Dragão no braço (João Silva - PENDENTE)
+  ('2026-01-14 10:30:00', 'PENDENTE', 19, 'ORC016', NULL, false, NULL); -- Lobo uivando (João Pedro - PENDENTE)
 
 -- Inserindo templates de email
 INSERT INTO template_email (nome_template, assunto, corpo_email)
