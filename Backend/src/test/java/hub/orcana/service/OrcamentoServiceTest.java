@@ -3,7 +3,9 @@ import hub.orcana.dto.orcamento.CadastroOrcamentoInput;
 import hub.orcana.dto.orcamento.DetalhesOrcamentoOutput;
 import hub.orcana.tables.Orcamento;
 import hub.orcana.tables.StatusOrcamento;
+import hub.orcana.tables.repository.AgendamentoRepository;
 import hub.orcana.tables.repository.OrcamentoRepository;
+import hub.orcana.tables.repository.UsuarioRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -34,6 +36,12 @@ class OrcamentoServiceTest {
     @Mock
     private EmailService emailService;
 
+    @Mock
+    private UsuarioRepository usuarioRepository;
+
+    @Mock
+    private AgendamentoRepository agendamentoRepository;
+
     @InjectMocks
     private OrcamentoService service;
 
@@ -61,6 +69,7 @@ class OrcamentoServiceTest {
 
         when(repository.findByCodigoOrcamento(anyString())).thenReturn(Optional.empty());
         when(repository.save(any(Orcamento.class))).thenAnswer(inv -> inv.getArgument(0));
+        when(usuarioRepository.findByEmail(anyString())).thenReturn(Optional.empty());
 
         Orcamento salvo = service.postOrcamento(entradaValidaCom(List.of(img1, img2)));
 
@@ -73,6 +82,7 @@ class OrcamentoServiceTest {
         verify(gerenciadorService, times(2)).salvarArquivo(any(MultipartFile.class));
         verify(repository, times(1)).save(any(Orcamento.class));
         verify(emailService, times(1)).updateOrcamento(any(Orcamento.class));
+        verify(usuarioRepository, times(1)).findByEmail(anyString());
     }
 
     @Test
@@ -80,6 +90,7 @@ class OrcamentoServiceTest {
     void deveSalvarSemImagensListaVazia() {
         when(repository.findByCodigoOrcamento(anyString())).thenReturn(Optional.empty());
         when(repository.save(any(Orcamento.class))).thenAnswer(inv -> inv.getArgument(0));
+        when(usuarioRepository.findByEmail(anyString())).thenReturn(Optional.empty());
 
         Orcamento salvo = service.postOrcamento(entradaValidaCom(new ArrayList<>()));
 
@@ -88,6 +99,7 @@ class OrcamentoServiceTest {
 
         verify(gerenciadorService, never()).salvarArquivo(any(MultipartFile.class));
         verify(emailService, times(1)).updateOrcamento(any(Orcamento.class));
+        verify(usuarioRepository, times(1)).findByEmail(anyString());
     }
 
     @Test
@@ -106,6 +118,7 @@ class OrcamentoServiceTest {
 
         when(repository.findByCodigoOrcamento(anyString())).thenReturn(Optional.empty());
         when(repository.save(any(Orcamento.class))).thenAnswer(inv -> inv.getArgument(0));
+        when(usuarioRepository.findByEmail(anyString())).thenReturn(Optional.empty());
 
         Orcamento salvo = service.postOrcamento(entrada);
 
@@ -115,6 +128,7 @@ class OrcamentoServiceTest {
 
         verify(gerenciadorService, never()).salvarArquivo(any(MultipartFile.class));
         verify(emailService, times(1)).updateOrcamento(any(Orcamento.class));
+        verify(usuarioRepository, times(1)).findByEmail(anyString());
     }
 
     @Test
@@ -126,6 +140,7 @@ class OrcamentoServiceTest {
                         ? Optional.of(new Orcamento("ORC-COLISAO", "X", "x@x", "y", 1.0, "c", "l", List.of(), 1L, StatusOrcamento.PENDENTE))
                         : Optional.empty());
         when(repository.save(any(Orcamento.class))).thenAnswer(inv -> inv.getArgument(0));
+        when(usuarioRepository.findByEmail(anyString())).thenReturn(Optional.empty());
 
         Orcamento salvo = service.postOrcamento(entradaValidaCom(null));
 
@@ -136,6 +151,7 @@ class OrcamentoServiceTest {
         // 2 chamadas: 1ª retorna colisão, 2ª libera
         verify(repository, times(2)).findByCodigoOrcamento(anyString());
         verify(repository, times(1)).save(any(Orcamento.class));
+        verify(usuarioRepository, times(1)).findByEmail(anyString());
     }
 
     @Test
@@ -143,12 +159,14 @@ class OrcamentoServiceTest {
     void naoPropagaExcecaoObserver() {
         when(repository.findByCodigoOrcamento(anyString())).thenReturn(Optional.empty());
         when(repository.save(any(Orcamento.class))).thenAnswer(inv -> inv.getArgument(0));
+        when(usuarioRepository.findByEmail(anyString())).thenReturn(Optional.empty());
         doThrow(new RuntimeException("Falha e-mail")).when(emailService).updateOrcamento(any(Orcamento.class));
 
         Orcamento salvo = service.postOrcamento(entradaValidaCom(null));
 
         assertNotNull(salvo);
         verify(emailService, times(1)).updateOrcamento(any(Orcamento.class));
+        verify(usuarioRepository, times(1)).findByEmail(anyString());
     }
 
     @Test
@@ -172,7 +190,7 @@ class OrcamentoServiceTest {
         List<DetalhesOrcamentoOutput> out = service.findAllOrcamentos();
 
         assertEquals(1, out.size());
-        DetalhesOrcamentoOutput d = out.get(0);
+        DetalhesOrcamentoOutput d = out.getFirst();
         assertEquals(o.getCodigoOrcamento(), d.codigoOrcamento());
         assertEquals(o.getNome(), d.nome());
         assertEquals(o.getEmail(), d.email());
@@ -181,6 +199,9 @@ class OrcamentoServiceTest {
         assertEquals(o.getCores(), d.cores());
         assertEquals(o.getLocalCorpo(), d.localCorpo());
         assertEquals(o.getImagemReferencia(), d.imagemReferencia());
+        assertEquals(o.getValor(), d.valor());
+        assertEquals(o.getTempo(), d.tempo());
+        assertEquals(o.getStatus(), d.status());
     }
 
     @Test
@@ -191,6 +212,7 @@ class OrcamentoServiceTest {
         when(gerenciadorService.salvarArquivo(any(MultipartFile.class))).thenReturn("http://cdn/foto.png");
         when(repository.findByCodigoOrcamento(anyString())).thenReturn(Optional.empty());
         when(repository.save(any(Orcamento.class))).thenAnswer(inv -> inv.getArgument(0));
+        when(usuarioRepository.findByEmail(anyString())).thenReturn(Optional.empty());
 
         service.postOrcamento(entradaValidaCom(List.of(img)));
 
@@ -199,5 +221,33 @@ class OrcamentoServiceTest {
 
         Orcamento enviado = captor.getValue();
         assertEquals(List.of("http://cdn/foto.png"), enviado.getImagemReferencia());
+    }
+
+    @Test
+    @DisplayName("Teste de validação do setup de mocks")
+    void testeValidacaoSetupMocks() {
+        // Setup
+        when(usuarioRepository.findByEmail(anyString())).thenReturn(Optional.empty());
+        when(repository.findByCodigoOrcamento(anyString())).thenReturn(Optional.empty());
+        when(repository.save(any(Orcamento.class))).thenAnswer(inv -> inv.getArgument(0));
+
+        // Execute
+        CadastroOrcamentoInput entrada = new CadastroOrcamentoInput(
+                "Teste",
+                "teste@email.com",
+                "Ideia teste",
+                5.0,
+                "Preto",
+                "Braço",
+                null,
+                null
+        );
+
+        Orcamento resultado = service.postOrcamento(entrada);
+
+        // Verify
+        assertNotNull(resultado);
+        verify(usuarioRepository, times(1)).findByEmail("teste@email.com");
+        verify(repository, times(1)).save(any(Orcamento.class));
     }
 }
