@@ -1,5 +1,6 @@
 package hub.orcana.controller;
 
+import hub.orcana.dto.dashboard.DashboardKPIsOutput;
 import hub.orcana.dto.dashboard.DashboardOutput;
 import hub.orcana.service.DashboardService;
 import hub.orcana.tables.Agendamento;
@@ -395,4 +396,280 @@ class DashboardControllerTest {
         assertEquals(agendamentos.get(0).getDataHora().toLocalDate(),
                 agendamentos.get(1).getDataHora().toLocalDate());
     }
+
+    // ------------------ TESTES PARA GET /dashboard/estatisticas ------------------
+
+    @Test
+    @DisplayName("Deve retornar status 200 e estatísticas completas")
+    void deveRetornar200ComEstatisticasCompletas() {
+        // Arrange
+        DashboardKPIsOutput estatisticas = new DashboardKPIsOutput(
+                15L,  // totalAgendamentos
+                8L,   // agendamentosConcluidos
+                12500.0, // faturamentoTotal
+                150   // totalProdutos
+        );
+
+        when(dashboardService.getEstatisticas()).thenReturn(estatisticas);
+
+        // Act
+        ResponseEntity<DashboardKPIsOutput> response = dashboardController.getEstatisticas();
+
+        // Assert
+        assertNotNull(response);
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertNotNull(response.getBody());
+        assertEquals(15L, response.getBody().totalAgendamentos());
+        assertEquals(8L, response.getBody().agendamentosConcluidos());
+        assertEquals(12500.0, response.getBody().faturamentoTotal());
+        assertEquals(150, response.getBody().totalProdutos());
+        verify(dashboardService, times(1)).getEstatisticas();
+    }
+
+    @Test
+    @DisplayName("Deve retornar estatísticas com valores zerados quando não houver dados")
+    void deveRetornarEstatisticasComValoresZerados() {
+        // Arrange
+        DashboardKPIsOutput estatisticasVazias = new DashboardKPIsOutput(
+                0L,    // totalAgendamentos
+                0L,    // agendamentosConcluidos
+                0.0,   // faturamentoTotal
+                0      // totalProdutos
+        );
+
+        when(dashboardService.getEstatisticas()).thenReturn(estatisticasVazias);
+
+        // Act
+        ResponseEntity<DashboardKPIsOutput> response = dashboardController.getEstatisticas();
+
+        // Assert
+        assertNotNull(response);
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertNotNull(response.getBody());
+        assertEquals(0L, response.getBody().totalAgendamentos());
+        assertEquals(0L, response.getBody().agendamentosConcluidos());
+        assertEquals(0.0, response.getBody().faturamentoTotal());
+        assertEquals(0, response.getBody().totalProdutos());
+        verify(dashboardService, times(1)).getEstatisticas();
+    }
+
+    @Test
+    @DisplayName("Deve retornar estatísticas com agendamentos mas sem faturamento")
+    void deveRetornarEstatisticasComAgendamentosSemFaturamento() {
+        // Arrange
+        DashboardKPIsOutput estatisticas = new DashboardKPIsOutput(
+                10L,   // totalAgendamentos
+                0L,    // agendamentosConcluidos (nenhum concluído)
+                0.0,   // faturamentoTotal (sem faturamento)
+                75     // totalProdutos
+        );
+
+        when(dashboardService.getEstatisticas()).thenReturn(estatisticas);
+
+        // Act
+        ResponseEntity<DashboardKPIsOutput> response = dashboardController.getEstatisticas();
+
+        // Assert
+        assertNotNull(response);
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertNotNull(response.getBody());
+        assertEquals(10L, response.getBody().totalAgendamentos());
+        assertEquals(0L, response.getBody().agendamentosConcluidos());
+        assertEquals(0.0, response.getBody().faturamentoTotal());
+        assertEquals(75, response.getBody().totalProdutos());
+        verify(dashboardService, times(1)).getEstatisticas();
+    }
+
+    @Test
+    @DisplayName("Deve retornar estatísticas com números grandes")
+    void deveRetornarEstatisticasComNumerosGrandes() {
+        // Arrange
+        DashboardKPIsOutput estatisticasGrandes = new DashboardKPIsOutput(
+                1000L,     // totalAgendamentos
+                750L,      // agendamentosConcluidos
+                125000.50, // faturamentoTotal
+                5000       // totalProdutos
+        );
+
+        when(dashboardService.getEstatisticas()).thenReturn(estatisticasGrandes);
+
+        // Act
+        ResponseEntity<DashboardKPIsOutput> response = dashboardController.getEstatisticas();
+
+        // Assert
+        assertNotNull(response);
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertNotNull(response.getBody());
+        assertEquals(1000L, response.getBody().totalAgendamentos());
+        assertEquals(750L, response.getBody().agendamentosConcluidos());
+        assertEquals(125000.50, response.getBody().faturamentoTotal());
+        assertEquals(5000, response.getBody().totalProdutos());
+        verify(dashboardService, times(1)).getEstatisticas();
+    }
+
+    @Test
+    @DisplayName("Deve propagar exceção quando service lança RuntimeException")
+    void devePropagaExcecaoQuandoServiceLancaRuntimeException() {
+        // Arrange
+        String mensagemErro = "Erro ao calcular estatísticas";
+        when(dashboardService.getEstatisticas())
+                .thenThrow(new RuntimeException(mensagemErro));
+
+        // Act & Assert
+        RuntimeException exception = assertThrows(RuntimeException.class,
+                () -> dashboardController.getEstatisticas());
+
+        assertEquals(mensagemErro, exception.getMessage());
+        verify(dashboardService, times(1)).getEstatisticas();
+    }
+
+    @Test
+    @DisplayName("Deve propagar exceção quando service lança IllegalArgumentException")
+    void devePropagaExcecaoQuandoServiceLancaIllegalArgumentException() {
+        // Arrange
+        String mensagemErro = "Parâmetros inválidos para cálculo";
+        when(dashboardService.getEstatisticas())
+                .thenThrow(new IllegalArgumentException(mensagemErro));
+
+        // Act & Assert
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
+                () -> dashboardController.getEstatisticas());
+
+        assertEquals(mensagemErro, exception.getMessage());
+        verify(dashboardService, times(1)).getEstatisticas();
+    }
+
+    @Test
+    @DisplayName("Deve validar estrutura das estatísticas")
+    void deveValidarEstruturaDasEstatisticas() {
+        // Arrange
+        DashboardKPIsOutput estatisticas = new DashboardKPIsOutput(
+                100L,      // long
+                85L,       // long
+                15750.75,  // Double
+                250        // Integer
+        );
+
+        when(dashboardService.getEstatisticas()).thenReturn(estatisticas);
+
+        // Act
+        ResponseEntity<DashboardKPIsOutput> response = dashboardController.getEstatisticas();
+
+        // Assert
+        assertNotNull(response);
+        assertNotNull(response.getBody());
+
+        // Validar que todos os campos são válidos
+        assertEquals(100L, response.getBody().totalAgendamentos());
+        assertEquals(85L, response.getBody().agendamentosConcluidos());
+        assertEquals(15750.75, response.getBody().faturamentoTotal());
+        assertEquals(250, response.getBody().totalProdutos());
+    }
+
+    @Test
+    @DisplayName("Deve validar faturamento com valores decimais")
+    void deveValidarFaturamentoComValoresDecimais() {
+        // Arrange
+        DashboardKPIsOutput estatisticas = new DashboardKPIsOutput(
+                50L,
+                35L,
+                9999.99,  // Valor com centavos
+                120
+        );
+
+        when(dashboardService.getEstatisticas()).thenReturn(estatisticas);
+
+        // Act
+        ResponseEntity<DashboardKPIsOutput> response = dashboardController.getEstatisticas();
+
+        // Assert
+        assertNotNull(response);
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertNotNull(response.getBody());
+        assertNotNull(response.getBody().faturamentoTotal());
+        assertEquals(9999.99, response.getBody().faturamentoTotal());
+    }
+
+    @Test
+    @DisplayName("Deve validar que totalProdutos pode ser null")
+    void deveValidarQueTotalProdutosPodeSerNull() {
+        // Arrange
+        DashboardKPIsOutput estatisticas = new DashboardKPIsOutput(
+                25L,
+                20L,
+                5000.0,
+                null  // totalProdutos null
+        );
+
+        when(dashboardService.getEstatisticas()).thenReturn(estatisticas);
+
+        // Act
+        ResponseEntity<DashboardKPIsOutput> response = dashboardController.getEstatisticas();
+
+        // Assert
+        assertNotNull(response);
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertNotNull(response.getBody());
+        assertEquals(25L, response.getBody().totalAgendamentos());
+        assertEquals(20L, response.getBody().agendamentosConcluidos());
+        assertEquals(5000.0, response.getBody().faturamentoTotal());
+        assertNull(response.getBody().totalProdutos());
+    }
+
+    @Test
+    @DisplayName("Deve validar múltiplas chamadas consecutivas")
+    void deveValidarMultiplasChamadasConsecutivas() {
+        // Arrange
+        DashboardKPIsOutput estatisticas1 = new DashboardKPIsOutput(10L, 8L, 1000.0, 50);
+        DashboardKPIsOutput estatisticas2 = new DashboardKPIsOutput(15L, 12L, 1500.0, 75);
+
+        when(dashboardService.getEstatisticas())
+                .thenReturn(estatisticas1)
+                .thenReturn(estatisticas2);
+
+        // Act
+        ResponseEntity<DashboardKPIsOutput> response1 = dashboardController.getEstatisticas();
+        ResponseEntity<DashboardKPIsOutput> response2 = dashboardController.getEstatisticas();
+
+        // Assert
+        assertNotNull(response1);
+        assertNotNull(response2);
+        assertEquals(HttpStatus.OK, response1.getStatusCode());
+        assertEquals(HttpStatus.OK, response2.getStatusCode());
+        assertNotNull(response1.getBody());
+        assertNotNull(response2.getBody());
+
+        assertEquals(10L, response1.getBody().totalAgendamentos());
+        assertEquals(15L, response2.getBody().totalAgendamentos());
+
+        verify(dashboardService, times(2)).getEstatisticas();
+    }
+
+    @Test
+    @DisplayName("Deve validar cenário com faturamento null")
+    void deveValidarCenarioComFaturamentoNull() {
+        // Arrange
+        DashboardKPIsOutput estatisticas = new DashboardKPIsOutput(
+                5L,
+                3L,
+                null,  // faturamentoTotal null
+                30
+        );
+
+        when(dashboardService.getEstatisticas()).thenReturn(estatisticas);
+
+        // Act
+        ResponseEntity<DashboardKPIsOutput> response = dashboardController.getEstatisticas();
+
+        // Assert
+        assertNotNull(response);
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertNotNull(response.getBody());
+        assertEquals(5L, response.getBody().totalAgendamentos());
+        assertEquals(3L, response.getBody().agendamentosConcluidos());
+        assertNull(response.getBody().faturamentoTotal());
+        assertEquals(30, response.getBody().totalProdutos());
+    }
 }
+
+
