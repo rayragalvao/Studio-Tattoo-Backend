@@ -95,7 +95,7 @@
 			<scope>test</scope>
 		</dependency>
 
-		<dependency>2
+		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-web</artifactId>
 		</dependency>
