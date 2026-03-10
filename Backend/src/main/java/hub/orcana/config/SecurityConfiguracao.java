@@ -1,6 +1,7 @@
 package hub.orcana.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import hub.orcana.service.AuditoriaService;
 import hub.orcana.service.AutenticacaoService;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.context.annotation.Bean;
@@ -15,11 +16,13 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.CsrfConfigurer;
 import org.springframework.security.config.annotation.web.configurers.HeadersConfigurer;
+import org.springframework.security.web.header.writers.XXssProtectionHeaderWriter;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
@@ -35,10 +38,14 @@ import java.util.Map;
 public class SecurityConfiguracao {
     private final AutenticacaoService autenticacaoService;
     private final AutenticacaoEntryPoint autenticacaoEntryPoint;
+    private final AuditoriaService auditoriaService;
 
-    public SecurityConfiguracao(AutenticacaoService autenticacaoService, AutenticacaoEntryPoint autenticacaoEntryPoint) {
+    public SecurityConfiguracao(AutenticacaoService autenticacaoService,
+                                AutenticacaoEntryPoint autenticacaoEntryPoint,
+                                AuditoriaService auditoriaService) {
         this.autenticacaoService = autenticacaoService;
         this.autenticacaoEntryPoint = autenticacaoEntryPoint;
+        this.auditoriaService = auditoriaService;
     }
 
     private static final String[] URLS_PERMITIDAS = {
@@ -46,7 +53,6 @@ public class SecurityConfiguracao {
             "/swagger-ui/**",
             "/swagger-ui.html",
             "/v3/api-docs.yaml",
-            "/h2-console/**",
             "/auth/**",
             "/usuario/cadastro",
             "/usuario/login",
@@ -58,8 +64,13 @@ public class SecurityConfiguracao {
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-        http.headers(headers ->
-                        headers.frameOptions(HeadersConfigurer.FrameOptionsConfig::disable))
+        http.headers(headers -> headers
+                .frameOptions(HeadersConfigurer.FrameOptionsConfig::deny)
+                .xssProtection(xss -> xss.headerValue(
+                        XXssProtectionHeaderWriter.HeaderValue.ENABLED_MODE_BLOCK))
+                .contentSecurityPolicy(csp -> csp.policyDirectives(
+                        "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; " +
+                        "img-src 'self' data:; font-src 'self'; object-src 'none'; frame-ancestors 'none'")))
                 .cors(Customizer.withDefaults())
                 .csrf(CsrfConfigurer<HttpSecurity>::disable)
                 .authorizeHttpRequests(authorizeRequests -> authorizeRequests
@@ -69,6 +80,7 @@ public class SecurityConfiguracao {
                         .authenticated()
                 ).exceptionHandling(handling -> handling
                         .authenticationEntryPoint(autenticacaoEntryPoint)
+                        .accessDeniedHandler(accessDeniedHandler())
                 ).sessionManagement(sessionManagement -> sessionManagement
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 );
@@ -82,7 +94,8 @@ public class SecurityConfiguracao {
     public AuthenticationManager authManager(HttpSecurity http) throws Exception {
         AuthenticationManagerBuilder authenticationManagerBuilder =
                 http.getSharedObject(AuthenticationManagerBuilder.class);
-        authenticationManagerBuilder.authenticationProvider(new AutenticacaoProvider(autenticacaoService, passwordEncoder()));
+        authenticationManagerBuilder.authenticationProvider(
+                new AutenticacaoProvider(autenticacaoService, passwordEncoder(), auditoriaService));
         return authenticationManagerBuilder.build();
     }
 
@@ -101,6 +114,23 @@ public class SecurityConfiguracao {
         };
     }
 
+
+    @Bean
+    public AccessDeniedHandler accessDeniedHandler() {
+        return (request, response, accessDeniedException) -> {
+            String usuario = (request.getUserPrincipal() != null)
+                    ? request.getUserPrincipal().getName()
+                    : "anonimo";
+            auditoriaService.registrarAcessoNegado(usuario, request.getRequestURI());
+            response.setContentType("application/json");
+            response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+            ObjectMapper mapper = new ObjectMapper();
+            Map<String, String> errorResponse = new HashMap<>();
+            errorResponse.put("message", "Acesso negado");
+            errorResponse.put("error", "FORBIDDEN");
+            response.getWriter().write(mapper.writeValueAsString(errorResponse));
+        };
+    }
 
     @Bean
     public AutenticacaoFilter jwtAuthenticationFilterBean() {

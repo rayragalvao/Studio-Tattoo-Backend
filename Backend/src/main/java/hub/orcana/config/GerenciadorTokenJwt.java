@@ -2,6 +2,7 @@ package hub.orcana.config;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
@@ -9,7 +10,6 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
 import javax.crypto.SecretKey;
-import java.nio.charset.StandardCharsets;
 import java.util.Date;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -19,8 +19,7 @@ public class GerenciadorTokenJwt {
 
     @Value("${orcana.jwt.secret}")
     private String secret;
-
-    @Value("${orcana.jwt.validity}")
+    @Value("${orcana.jwt.validity:3600}")
     private long jwtTokenValidity;
 
     public String getUsernameFromToken(String token) {
@@ -36,9 +35,12 @@ public class GerenciadorTokenJwt {
                 .map(grantedAuthority -> grantedAuthority.getAuthority())
                 .collect(Collectors.joining(","));
 
-        return Jwts.builder().setSubject(authentication.getName())
-                .signWith(parseSecret()).setIssuedAt(new Date(System.currentTimeMillis()))
-                .setExpiration(new Date(System.currentTimeMillis() + jwtTokenValidity * 1000))
+        return Jwts.builder()
+                .subject(authentication.getName())
+                .claim("roles", authorities)
+                .issuedAt(new Date(System.currentTimeMillis()))
+                .expiration(new Date(System.currentTimeMillis() + jwtTokenValidity * 1000))
+                .signWith(parseSecret())
                 .compact();
     }
 
@@ -58,13 +60,14 @@ public class GerenciadorTokenJwt {
     }
 
     private Claims getAllClaimsFromToken(String token) {
-        return Jwts.parserBuilder()
-                .setSigningKey(parseSecret())
+        return Jwts.parser()
+                .verifyWith(parseSecret())
                 .build()
-                .parseClaimsJws(token).getBody();
+                .parseSignedClaims(token)
+                .getPayload();
     }
 
     private SecretKey parseSecret() {
-        return Keys.hmacShaKeyFor(this.secret.getBytes(StandardCharsets.UTF_8));
+        return Keys.hmacShaKeyFor(Decoders.BASE64.decode(this.secret));
     }
 }
