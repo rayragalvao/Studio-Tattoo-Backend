@@ -6,14 +6,19 @@ import hub.orcana.tables.Agendamento;
 import hub.orcana.tables.TemplateEmail;
 import hub.orcana.tables.repository.TemplateEmailRepository;
 import hub.orcana.tables.repository.UsuarioRepository;
-import org.springframework.mail.SimpleMailMessage;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
 import hub.orcana.observer.EstoqueObserver;
 import hub.orcana.tables.Orcamento;
-
+import org.springframework.web.client.RestTemplate;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.sql.Time;
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class EmailService implements  EstoqueObserver, OrcamentoObserver, AgendamentoObserver {
@@ -28,15 +33,33 @@ public class EmailService implements  EstoqueObserver, OrcamentoObserver, Agenda
         this.templateEmailRepository = templateEmailRepository;
     }
 
-    // código base para envio de e-mail
+    // código base para envio de e-mail via microsserviço
     public void enviarTextoSimples(String destinatario, String assunto, String texto) {
-        SimpleMailMessage message = new SimpleMailMessage();
-        message.setFrom("orcanatechschool@gmail.com"); // e-mail da aplicação Brevo
-        message.setTo(destinatario);
-        message.setSubject(assunto);
-        message.setText(texto);
-        mailSender.send(message);
+        try {
+            RestTemplate restTemplate = new RestTemplate();
+
+            // Criando o objeto para enviar no body
+            Map<String, String> emailRequest = Map.of(
+                    "destinatario", destinatario,
+                    "assunto", assunto,
+                    "texto", texto
+            );
+
+            // Configurando headers
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_JSON);
+
+            HttpEntity<Map<String, String>> request = new HttpEntity<>(emailRequest, headers);
+
+            String url = "http://localhost:8081/email/simples";
+
+            restTemplate.postForEntity(url, request, String.class);
+
+        } catch (Exception e) {
+            throw new RuntimeException("Erro ao enviar e-mail via microsserviço: " + e.getMessage(), e);
+        }
     }
+
 
     // quando um novo orçamento é criado, envia e-mail para o cliente
     public void enviaEmailNovoOrcamento(String emailCliente, String nomeCliente, String codigoOrcamento) {
