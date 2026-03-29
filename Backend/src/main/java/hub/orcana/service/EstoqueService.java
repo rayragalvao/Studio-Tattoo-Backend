@@ -5,6 +5,8 @@ import hub.orcana.dto.estoque.DetalhesMaterialOutput;
 import hub.orcana.exception.DependenciaNaoEncontradaException;
 import hub.orcana.tables.Estoque;
 import hub.orcana.tables.repository.EstoqueRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -72,7 +74,7 @@ public class EstoqueService implements EstoqueSubject{
         if (materiais.isEmpty()) {
             throw new DependenciaNaoEncontradaException("Material");
         }
-        return materiais.getFirst();
+        return materiais.get(0);
     }
 
     public DetalhesMaterialOutput postEstoque(CadastroMaterialInput estoque) {
@@ -152,6 +154,31 @@ public class EstoqueService implements EstoqueSubject{
                 throw new IllegalArgumentException("Erro ao excluir material.");
             }
     }
+
+    // metodo de paginação com filtro opcional por nome
+    public Page<DetalhesMaterialOutput> listarPaginado(Pageable pageable, String nome) {
+        if (nome == null || nome.trim().isEmpty()) {
+            return repository.findAll(pageable)
+                    .map(atual -> new DetalhesMaterialOutput(
+                            atual.getId(),
+                            atual.getNome(),
+                            atual.getQuantidade(),
+                            atual.getUnidadeMedida(),
+                            atual.getMinAviso()
+                    ));
+        }
+        return repository.findByNomeContainingIgnoreCase(nome.trim(), pageable)
+                .map(atual -> new DetalhesMaterialOutput(
+                        atual.getId(),
+                        atual.getNome(),
+                        atual.getQuantidade(),
+                        atual.getUnidadeMedida(),
+                        atual.getMinAviso()
+                ));
+    }
+
+    // metodo de paginação sem filtro (chama o outro passando null)
+    public Page<DetalhesMaterialOutput> listarPaginado(Pageable pageable) {
+        return listarPaginado(pageable, null);
+    }
 }
-
-

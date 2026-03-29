@@ -75,4 +75,6 @@ public class Estoque {
     public void setQuantidade(Double quantidade) {
         this.quantidade = quantidade;
     }
+
+    public void setUnidadeMedida(String unidadeMedida) {this.unidadeMedida = unidadeMedida;}
 }
