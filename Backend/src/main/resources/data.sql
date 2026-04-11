@@ -22,9 +22,8 @@ INSERT INTO estoque (nome, quantidade, unidade_medida, min_aviso) VALUES
     ('Sabonete higienizador para as mãos', 200, 'ml', NULL);
 
 INSERT INTO usuario (nome, email, telefone, senha, dt_nasc, is_admin) VALUES
-  ('admin', 'admin@gmail.com', '(11) 99999-9999', '$2a$10$mLZ3Uq7mYdoZZuO8OnBGmeeZ5eMG2sslJiJunOtylsjr.yU9jw1bC', '1990-01-01', TRUE),
-  ('user', 'user@gmail.com', '(11) 98888-8888', '$2a$10$Vh8y2vflQWGG/VEqjaC1yOfZQhoGYDEZruob3lngf3Rfnh7wwTH66', '1995-05-15', FALSE),
-  ('Julia Tatuadora', 'julia@jupiterfrito.com', '(11) 97777-7777', '$2a$10$Vh8y2vflQWGG/VEqjaC1yOfZQhoGYDEZruob3lngf3Rfnh7wwTH66', '1988-03-20', TRUE),
+  ('Admin Estudio', 'jupiterfritostudio@gmail.com', '(11) 99998-8888', '$2a$10$Do4Cjbe6VRh6MqZqRRfqwOUH1uxcKz7ilLEzKLLtUgQOyCD8KjuNS', '2000-01-01', TRUE),
+  ('Viviane Santos', 'vivis.ds12@gmail.com', '(11) 98888-8888', '$2a$10$Do4Cjbe6VRh6MqZqRRfqwOUH1uxcKz7ilLEzKLLtUgQOyCD8KjuNS', '2000-05-15', FALSE),
 
   -- Usuários clientes que fazem orçamentos
   ('João Silva', 'joao@email.com', '(11) 96666-6666', '$2a$10$Vh8y2vflQWGG/VEqjaC1yOfZQhoGYDEZruob3lngf3Rfnh7wwTH66', '1992-07-12', FALSE),
@@ -112,16 +111,8 @@ INSERT INTO orcamento_imagens (codigo_orcamento, imagem_url) VALUES
   -- ORC002 - Rosa pequena no punho
   ('ORC002', 'uploads/0c8fe331-0cae-4ac3-bd52-855443747530_portfolio-image-0.jpg'),
 
-
-
   -- ORC004 - Borboleta colorida
   ('ORC004', 'uploads/1acdd99b-0a7e-4ef3-a4c8-fc9a56f3cf30_oldschool.jpg'),
-
-  -- ORC005 - Frase inspiracional
-  ('ORC005', 'uploads/1c85c18a-1578-4bc5-8228-4d7bc10f38d3_oldschool.jpg'),
-
-  -- ORC006 - Tatuagem minimalista
-  ('ORC006', 'uploads/224e2b06-c1eb-4941-bb10-8207c0ab5b7c_oldschool.jpg'),
 
   -- ORC007 - Leão realista no braço
   ('ORC007', 'uploads/24d9abd6-7505-4315-8bc5-afea79110e90_oldschool.jpg'),

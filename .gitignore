@@ -37,5 +37,4 @@ build/
 
 .env
 /data/
-/uploads
 **/uploads
