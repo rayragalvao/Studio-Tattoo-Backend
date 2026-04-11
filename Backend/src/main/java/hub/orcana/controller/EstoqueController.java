@@ -14,9 +14,15 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -43,19 +49,25 @@ public class EstoqueController {
         @ApiResponse(responseCode = "500", description = "Erro interno do servidor",
                 content = @Content(mediaType = "application/json"))
     })
-    public ResponseEntity<List<DetalhesMaterialOutput>> getEstoque() {
-        log.info("Iniciando busca por todos os materiais do estoque");
-        try {
-            var materiais = service.getEstoque();
-            log.info("Busca por todos os materiais concluída com sucesso. Encontrados {} materiais", materiais.size());
-            if (materiais.isEmpty()) {
-                return ResponseEntity.noContent().build();
-            }
-            return ResponseEntity.ok(materiais);
-        } catch (Exception e) {
-            log.error("Erro ao buscar todos os materiais do estoque", e);
-            throw e;
+
+    @SecurityRequirement(name = "Bearer")
+    public ResponseEntity<Page<DetalhesMaterialOutput>> getEstoque(
+            @PageableDefault(size = 20) Pageable pageable,
+            @RequestParam(required = false) String nome
+    ) {
+        log.info("Buscando materiais - página: {} tamanho: {} filtro nome: {}",
+                pageable.getPageNumber(), pageable.getPageSize(), nome);
+
+        Page<DetalhesMaterialOutput> materiais = service.listarPaginado(pageable, nome);
+
+        if (materiais.isEmpty()) {
+            log.info("Nenhum material encontrado");
+            return ResponseEntity.noContent().build();
         }
+
+        log.info("Encontrados {} materiais na página", materiais.getNumberOfElements());
+
+        return ResponseEntity.ok(materiais);
     }
 
     @GetMapping("/{nomeMaterial}")
