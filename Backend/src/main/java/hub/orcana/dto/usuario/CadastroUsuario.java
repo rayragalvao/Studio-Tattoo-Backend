@@ -18,6 +18,10 @@ public record CadastroUsuario(
         String telefone,
 
         @NotBlank
+        @Pattern(
+            regexp = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&#^()_+\\-=\\[\\]{};':\"\\\\|,.<>\\/?]).{8,}$",
+            message = "A senha deve ter no mínimo 8 caracteres, contendo letras maiúsculas, minúsculas, números e caracteres especiais."
+        )
         String senha,
         Date dtNasc,
         boolean isAdmin

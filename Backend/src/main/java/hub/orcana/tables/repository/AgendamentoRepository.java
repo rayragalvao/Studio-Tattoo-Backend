@@ -14,6 +14,19 @@ public interface AgendamentoRepository extends JpaRepository<Agendamento, Long> 
 
     List<Agendamento> findByUsuarioId(Long usuarioId);
 
+    @Query("SELECT a FROM Agendamento a WHERE a.usuario.id = :usuarioId AND a.status = :status")
+    List<Agendamento> findByUsuarioIdAndStatus(
+            @Param("usuarioId") Long usuarioId,
+            @Param("status") StatusAgendamento status
+    );
+
+    @Query("SELECT a FROM Agendamento a WHERE a.dataHora BETWEEN :inicio AND :fim AND a.status <> :status")
+    List<Agendamento> findByDataHoraBetweenAndStatusNot(
+            @Param("inicio") LocalDateTime inicio,
+            @Param("fim") LocalDateTime fim,
+            @Param("status") StatusAgendamento status
+    );
+
     List<Agendamento> findAllByDataHoraBetween(LocalDateTime inicio, LocalDateTime fim);
 
     Optional<Agendamento> findTopByStatusOrderByDataHoraAsc(StatusAgendamento status);
