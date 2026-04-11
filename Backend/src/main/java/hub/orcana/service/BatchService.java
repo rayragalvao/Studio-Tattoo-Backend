@@ -44,25 +44,27 @@ public class BatchService {
                 log.info("Todos os materiais estão com estoque adequado");
 
                 try {
-                emailService.enviarEmailParaTodosAdminsEstoqueOk(nomeTemplate);
+                    emailService.enviarEmailParaTodosAdminsEstoqueOk(nomeTemplate);
                 } catch (Exception e) {
                     log.error("Erro ao enviar emails para administradores", e);
                 }
-            } nomeTemplate = "estoque_baixo_observer";
+            } else {
+                nomeTemplate = "estoque_baixo_observer";
 
-            for (DetalhesMaterialOutput material : materiais) {
-                String itemInfo = "- " + material.nome() + ": " + material.quantidade() + " " + material.unidadeMedida() + " (Mínimo: " + material.minAviso() + ")\n";
-                texto.append(itemInfo);
-                log.warn("Estoque baixo: {} - Atual: {} {}, Mínimo: {}",
-                        material.nome(), material.quantidade(), material.unidadeMedida(), material.minAviso());
-            }
+                for (DetalhesMaterialOutput material : materiais) {
+                    String itemInfo = "- " + material.nome() + ": " + material.quantidade() + " " + material.unidadeMedida() + " (Mínimo: " + material.minAviso() + ")\n";
+                    texto.append(itemInfo);
+                    log.warn("Estoque baixo: {} - Atual: {} {}, Mínimo: {}",
+                            material.nome(), material.quantidade(), material.unidadeMedida(), material.minAviso());
+                }
 
-            log.info("Iniciando envio de emails para administradores. Materiais com estoque baixo.");
+                log.info("Iniciando envio de emails para administradores. Materiais com estoque baixo.");
 
-            try {
-                emailService.enviarEmailParaTodosAdminsEstoqueBaixo(nomeTemplate, texto.toString());
-            } catch (Exception e) {
-                log.error("Erro ao enviar emails para administradores", e);
+                try {
+                    emailService.enviarEmailParaTodosAdminsEstoqueBaixo(nomeTemplate, texto.toString());
+                } catch (Exception e) {
+                    log.error("Erro ao enviar emails para administradores", e);
+                }
             }
             log.info("Verificação de estoque concluída com sucesso");
         } catch (Exception e) {

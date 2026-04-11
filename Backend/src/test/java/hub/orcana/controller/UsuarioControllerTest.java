@@ -218,4 +218,169 @@ class UsuarioControllerTest {
         assertEquals("Erro delete", ex.getMessage());
         verify(usuarioService, times(1)).deletarById(1L);
     }
+
+    // ---------------- PATCH /usuario/{id}/perfil ----------------
+
+    @Test
+    @DisplayName("atualizarPerfil - deve atualizar perfil e retornar 200")
+    void atualizarPerfil_sucesso() {
+        // Arrange
+        hub.orcana.dto.usuario.AtualizarPerfilUsuario perfilUsuario = mock(hub.orcana.dto.usuario.AtualizarPerfilUsuario.class);
+        ListarUsuarios usuarioAtualizado = mock(ListarUsuarios.class);
+
+        when(usuarioService.atualizarPerfil(eq(1L), any(hub.orcana.dto.usuario.AtualizarPerfilUsuario.class)))
+                .thenReturn(usuarioAtualizado);
+
+        // Act
+        ResponseEntity<ListarUsuarios> response = usuarioController.atualizarPerfil(1L, perfilUsuario);
+
+        // Assert
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertNotNull(response.getBody());
+        assertEquals(usuarioAtualizado, response.getBody());
+        verify(usuarioService, times(1)).atualizarPerfil(eq(1L), any(hub.orcana.dto.usuario.AtualizarPerfilUsuario.class));
+    }
+
+    @Test
+    @DisplayName("atualizarPerfil - deve propagar exceção quando usuário não encontrado")
+    void atualizarPerfil_usuarioNaoEncontrado() {
+        // Arrange
+        hub.orcana.dto.usuario.AtualizarPerfilUsuario perfilUsuario = mock(hub.orcana.dto.usuario.AtualizarPerfilUsuario.class);
+
+        when(usuarioService.atualizarPerfil(eq(999L), any(hub.orcana.dto.usuario.AtualizarPerfilUsuario.class)))
+                .thenThrow(new RuntimeException("Usuário não encontrado(a) no sistema"));
+
+        // Act & Assert
+        RuntimeException ex = assertThrows(RuntimeException.class,
+            () -> usuarioController.atualizarPerfil(999L, perfilUsuario));
+
+        assertEquals("Usuário não encontrado(a) no sistema", ex.getMessage());
+        verify(usuarioService, times(1)).atualizarPerfil(eq(999L), any(hub.orcana.dto.usuario.AtualizarPerfilUsuario.class));
+    }
+
+    @Test
+    @DisplayName("atualizarPerfil - deve propagar exceção quando dados inválidos")
+    void atualizarPerfil_dadosInvalidos() {
+        // Arrange
+        hub.orcana.dto.usuario.AtualizarPerfilUsuario perfilUsuario = mock(hub.orcana.dto.usuario.AtualizarPerfilUsuario.class);
+
+        when(usuarioService.atualizarPerfil(eq(1L), any(hub.orcana.dto.usuario.AtualizarPerfilUsuario.class)))
+                .thenThrow(new IllegalArgumentException("Dados inválidos"));
+
+        // Act & Assert
+        IllegalArgumentException ex = assertThrows(IllegalArgumentException.class,
+            () -> usuarioController.atualizarPerfil(1L, perfilUsuario));
+
+        assertEquals("Dados inválidos", ex.getMessage());
+        verify(usuarioService, times(1)).atualizarPerfil(eq(1L), any(hub.orcana.dto.usuario.AtualizarPerfilUsuario.class));
+    }
+
+    @Test
+    @DisplayName("atualizarPerfil - deve propagar exceção genérica do service")
+    void atualizarPerfil_erroInterno() {
+        // Arrange
+        hub.orcana.dto.usuario.AtualizarPerfilUsuario perfilUsuario = mock(hub.orcana.dto.usuario.AtualizarPerfilUsuario.class);
+
+        when(usuarioService.atualizarPerfil(eq(1L), any(hub.orcana.dto.usuario.AtualizarPerfilUsuario.class)))
+                .thenThrow(new RuntimeException("Erro interno do servidor"));
+
+        // Act & Assert
+        RuntimeException ex = assertThrows(RuntimeException.class,
+            () -> usuarioController.atualizarPerfil(1L, perfilUsuario));
+
+        assertEquals("Erro interno do servidor", ex.getMessage());
+        verify(usuarioService, times(1)).atualizarPerfil(eq(1L), any(hub.orcana.dto.usuario.AtualizarPerfilUsuario.class));
+    }
+
+    @Test
+    @DisplayName("atualizarPerfil - deve validar com dados reais do DTO")
+    void atualizarPerfil_dadosReais() {
+        // Arrange
+        hub.orcana.dto.usuario.AtualizarPerfilUsuario perfilReal = mock(hub.orcana.dto.usuario.AtualizarPerfilUsuario.class);
+        ListarUsuarios usuarioAtualizado = new ListarUsuarios(
+            1L, "João Silva Atualizado", "joao@email.com",
+            "(11) 99999-9999", null, false
+        );
+
+        when(usuarioService.atualizarPerfil(eq(1L), any(hub.orcana.dto.usuario.AtualizarPerfilUsuario.class)))
+                .thenReturn(usuarioAtualizado);
+
+        // Act
+        ResponseEntity<ListarUsuarios> response = usuarioController.atualizarPerfil(1L, perfilReal);
+
+        // Assert
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertNotNull(response.getBody());
+        assertEquals("João Silva Atualizado", response.getBody().nome());
+        assertEquals("(11) 99999-9999", response.getBody().telefone());
+        verify(usuarioService, times(1)).atualizarPerfil(eq(1L), any(hub.orcana.dto.usuario.AtualizarPerfilUsuario.class));
+    }
+
+    // ---------------- TESTES ADICIONAIS PARA DELETARUSUARIO ----------------
+
+    @Test
+    @DisplayName("deletarUsuario - deve validar com ID válido")
+    void deletarUsuario_idValido() {
+        // Arrange
+        Long idValido = 100L;
+        doNothing().when(usuarioService).deletarById(idValido);
+
+        // Act
+        ResponseEntity<Void> response = usuarioController.deletarUsuario(idValido);
+
+        // Assert
+        assertEquals(HttpStatus.NO_CONTENT, response.getStatusCode());
+        assertNull(response.getBody());
+        verify(usuarioService, times(1)).deletarById(idValido);
+    }
+
+    @Test
+    @DisplayName("deletarUsuario - deve propagar exceção quando usuário não encontrado")
+    void deletarUsuario_usuarioNaoEncontrado() {
+        // Arrange
+        Long idInexistente = 999L;
+        doThrow(new RuntimeException("Usuário não encontrado(a) no sistema"))
+                .when(usuarioService).deletarById(idInexistente);
+
+        // Act & Assert
+        RuntimeException ex = assertThrows(RuntimeException.class,
+            () -> usuarioController.deletarUsuario(idInexistente));
+
+        assertEquals("Usuário não encontrado(a) no sistema", ex.getMessage());
+        verify(usuarioService, times(1)).deletarById(idInexistente);
+    }
+
+    @Test
+    @DisplayName("deletarUsuario - deve propagar IllegalArgumentException")
+    void deletarUsuario_argumentoInvalido() {
+        // Arrange
+        Long idInvalido = -1L;
+        doThrow(new IllegalArgumentException("ID deve ser positivo"))
+                .when(usuarioService).deletarById(idInvalido);
+
+        // Act & Assert
+        IllegalArgumentException ex = assertThrows(IllegalArgumentException.class,
+            () -> usuarioController.deletarUsuario(idInvalido));
+
+        assertEquals("ID deve ser positivo", ex.getMessage());
+        verify(usuarioService, times(1)).deletarById(idInvalido);
+    }
+
+    @Test
+    @DisplayName("deletarUsuario - deve tratar múltiplas exclusões")
+    void deletarUsuario_multiplasExclusoes() {
+        // Arrange
+        Long[] ids = {1L, 2L, 3L};
+
+        for (Long id : ids) {
+            doNothing().when(usuarioService).deletarById(id);
+        }
+
+        // Act & Assert
+        for (Long id : ids) {
+            ResponseEntity<Void> response = usuarioController.deletarUsuario(id);
+            assertEquals(HttpStatus.NO_CONTENT, response.getStatusCode());
+            verify(usuarioService, times(1)).deletarById(id);
+        }
+    }
 }

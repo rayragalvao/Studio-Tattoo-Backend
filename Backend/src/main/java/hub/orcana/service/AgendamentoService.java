@@ -62,7 +62,11 @@ public class AgendamentoService implements AgendamentoSubject {
     @Override
     public void notifyObservers(Agendamento agendamento) {
         for (AgendamentoObserver observer : observers) {
-            observer.updateAgendamento(agendamento);
+            try {
+                observer.updateAgendamento(agendamento);
+            } catch (Exception e) {
+                log.error("Falha ao notificar observer: {}", e.getMessage());
+            }
         }
     }
 
@@ -127,7 +131,7 @@ public class AgendamentoService implements AgendamentoSubject {
                 .orElseThrow(() -> new IllegalArgumentException("Orçamento não encontrado."));
         existente.setOrcamento(orcamento);
 
-        // ✅ ATUALIZAR CAMPOS DE PAGAMENTO E TEMPO
+        // ATUALIZAR CAMPOS DE PAGAMENTO E TEMPO
         if (agendamento.tempoDuracao() != null) {
             existente.setTempoDuracao(agendamento.tempoDuracao());
         }
@@ -225,7 +229,7 @@ public class AgendamentoService implements AgendamentoSubject {
             // Verificar se há estoque suficiente
             if (equipamento.getQuantidade() < material.quantidade()) {
                 throw new IllegalArgumentException(
-                        String.format("Estoque insuficiente para %s. Disponível: %d, Solicitado: %d",
+                        String.format("Estoque insuficiente para %s. Disponível: %.1f, Solicitado: %d",
                                 equipamento.getNome(), equipamento.getQuantidade(), material.quantidade()));
             }
 

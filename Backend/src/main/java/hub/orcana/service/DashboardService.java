@@ -93,10 +93,20 @@ public class DashboardService {
         LocalDateTime fimDoDia = hoje.atTime(23, 59, 59);
         List<Agendamento> agendamentosDoDia = agendamentoRepository
                 .findAllByDataHoraBetween(inicioDoDia, fimDoDia);
+
+        // Protege contra null
+        if (agendamentosDoDia == null) {
+            agendamentosDoDia = new ArrayList<>();
+        }
         log.debug("Agendamentos do dia: {}", agendamentosDoDia.size());
 
         // Alertas de estoque
         List<Estoque> alertasEstoque = estoqueRepository.findAllByQuantidadeLessThanMinAviso();
+
+        // Protege contra null
+        if (alertasEstoque == null) {
+            alertasEstoque = new ArrayList<>();
+        }
         log.debug("Alertas de estoque: {}", alertasEstoque.size());
 
         DashboardOutput output = new DashboardOutput(

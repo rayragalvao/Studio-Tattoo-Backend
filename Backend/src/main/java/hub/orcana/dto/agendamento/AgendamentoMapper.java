@@ -38,7 +38,7 @@ public class AgendamentoMapper {
         agendamento.setStatus(dto.status());
 
 
-        // ⚠️ IMPORTANTE: copiar a lista para evitar erro de Hibernate
+        // IMPORTANTE: copiar a lista para evitar erro de Hibernate
         if (orcamento.getImagemReferencia() != null) {
             agendamento.setImagemReferencia(
                     new ArrayList<>(orcamento.getImagemReferencia())

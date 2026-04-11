@@ -15,6 +15,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -215,13 +216,4 @@ public class UsuarioController {
             throw e;
         }
     }
-
-
-    //temporario para testes
-    @GetMapping("/encode/{senha}")
-    public String encode(@PathVariable String senha) {
-        return new org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder().encode(senha);
-    }
-
-
 }

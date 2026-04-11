@@ -26,7 +26,6 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-@DisplayName("Testes unitários para OrcamentoController")
 class OrcamentoControllerTest {
 
     @Mock
@@ -100,7 +99,9 @@ class OrcamentoControllerTest {
 
         ResponseEntity<?> resposta = controlador.postOrcamento(entradaValida);
 
+        @SuppressWarnings("unchecked")
         Map<String, Object> corpo = (Map<String, Object>) resposta.getBody();
+        assertNotNull(corpo);
         String codigo = (String) corpo.get("codigo");
 
         assertNotNull(codigo);
@@ -115,9 +116,7 @@ class OrcamentoControllerTest {
         when(servico.postOrcamento(any(CadastroOrcamentoInput.class)))
                 .thenThrow(new RuntimeException("Erro ao processar orçamento"));
 
-        assertThrows(RuntimeException.class, () -> {
-            controlador.postOrcamento(entradaValida);
-        });
+        assertThrows(RuntimeException.class, () -> controlador.postOrcamento(entradaValida));
 
         verify(servico, times(1)).postOrcamento(any(CadastroOrcamentoInput.class));
     }
@@ -185,9 +184,7 @@ class OrcamentoControllerTest {
         when(servico.findAllOrcamentos())
                 .thenThrow(new RuntimeException("Erro ao buscar orçamentos"));
 
-        assertThrows(RuntimeException.class, () -> {
-            controlador.getOrcamentos();
-        });
+        assertThrows(RuntimeException.class, () -> controlador.getOrcamentos());
 
         verify(servico, times(1)).findAllOrcamentos();
     }
@@ -222,5 +219,335 @@ class OrcamentoControllerTest {
         verify(servico, times(1)).postOrcamento(argThat(entrada ->
                 entrada.imagemReferencia().size() == 2
         ));
+    }
+
+    @Test
+    @DisplayName("Deve retornar orçamentos por usuário com sucesso")
+    void deveRetornarOrcamentosPorUsuarioComSucesso() {
+        // Arrange
+        Long usuarioId = 1L;
+        DetalhesOrcamentoOutput orcamento1 = new DetalhesOrcamentoOutput(
+                "ORC-123", "João Silva", "joao@email.com", "Dragão",
+                10.0, "Preto", "Braço", List.of(), 500.0, Time.valueOf("02:00:00"), StatusOrcamento.PENDENTE
+        );
+        DetalhesOrcamentoOutput orcamento2 = new DetalhesOrcamentoOutput(
+                "ORC-124", "João Silva", "joao@email.com", "Rosa",
+                5.0, "Rosa", "Perna", List.of(), 300.0, Time.valueOf("01:30:00"), StatusOrcamento.APROVADO
+        );
+        List<DetalhesOrcamentoOutput> orcamentos = List.of(orcamento1, orcamento2);
+
+        when(servico.findOrcamentosByUsuarioId(usuarioId)).thenReturn(orcamentos);
+
+        // Act
+        ResponseEntity<List<DetalhesOrcamentoOutput>> response = controlador.getOrcamentosPorUsuario(usuarioId);
+
+        // Assert
+        assertNotNull(response);
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertNotNull(response.getBody());
+        assertEquals(2, response.getBody().size());
+        assertEquals("ORC-123", response.getBody().get(0).codigoOrcamento());
+        assertEquals("ORC-124", response.getBody().get(1).codigoOrcamento());
+        verify(servico, times(1)).findOrcamentosByUsuarioId(usuarioId);
+    }
+
+    @Test
+    @DisplayName("Deve retornar 204 quando usuário não tiver orçamentos")
+    void deveRetornar204QuandoUsuarioNaoTiverOrcamentos() {
+        // Arrange
+        Long usuarioId = 1L;
+        when(servico.findOrcamentosByUsuarioId(usuarioId)).thenReturn(List.of());
+
+        // Act
+        ResponseEntity<List<DetalhesOrcamentoOutput>> response = controlador.getOrcamentosPorUsuario(usuarioId);
+
+        // Assert
+        assertNotNull(response);
+        assertEquals(HttpStatus.NO_CONTENT, response.getStatusCode());
+        verify(servico, times(1)).findOrcamentosByUsuarioId(usuarioId);
+    }
+
+    @Test
+    @DisplayName("Deve lançar exceção ao buscar orçamentos por usuário inexistente")
+    void deveLancarExcecaoAoBuscarOrcamentosPorUsuarioInexistente() {
+        // Arrange
+        Long usuarioId = 999L;
+        when(servico.findOrcamentosByUsuarioId(usuarioId))
+                .thenThrow(new RuntimeException("Usuário não encontrado"));
+
+        // Act & Assert
+        assertThrows(RuntimeException.class, () -> controlador.getOrcamentosPorUsuario(usuarioId));
+        verify(servico, times(1)).findOrcamentosByUsuarioId(usuarioId);
+    }
+
+    @Test
+    @DisplayName("Deve retornar orçamento por código com sucesso")
+    void deveRetornarOrcamentoPorCodigoComSucesso() {
+        // Arrange
+        String codigo = "ORC-123";
+        DetalhesOrcamentoOutput orcamento = new DetalhesOrcamentoOutput(
+                codigo, "João Silva", "joao@email.com", "Dragão",
+                10.0, "Preto", "Braço", List.of(), 500.0, Time.valueOf("02:00:00"), StatusOrcamento.PENDENTE
+        );
+
+        when(servico.findByCodigo(codigo)).thenReturn(orcamento);
+
+        // Act
+        ResponseEntity<DetalhesOrcamentoOutput> response = controlador.getOrcamentoPorCodigo(codigo);
+
+        // Assert
+        assertNotNull(response);
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertNotNull(response.getBody());
+        assertEquals(codigo, response.getBody().codigoOrcamento());
+        assertEquals("João Silva", response.getBody().nome());
+        verify(servico, times(1)).findByCodigo(codigo);
+    }
+
+    @Test
+    @DisplayName("Deve retornar 404 quando orçamento não for encontrado por código")
+    void deveRetornar404QuandoOrcamentoNaoEncontradoPorCodigo() {
+        // Arrange
+        String codigo = "ORC-999";
+        when(servico.findByCodigo(codigo)).thenThrow(new RuntimeException("Orçamento não encontrado"));
+
+        // Act
+        ResponseEntity<DetalhesOrcamentoOutput> response = controlador.getOrcamentoPorCodigo(codigo);
+
+        // Assert
+        assertNotNull(response);
+        assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
+        verify(servico, times(1)).findByCodigo(codigo);
+    }
+
+    @Test
+    @DisplayName("Deve atualizar orçamento com sucesso")
+    void deveAtualizarOrcamentoComSucesso() {
+        // Arrange
+        String codigo = "ORC-123";
+        Map<String, Object> dados = Map.of(
+                "valor", 600.0,
+                "tempo", "03:00:00",
+                "status", "APROVADO"
+        );
+        DetalhesOrcamentoOutput orcamentoAtualizado = new DetalhesOrcamentoOutput(
+                codigo, "João Silva", "joao@email.com", "Dragão",
+                10.0, "Preto", "Braço", List.of(), 600.0, Time.valueOf("03:00:00"), StatusOrcamento.APROVADO
+        );
+
+        when(servico.atualizarOrcamento(codigo, dados)).thenReturn(orcamentoAtualizado);
+
+        // Act
+        ResponseEntity<?> response = controlador.atualizarOrcamento(codigo, dados);
+
+        // Assert
+        assertNotNull(response);
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+
+        @SuppressWarnings("unchecked")
+        Map<String, Object> responseBody = (Map<String, Object>) response.getBody();
+        assertNotNull(responseBody);
+        assertTrue((Boolean) responseBody.get("success"));
+        assertEquals("Orçamento atualizado com sucesso", responseBody.get("message"));
+        assertEquals(codigo, responseBody.get("codigo"));
+        verify(servico, times(1)).atualizarOrcamento(codigo, dados);
+    }
+
+    @Test
+    @DisplayName("Deve retornar 404 quando orçamento não encontrado para atualização")
+    void deveRetornar404QuandoOrcamentoNaoEncontradoParaAtualizacao() {
+        // Arrange
+        String codigo = "ORC-999";
+        Map<String, Object> dados = Map.of("valor", 600.0);
+        when(servico.atualizarOrcamento(codigo, dados))
+                .thenThrow(new RuntimeException("Orçamento não encontrado"));
+
+        // Act
+        ResponseEntity<?> response = controlador.atualizarOrcamento(codigo, dados);
+
+        // Assert
+        assertNotNull(response);
+        assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
+
+        @SuppressWarnings("unchecked")
+        Map<String, Object> responseBody = (Map<String, Object>) response.getBody();
+        assertNotNull(responseBody);
+        assertFalse((Boolean) responseBody.get("success"));
+        assertEquals("Orçamento não encontrado", responseBody.get("message"));
+        verify(servico, times(1)).atualizarOrcamento(codigo, dados);
+    }
+
+    @Test
+    @DisplayName("Deve verificar se orçamento tem agendamento - true")
+    void deveVerificarSeOrcamentoTemAgendamentoTrue() {
+        // Arrange
+        String codigo = "ORC-123";
+        when(servico.verificarSeTemAgendamento(codigo)).thenReturn(true);
+
+        // Act
+        ResponseEntity<?> response = controlador.verificarSeTemAgendamento(codigo);
+
+        // Assert
+        assertNotNull(response);
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+
+        @SuppressWarnings("unchecked")
+        Map<String, Object> responseBody = (Map<String, Object>) response.getBody();
+        assertNotNull(responseBody);
+        assertTrue((Boolean) responseBody.get("temAgendamento"));
+        verify(servico, times(1)).verificarSeTemAgendamento(codigo);
+    }
+
+    @Test
+    @DisplayName("Deve verificar se orçamento tem agendamento - false")
+    void deveVerificarSeOrcamentoTemAgendamentoFalse() {
+        // Arrange
+        String codigo = "ORC-123";
+        when(servico.verificarSeTemAgendamento(codigo)).thenReturn(false);
+
+        // Act
+        ResponseEntity<?> response = controlador.verificarSeTemAgendamento(codigo);
+
+        // Assert
+        assertNotNull(response);
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+
+        @SuppressWarnings("unchecked")
+        Map<String, Object> responseBody = (Map<String, Object>) response.getBody();
+        assertNotNull(responseBody);
+        assertFalse((Boolean) responseBody.get("temAgendamento"));
+        verify(servico, times(1)).verificarSeTemAgendamento(codigo);
+    }
+
+    @Test
+    @DisplayName("Deve retornar 500 quando ocorrer erro ao verificar agendamento")
+    void deveRetornar500QuandoOcorrerErroAoVerificarAgendamento() {
+        // Arrange
+        String codigo = "ORC-123";
+        when(servico.verificarSeTemAgendamento(codigo))
+                .thenThrow(new RuntimeException("Erro de conexão"));
+
+        // Act
+        ResponseEntity<?> response = controlador.verificarSeTemAgendamento(codigo);
+
+        // Assert
+        assertNotNull(response);
+        assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
+
+        @SuppressWarnings("unchecked")
+        Map<String, Object> responseBody = (Map<String, Object>) response.getBody();
+        assertNotNull(responseBody);
+        assertFalse((Boolean) responseBody.get("success"));
+        assertEquals("Erro ao verificar agendamento", responseBody.get("message"));
+        verify(servico, times(1)).verificarSeTemAgendamento(codigo);
+    }
+
+    @Test
+    @DisplayName("Deve deletar orçamento com sucesso")
+    void deveDeletarOrcamentoComSucesso() {
+        // Arrange
+        String codigo = "ORC-123";
+        doNothing().when(servico).deletarOrcamento(codigo);
+
+        // Act
+        ResponseEntity<?> response = controlador.deletarOrcamento(codigo);
+
+        // Assert
+        assertNotNull(response);
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+
+        @SuppressWarnings("unchecked")
+        Map<String, Object> responseBody = (Map<String, Object>) response.getBody();
+        assertNotNull(responseBody);
+        assertTrue((Boolean) responseBody.get("success"));
+        assertEquals("Orçamento excluído com sucesso", responseBody.get("message"));
+        verify(servico, times(1)).deletarOrcamento(codigo);
+    }
+
+    @Test
+    @DisplayName("Deve retornar 404 quando orçamento não encontrado para exclusão")
+    void deveRetornar404QuandoOrcamentoNaoEncontradoParaExclusao() {
+        // Arrange
+        String codigo = "ORC-999";
+        doThrow(new RuntimeException("Orçamento não encontrado"))
+                .when(servico).deletarOrcamento(codigo);
+
+        // Act
+        ResponseEntity<?> response = controlador.deletarOrcamento(codigo);
+
+        // Assert
+        assertNotNull(response);
+        assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
+
+        @SuppressWarnings("unchecked")
+        Map<String, Object> responseBody = (Map<String, Object>) response.getBody();
+        assertNotNull(responseBody);
+        assertFalse((Boolean) responseBody.get("success"));
+        assertEquals("Orçamento não encontrado", responseBody.get("message"));
+        verify(servico, times(1)).deletarOrcamento(codigo);
+    }
+
+    @Test
+    @DisplayName("Deve tratar dados de atualização com múltiplos campos")
+    void deveTratarDadosDeAtualizacaoComMultiplosCampos() {
+        // Arrange
+        String codigo = "ORC-123";
+        Map<String, Object> dados = Map.of(
+                "valor", 800.0,
+                "tempo", "04:00:00",
+                "status", "APROVADO",
+                "cores", "Azul e Verde"
+        );
+        DetalhesOrcamentoOutput orcamentoAtualizado = new DetalhesOrcamentoOutput(
+                codigo, "João Silva", "joao@email.com", "Dragão",
+                10.0, "Azul e Verde", "Braço", List.of(), 800.0, Time.valueOf("04:00:00"), StatusOrcamento.APROVADO
+        );
+
+        when(servico.atualizarOrcamento(codigo, dados)).thenReturn(orcamentoAtualizado);
+
+        // Act
+        ResponseEntity<?> response = controlador.atualizarOrcamento(codigo, dados);
+
+        // Assert
+        assertNotNull(response);
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+
+        @SuppressWarnings("unchecked")
+        Map<String, Object> responseBody = (Map<String, Object>) response.getBody();
+        assertNotNull(responseBody);
+        assertTrue((Boolean) responseBody.get("success"));
+
+        @SuppressWarnings("unchecked")
+        DetalhesOrcamentoOutput orcamentoResponse = (DetalhesOrcamentoOutput) responseBody.get("orcamento");
+        assertNotNull(orcamentoResponse);
+        assertEquals(800.0, orcamentoResponse.valor());
+        assertEquals("Azul e Verde", orcamentoResponse.cores());
+        verify(servico, times(1)).atualizarOrcamento(codigo, dados);
+    }
+
+    @Test
+    @DisplayName("Deve validar diferentes códigos de orçamento")
+    void deveValidarDiferentesCodigosDeOrcamento() {
+        // Arrange
+        String[] codigos = {"ORC-001", "ORC-999", "ORC-ABC123"};
+
+        for (String codigo : codigos) {
+            DetalhesOrcamentoOutput orcamento = new DetalhesOrcamentoOutput(
+                    codigo, "Cliente", "email@test.com", "Tatuagem",
+                    5.0, "Preto", "Local", List.of(), 100.0, Time.valueOf("01:00:00"), StatusOrcamento.PENDENTE
+            );
+            when(servico.findByCodigo(codigo)).thenReturn(orcamento);
+
+            // Act
+            ResponseEntity<DetalhesOrcamentoOutput> response = controlador.getOrcamentoPorCodigo(codigo);
+
+            // Assert
+            assertNotNull(response);
+            assertEquals(HttpStatus.OK, response.getStatusCode());
+            assertNotNull(response.getBody());
+            assertEquals(codigo, response.getBody().codigoOrcamento());
+        }
+
+        verify(servico, times(codigos.length)).findByCodigo(anyString());
     }
 }

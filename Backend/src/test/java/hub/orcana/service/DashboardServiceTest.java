@@ -21,13 +21,15 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.sql.Time;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.Arrays;
+import java.time.LocalTime;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -46,9 +48,6 @@ class DashboardServiceTest {
     private DashboardService dashboardService;
 
     private Usuario usuario;
-    private Orcamento orcamento;
-    private Agendamento agendamento;
-    private Estoque estoque;
 
     @BeforeEach
     void setUp() {
@@ -56,22 +55,6 @@ class DashboardServiceTest {
         usuario.setId(1L);
         usuario.setNome("João Silva");
         usuario.setEmail("joao@email.com");
-
-        orcamento = new Orcamento("ORC123", "João Silva", "joao@email.com",
-                "Dragão nas costas", 1500.0, "Preto e Vermelho", "Costas", 2.0, Time.valueOf("2:00"), null, StatusOrcamento.APROVADO, usuario);
-
-        agendamento = new Agendamento();
-        agendamento.setId(1L);
-        agendamento.setDataHora(LocalDateTime.now().plusDays(1));
-        agendamento.setStatus(StatusAgendamento.CONCLUIDO);
-        agendamento.setUsuario(usuario);
-        agendamento.setOrcamento(orcamento);
-
-        estoque = new Estoque();
-        estoque.setId(1L);
-        estoque.setNome("Tinta Preta");
-        estoque.setQuantidade(5.0);
-        estoque.setMinAviso(10.0);
     }
 
 
@@ -112,7 +95,7 @@ class DashboardServiceTest {
         Agendamento agendamentoPendente = criarAgendamento(2L, StatusAgendamento.PENDENTE, 500.0);
         Agendamento agendamentoCancelado = criarAgendamento(3L, StatusAgendamento.CANCELADO, 300.0);
 
-        List<Agendamento> agendamentos = Arrays.asList(
+        List<Agendamento> agendamentos = List.of(
                 agendamentoConcluido,
                 agendamentoPendente,
                 agendamentoCancelado
@@ -136,7 +119,7 @@ class DashboardServiceTest {
 
         assertNotNull(resultado);
         assertEquals(12, resultado.size());
-        assertEquals(1000.0, resultado.get(11)); 
+        assertEquals(1000.0, resultado.get(0)); // Primeira posição (primeiro mês consultado)
     }
 
     @Test
@@ -161,7 +144,7 @@ class DashboardServiceTest {
         agendamentoSemOrcamento.setOrcamento(null);
 
         when(agendamentoRepository.findByDataHoraBetween(any(), any()))
-                .thenReturn(Arrays.asList(agendamentoSemOrcamento))
+                .thenReturn(List.of(agendamentoSemOrcamento))
                 .thenReturn(Collections.emptyList())
                 .thenReturn(Collections.emptyList())
                 .thenReturn(Collections.emptyList())
@@ -177,7 +160,7 @@ class DashboardServiceTest {
         List<Double> resultado = dashboardService.getFaturamentoUltimos12Meses();
 
         assertNotNull(resultado);
-        assertEquals(0.0, resultado.get(11));
+        assertEquals(0.0, resultado.get(0)); // Primeira posição (primeiro mês consultado)
     }
 
     @Test
@@ -185,12 +168,16 @@ class DashboardServiceTest {
     void deveTratarAgendamentosComValorNullNoOrcamento() {
         Orcamento orcamentoSemValor = new Orcamento("ORC456", "João Silva", "joao@email.com",
                 "Tatuagem", 10.0, "Preto", "Braço", null);
+        orcamentoSemValor.setValor(null); // Garante que o valor seja null
 
-        Agendamento agendamentoComOrcamentoSemValor = criarAgendamento(1L, StatusAgendamento.CONCLUIDO, null);
+        Agendamento agendamentoComOrcamentoSemValor = new Agendamento();
+        agendamentoComOrcamentoSemValor.setId(1L);
+        agendamentoComOrcamentoSemValor.setStatus(StatusAgendamento.CONCLUIDO);
+        agendamentoComOrcamentoSemValor.setUsuario(usuario);
         agendamentoComOrcamentoSemValor.setOrcamento(orcamentoSemValor);
 
         when(agendamentoRepository.findByDataHoraBetween(any(), any()))
-                .thenReturn(Arrays.asList(agendamentoComOrcamentoSemValor))
+                .thenReturn(List.of(agendamentoComOrcamentoSemValor))
                 .thenReturn(Collections.emptyList())
                 .thenReturn(Collections.emptyList())
                 .thenReturn(Collections.emptyList())
@@ -205,13 +192,13 @@ class DashboardServiceTest {
 
         List<Double> resultado = dashboardService.getFaturamentoUltimos12Meses();
         assertNotNull(resultado);
-        assertEquals(0.0, resultado.get(11)); 
+        assertEquals(0.0, resultado.get(0)); // Primeira posição (primeiro mês consultado)
     }
 
     @Test
     @DisplayName("Deve somar múltiplos agendamentos do mesmo mês")
     void deveSomarMultiplosAgendamentosDoMesmoMes() {
-        List<Agendamento> agendamentos = Arrays.asList(
+        List<Agendamento> agendamentos = List.of(
                 criarAgendamento(1L, StatusAgendamento.CONCLUIDO, 1000.0),
                 criarAgendamento(2L, StatusAgendamento.CONCLUIDO, 1500.0),
                 criarAgendamento(3L, StatusAgendamento.CONCLUIDO, 2000.0)
@@ -234,7 +221,7 @@ class DashboardServiceTest {
         List<Double> resultado = dashboardService.getFaturamentoUltimos12Meses();
 
         assertNotNull(resultado);
-        assertEquals(4500.0, resultado.get(11)); 
+        assertEquals(4500.0, resultado.get(0)); // Primeira posição (primeiro mês consultado)
     }
 
     @Test
@@ -264,10 +251,10 @@ class DashboardServiceTest {
     @Test
     @DisplayName("Deve retornar próximo agendamento pendente")
     void deveRetornarProximoAgendamentoPendente() {
-        Agendamento proximoAgendamento = criarAgendamento(1L, StatusAgendamento.PENDENTE, 1000.0);
+        Agendamento proximoAgendamento = criarAgendamento(1L, StatusAgendamento.CONFIRMADO, 1000.0);
         proximoAgendamento.setDataHora(LocalDateTime.now().plusDays(1));
 
-        when(agendamentoRepository.findTopByStatusOrderByDataHoraAsc(StatusAgendamento.PENDENTE))
+        when(agendamentoRepository.findProximoAgendamentoPorStatus(eq(StatusAgendamento.CONFIRMADO), any(LocalDateTime.class)))
                 .thenReturn(Optional.of(proximoAgendamento));
         when(orcamentoRepository.countByStatus(StatusOrcamento.PENDENTE)).thenReturn(5L);
         when(agendamentoRepository.findAllByDataHoraBetween(any(), any()))
@@ -280,13 +267,13 @@ class DashboardServiceTest {
         assertNotNull(resultado);
         assertNotNull(resultado.proximoAgendamento());
         assertEquals(1L, resultado.proximoAgendamento().getId());
-        assertEquals(StatusAgendamento.PENDENTE, resultado.proximoAgendamento().getStatus());
+        assertEquals(StatusAgendamento.CONFIRMADO, resultado.proximoAgendamento().getStatus());
     }
 
     @Test
     @DisplayName("Deve retornar null quando não houver próximo agendamento")
     void deveRetornarNullQuandoNaoHouverProximoAgendamento() {
-        when(agendamentoRepository.findTopByStatusOrderByDataHoraAsc(StatusAgendamento.PENDENTE))
+        when(agendamentoRepository.findProximoAgendamentoPorStatus(eq(StatusAgendamento.CONFIRMADO), any(LocalDateTime.class)))
                 .thenReturn(Optional.empty());
         when(orcamentoRepository.countByStatus(StatusOrcamento.PENDENTE)).thenReturn(0L);
         when(agendamentoRepository.findAllByDataHoraBetween(any(), any()))
@@ -303,7 +290,7 @@ class DashboardServiceTest {
     @Test
     @DisplayName("Deve contar orçamentos pendentes corretamente")
     void deveContarOrcamentosPendentesCorretamente() {
-        when(agendamentoRepository.findTopByStatusOrderByDataHoraAsc(StatusAgendamento.PENDENTE))
+        when(agendamentoRepository.findProximoAgendamentoPorStatus(eq(StatusAgendamento.CONFIRMADO), any(LocalDateTime.class)))
                 .thenReturn(Optional.empty());
         when(orcamentoRepository.countByStatus(StatusOrcamento.PENDENTE)).thenReturn(15L);
         when(agendamentoRepository.findAllByDataHoraBetween(any(), any()))
@@ -321,7 +308,7 @@ class DashboardServiceTest {
     @Test
     @DisplayName("Deve retornar zero quando não houver orçamentos pendentes")
     void deveRetornarZeroQuandoNaoHouverOrcamentosPendentes() {
-        when(agendamentoRepository.findTopByStatusOrderByDataHoraAsc(StatusAgendamento.PENDENTE))
+        when(agendamentoRepository.findProximoAgendamentoPorStatus(eq(StatusAgendamento.CONFIRMADO), any(LocalDateTime.class)))
                 .thenReturn(Optional.empty());
         when(orcamentoRepository.countByStatus(StatusOrcamento.PENDENTE)).thenReturn(0L);
         when(agendamentoRepository.findAllByDataHoraBetween(any(), any()))
@@ -339,13 +326,13 @@ class DashboardServiceTest {
     @DisplayName("Deve retornar agendamentos do dia atual")
     void deveRetornarAgendamentosDoDiaAtual() {
         LocalDateTime agora = LocalDateTime.now();
-        List<Agendamento> agendamentosDoDia = Arrays.asList(
+        List<Agendamento> agendamentosDoDia = List.of(
                 criarAgendamentoComData(1L, agora.withHour(10).withMinute(0)),
                 criarAgendamentoComData(2L, agora.withHour(14).withMinute(0)),
                 criarAgendamentoComData(3L, agora.withHour(16).withMinute(30))
         );
 
-        when(agendamentoRepository.findTopByStatusOrderByDataHoraAsc(StatusAgendamento.PENDENTE))
+        when(agendamentoRepository.findProximoAgendamentoPorStatus(eq(StatusAgendamento.CONFIRMADO), any(LocalDateTime.class)))
                 .thenReturn(Optional.empty());
         when(orcamentoRepository.countByStatus(StatusOrcamento.PENDENTE)).thenReturn(0L);
         when(agendamentoRepository.findAllByDataHoraBetween(any(), any()))
@@ -363,7 +350,7 @@ class DashboardServiceTest {
     @Test
     @DisplayName("Deve retornar lista vazia quando não houver agendamentos do dia")
     void deveRetornarListaVaziaQuandoNaoHouverAgendamentosDoDia() {
-        when(agendamentoRepository.findTopByStatusOrderByDataHoraAsc(StatusAgendamento.PENDENTE))
+        when(agendamentoRepository.findProximoAgendamentoPorStatus(eq(StatusAgendamento.CONFIRMADO), any(LocalDateTime.class)))
                 .thenReturn(Optional.empty());
         when(orcamentoRepository.countByStatus(StatusOrcamento.PENDENTE)).thenReturn(0L);
         when(agendamentoRepository.findAllByDataHoraBetween(any(), any()))
@@ -380,11 +367,7 @@ class DashboardServiceTest {
     @Test
     @DisplayName("Deve buscar agendamentos do dia entre início e fim do dia")
     void deveBuscarAgendamentosEntrInicioEFimDoDia() {
-        LocalDate hoje = LocalDate.now();
-        LocalDateTime inicioEsperado = hoje.atStartOfDay();
-        LocalDateTime fimEsperado = hoje.atTime(23, 59, 59);
-
-        when(agendamentoRepository.findTopByStatusOrderByDataHoraAsc(StatusAgendamento.PENDENTE))
+        when(agendamentoRepository.findProximoAgendamentoPorStatus(eq(StatusAgendamento.CONFIRMADO), any(LocalDateTime.class)))
                 .thenReturn(Optional.empty());
         when(orcamentoRepository.countByStatus(StatusOrcamento.PENDENTE)).thenReturn(0L);
         when(agendamentoRepository.findAllByDataHoraBetween(any(), any()))
@@ -400,13 +383,13 @@ class DashboardServiceTest {
     @Test
     @DisplayName("Deve retornar alertas de estoque abaixo do mínimo")
     void deveRetornarAlertasDeEstoqueAbaixoDoMinimo() {
-        List<Estoque> alertas = Arrays.asList(
+        List<Estoque> alertas = List.of(
                 criarEstoque(1L, "Tinta Preta", 5.0, 10.0),
                 criarEstoque(2L, "Tinta Vermelha", 3.0, 15.0),
                 criarEstoque(3L, "Agulhas", 8.0, 20.0)
         );
 
-        when(agendamentoRepository.findTopByStatusOrderByDataHoraAsc(StatusAgendamento.PENDENTE))
+        when(agendamentoRepository.findProximoAgendamentoPorStatus(eq(StatusAgendamento.CONFIRMADO), any(LocalDateTime.class)))
                 .thenReturn(Optional.empty());
         when(orcamentoRepository.countByStatus(StatusOrcamento.PENDENTE)).thenReturn(0L);
         when(agendamentoRepository.findAllByDataHoraBetween(any(), any()))
@@ -424,7 +407,7 @@ class DashboardServiceTest {
     @Test
     @DisplayName("Deve retornar lista vazia quando não houver alertas de estoque")
     void deveRetornarListaVaziaQuandoNaoHouverAlertasDeEstoque() {
-        when(agendamentoRepository.findTopByStatusOrderByDataHoraAsc(StatusAgendamento.PENDENTE))
+        when(agendamentoRepository.findProximoAgendamentoPorStatus(eq(StatusAgendamento.CONFIRMADO), any(LocalDateTime.class)))
                 .thenReturn(Optional.empty());
         when(orcamentoRepository.countByStatus(StatusOrcamento.PENDENTE)).thenReturn(0L);
         when(agendamentoRepository.findAllByDataHoraBetween(any(), any()))
@@ -441,15 +424,15 @@ class DashboardServiceTest {
     @Test
     @DisplayName("Deve retornar KPIs completos com todos os dados")
     void deveRetornarKPIsCompletosComTodosDados() {
-        Agendamento proximoAgendamento = criarAgendamento(1L, StatusAgendamento.PENDENTE, 1000.0);
-        List<Agendamento> agendamentosDoDia = Arrays.asList(
+        Agendamento proximoAgendamento = criarAgendamento(1L, StatusAgendamento.CONFIRMADO, 1000.0);
+        List<Agendamento> agendamentosDoDia = List.of(
                 criarAgendamento(2L, StatusAgendamento.CONFIRMADO, 1500.0)
         );
-        List<Estoque> alertas = Arrays.asList(
+        List<Estoque> alertas = List.of(
                 criarEstoque(1L, "Tinta Preta", 5.0, 10.0)
         );
 
-        when(agendamentoRepository.findTopByStatusOrderByDataHoraAsc(StatusAgendamento.PENDENTE))
+        when(agendamentoRepository.findProximoAgendamentoPorStatus(eq(StatusAgendamento.CONFIRMADO), any(LocalDateTime.class)))
                 .thenReturn(Optional.of(proximoAgendamento));
         when(orcamentoRepository.countByStatus(StatusOrcamento.PENDENTE)).thenReturn(10L);
         when(agendamentoRepository.findAllByDataHoraBetween(any(), any()))
@@ -469,7 +452,7 @@ class DashboardServiceTest {
     @Test
     @DisplayName("Deve garantir que listas não sejam null no DashboardOutput")
     void deveGarantirQueListasNaoSejamNull() {
-        when(agendamentoRepository.findTopByStatusOrderByDataHoraAsc(StatusAgendamento.PENDENTE))
+        when(agendamentoRepository.findProximoAgendamentoPorStatus(eq(StatusAgendamento.CONFIRMADO), any(LocalDateTime.class)))
                 .thenReturn(Optional.empty());
         when(orcamentoRepository.countByStatus(StatusOrcamento.PENDENTE)).thenReturn(0L);
         when(agendamentoRepository.findAllByDataHoraBetween(any(), any()))
@@ -493,7 +476,8 @@ class DashboardServiceTest {
 
         if (valorOrcamento != null) {
             Orcamento orc = new Orcamento("ORC" + id, "João Silva", "joao@email.com",
-                    "Tatuagem", valorOrcamento, "Preto", "Braço", 2.0, Time.valueOf("2:00"), null, StatusOrcamento.APROVADO, null);
+                    "Tatuagem", valorOrcamento, "Preto", "Braço", 2.0,
+                    Time.valueOf(LocalTime.of(2, 0, 0)), null, StatusOrcamento.APROVADO, usuario);
             agendamento.setOrcamento(orc);
         }
 
@@ -507,7 +491,7 @@ class DashboardServiceTest {
     }
 
     private List<Agendamento> criarAgendamentosParaMes(LocalDateTime data, Double... valores) {
-        return Arrays.stream(valores)
+        return Stream.of(valores)
                 .map(valor -> {
                     Agendamento ag = criarAgendamento(1L, StatusAgendamento.CONCLUIDO, valor);
                     ag.setDataHora(data);
