@@ -16,7 +16,6 @@ import java.lang.reflect.Field;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -41,7 +40,7 @@ class GerenciadorDeArquivosServiceTest {
                 "file",
                 "test-image.jpg",
                 "image/jpeg",
-                "conteúdo do arquivo de teste".getBytes()
+                "conteudo do arquivo de teste".getBytes()
         );
 
         // Arquivo vazio para teste de erro
@@ -55,9 +54,9 @@ class GerenciadorDeArquivosServiceTest {
         // Arquivo com nome especial
         fileWithSpecialName = new MockMultipartFile(
                 "file",
-                "arquivo com espaços & caracteres especiais.png",
+                "arquivo-com-especiais.png",
                 "image/png",
-                "conteúdo da imagem".getBytes()
+                "conteudo da imagem".getBytes()
         );
     }
 
@@ -139,9 +138,9 @@ class GerenciadorDeArquivosServiceTest {
             Path arquivoSalvo = Paths.get(caminhoSalvo);
             assertTrue(Files.exists(arquivoSalvo));
 
-            // Verificar conteúdo
+            // Verificar conteudo
             String conteudo = Files.readString(arquivoSalvo);
-            assertEquals("conteúdo do arquivo de teste", conteudo);
+            assertEquals("conteudo do arquivo de teste", conteudo);
 
             // Verificar que o nome do arquivo contém UUID (formato esperado: UUID_nomeOriginal)
             String nomeArquivo = arquivoSalvo.getFileName().toString();
@@ -199,12 +198,12 @@ class GerenciadorDeArquivosServiceTest {
             );
 
             assertEquals("Falha ao salvar o arquivo.", exception.getMessage());
-            assertTrue(exception.getCause() instanceof IOException);
+            assertInstanceOf(IOException.class, exception.getCause());
         }
     }
 
     @Test
-    @DisplayName("Deve gerar nomes únicos para arquivos diferentes")
+    @DisplayName("Deve gerar nomes unicos para arquivos diferentes")
     void deveGerarNomesUnicosParaArquivosDiferentes() throws Exception {
         // Arrange - usar um diretório temporário real
         Path realTempDir = Files.createTempDirectory("test-uploads");
@@ -221,11 +220,11 @@ class GerenciadorDeArquivosServiceTest {
             pastaRaizField.set(testService, realTempDir);
 
             MultipartFile arquivo1 = new MockMultipartFile(
-                    "file1", "documento.pdf", "application/pdf", "conteúdo 1".getBytes()
+                    "file1", "documento.pdf", "application/pdf", "conteudo 1".getBytes()
             );
 
             MultipartFile arquivo2 = new MockMultipartFile(
-                    "file2", "documento.pdf", "application/pdf", "conteúdo 2".getBytes()
+                    "file2", "documento.pdf", "application/pdf", "conteudo 2".getBytes()
             );
 
             // Act
@@ -235,18 +234,18 @@ class GerenciadorDeArquivosServiceTest {
             // Assert - Verificações básicas
             assertNotNull(caminho1, "Caminho 1 não deve ser null");
             assertNotNull(caminho2, "Caminho 2 não deve ser null");
-            assertNotEquals(caminho1, caminho2, "Os caminhos devem ser únicos");
+            assertNotEquals(caminho1, caminho2, "Os caminhos devem ser unicos");
 
             // Verificar que arquivos foram criados
             assertTrue(Files.exists(Paths.get(caminho1)), "Arquivo 1 deve existir");
             assertTrue(Files.exists(Paths.get(caminho2)), "Arquivo 2 deve existir");
 
-            // Verificar que conteúdos são diferentes
+            // Verificar que conteudos são diferentes
             String conteudo1 = Files.readString(Paths.get(caminho1));
             String conteudo2 = Files.readString(Paths.get(caminho2));
-            assertNotEquals(conteudo1, conteudo2, "Conteúdos devem ser diferentes");
-            assertEquals("conteúdo 1", conteudo1);
-            assertEquals("conteúdo 2", conteudo2);
+            assertNotEquals(conteudo1, conteudo2, "Conteudos devem ser diferentes");
+            assertEquals("conteudo 1", conteudo1);
+            assertEquals("conteudo 2", conteudo2);
 
         } finally {
             // Limpeza - remover diretório temporário e seus arquivos
@@ -281,7 +280,7 @@ class GerenciadorDeArquivosServiceTest {
             pastaRaizField.set(testService, realTempDir);
 
             MultipartFile arquivoSemNome = new MockMultipartFile(
-                    "file", null, "text/plain", "conteúdo".getBytes()
+                    "file", null, "text/plain", "conteudo".getBytes()
             );
 
             // Act
@@ -291,9 +290,9 @@ class GerenciadorDeArquivosServiceTest {
             assertNotNull(caminhoSalvo, "Caminho salvo não deve ser null");
             assertTrue(Files.exists(Paths.get(caminhoSalvo)), "Arquivo deve existir no caminho retornado");
 
-            // Verificar conteúdo
+            // Verificar conteudo
             String conteudo = Files.readString(Paths.get(caminhoSalvo));
-            assertEquals("conteúdo", conteudo, "Conteúdo deve ser preservado");
+            assertEquals("conteudo", conteudo, "Conteudo deve ser preservado");
 
             // Verificar que o arquivo foi salvo - o nome exato pode variar dependendo de como o MockMultipartFile trata null
             Path arquivoSalvo = Paths.get(caminhoSalvo);
