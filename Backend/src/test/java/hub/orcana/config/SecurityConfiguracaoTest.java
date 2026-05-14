@@ -1,5 +1,6 @@
 package hub.orcana.config;
 
+import hub.orcana.service.AuditoriaService;
 import hub.orcana.service.AutenticacaoService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -24,10 +25,13 @@ class SecurityConfiguracaoTest {
     @Mock
     private AutenticacaoEntryPoint autenticacaoEntryPoint;
 
+    @Mock
+    private AuditoriaService auditoriaService;
+
     @Test
     void passwordEncoder_deveRetornarBCryptPasswordEncoder() {
         // Arrange
-        SecurityConfiguracao config = new SecurityConfiguracao(autenticacaoService, autenticacaoEntryPoint);
+        SecurityConfiguracao config = new SecurityConfiguracao(autenticacaoService, autenticacaoEntryPoint, auditoriaService);
 
         // Act
         PasswordEncoder encoder = config.passwordEncoder();
@@ -40,7 +44,7 @@ class SecurityConfiguracaoTest {
     @Test
     void jwtAuthenticationFilterBean_deveRetornarAutenticacaoFilter() {
         // Arrange
-        SecurityConfiguracao config = new SecurityConfiguracao(autenticacaoService, autenticacaoEntryPoint);
+        SecurityConfiguracao config = new SecurityConfiguracao(autenticacaoService, autenticacaoEntryPoint, auditoriaService);
 
         // Act
         AutenticacaoFilter filter = config.jwtAuthenticationFilterBean();
@@ -52,7 +56,7 @@ class SecurityConfiguracaoTest {
     @Test
     void jwtAuthenticationUtilBean_deveRetornarGerenciadorTokenJwt() {
         // Arrange
-        SecurityConfiguracao config = new SecurityConfiguracao(autenticacaoService, autenticacaoEntryPoint);
+        SecurityConfiguracao config = new SecurityConfiguracao(autenticacaoService, autenticacaoEntryPoint, auditoriaService);
 
         // Act
         GerenciadorTokenJwt gerenciador = config.jwtAuthenticationUtilBean();
@@ -64,7 +68,7 @@ class SecurityConfiguracaoTest {
     @Test
     void corsConfigurationSource_deveConfigurarCorsCorretamente() {
         // Arrange
-        SecurityConfiguracao config = new SecurityConfiguracao(autenticacaoService, autenticacaoEntryPoint);
+        SecurityConfiguracao config = new SecurityConfiguracao(autenticacaoService, autenticacaoEntryPoint, auditoriaService);
 
         // Act
         CorsConfigurationSource corsSource = config.corsConfigurationSource();
@@ -116,7 +120,7 @@ class SecurityConfiguracaoTest {
     @Test
     void authenticationEntryPoint_deveRetornarEntryPointPersonalizado() {
         // Arrange
-        SecurityConfiguracao config = new SecurityConfiguracao(autenticacaoService, autenticacaoEntryPoint);
+        SecurityConfiguracao config = new SecurityConfiguracao(autenticacaoService, autenticacaoEntryPoint, auditoriaService);
 
         // Act
         var entryPoint = config.authenticationEntryPoint();
@@ -128,7 +132,7 @@ class SecurityConfiguracaoTest {
     @Test
     void passwordEncoder_devePermitirValidacaoSenhas() {
         // Arrange
-        SecurityConfiguracao config = new SecurityConfiguracao(autenticacaoService, autenticacaoEntryPoint);
+        SecurityConfiguracao config = new SecurityConfiguracao(autenticacaoService, autenticacaoEntryPoint, auditoriaService);
         PasswordEncoder encoder = config.passwordEncoder();
         String senhaOriginal = "minhasenha123";
 
@@ -145,7 +149,7 @@ class SecurityConfiguracaoTest {
     @Test
     void passwordEncoder_senhasIguaisDevemGerarHashesDiferentes() {
         // Arrange
-        SecurityConfiguracao config = new SecurityConfiguracao(autenticacaoService, autenticacaoEntryPoint);
+        SecurityConfiguracao config = new SecurityConfiguracao(autenticacaoService, autenticacaoEntryPoint, auditoriaService);
         PasswordEncoder encoder = config.passwordEncoder();
         String senha = "minhasenha123";
 
@@ -162,7 +166,7 @@ class SecurityConfiguracaoTest {
     @Test
     void corsConfigurationSource_devePermitirTodasAsOrigens() {
         // Arrange
-        SecurityConfiguracao config = new SecurityConfiguracao(autenticacaoService, autenticacaoEntryPoint);
+        SecurityConfiguracao config = new SecurityConfiguracao(autenticacaoService, autenticacaoEntryPoint, auditoriaService);
 
         // Act
         CorsConfigurationSource corsSource = config.corsConfigurationSource();

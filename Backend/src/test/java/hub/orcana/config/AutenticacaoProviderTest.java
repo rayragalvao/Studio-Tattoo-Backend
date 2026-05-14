@@ -1,5 +1,6 @@
 package hub.orcana.config;
 
+import hub.orcana.service.AuditoriaService;
 import hub.orcana.service.AutenticacaoService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -28,6 +29,9 @@ class AutenticacaoProviderTest {
     @Mock
     private PasswordEncoder passwordEncoder;
 
+    @Mock
+    private AuditoriaService auditoriaService;
+
     @InjectMocks
     private AutenticacaoProvider provider;
 
@@ -55,6 +59,7 @@ class AutenticacaoProviderTest {
         assertInstanceOf(UsernamePasswordAuthenticationToken.class, result);
         assertEquals(userDetails, result.getPrincipal());
         assertNull(result.getCredentials());
+        verify(auditoriaService, times(1)).registrarLoginSucesso(username);
     }
 
     @Test
@@ -78,6 +83,7 @@ class AutenticacaoProviderTest {
             () -> provider.authenticate(inputAuth));
 
         assertEquals("Usuário ou senha inválidos", exception.getMessage());
+        verify(auditoriaService, times(1)).registrarLoginFalha(username, "Senha incorreta");
     }
 
     @Test
@@ -148,6 +154,6 @@ class AutenticacaoProviderTest {
         // Assert
         verify(autenticacaoService, times(1)).loadUserByUsername(username);
         verify(passwordEncoder, times(1)).matches(password, encodedPassword);
+        verify(auditoriaService, times(1)).registrarLoginSucesso(username);
     }
 }
-

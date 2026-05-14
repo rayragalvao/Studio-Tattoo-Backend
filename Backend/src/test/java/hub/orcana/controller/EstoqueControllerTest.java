@@ -11,6 +11,10 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
@@ -64,24 +68,30 @@ class EstoqueControllerTest {
     @Test
     @DisplayName("Deve retornar o estoque com sucesso")
     void getEstoque_deveRetornarListaComSucesso() {
-        when(estoqueService.getEstoque()).thenReturn(materiaisEsperados);
+        Pageable pageable = PageRequest.of(0, 20);
+        Page<DetalhesMaterialOutput> page = new PageImpl<>(materiaisEsperados, pageable, materiaisEsperados.size());
 
-        ResponseEntity<List<DetalhesMaterialOutput>> materiais = estoqueController.getEstoque();
+        when(estoqueService.listarPaginado(pageable, null)).thenReturn(page);
+
+        ResponseEntity<Page<DetalhesMaterialOutput>> materiais = estoqueController.getEstoque(pageable, null);
 
         assertNotNull(materiais);
         assertEquals(HttpStatus.OK, materiais.getStatusCode());
         assertNotNull(materiais.getBody());
-        assertEquals(3, materiais.getBody().size());
+        assertEquals(3, materiais.getBody().getContent().size());
 
-        verify(estoqueService, times(1)).getEstoque();
+        verify(estoqueService, times(1)).listarPaginado(pageable, null);
     }
 
     @Test
     @DisplayName("Deve retornar lista vazia quando não houver materiais em estoque")
     void getEstoque_deveRetornarCorpoVazio() {
-        when(estoqueService.getEstoque()).thenReturn(List.of());
+        Pageable pageable = PageRequest.of(0, 20);
+        Page<DetalhesMaterialOutput> emptyPage = new PageImpl<>(List.of(), pageable, 0);
 
-        ResponseEntity<List<DetalhesMaterialOutput>> materiais = estoqueController.getEstoque();
+        when(estoqueService.listarPaginado(pageable, null)).thenReturn(emptyPage);
+
+        ResponseEntity<Page<DetalhesMaterialOutput>> materiais = estoqueController.getEstoque(pageable, null);
 
         assertEquals(HttpStatus.NO_CONTENT, materiais.getStatusCode());
         assertNull(materiais.getBody());
@@ -90,13 +100,14 @@ class EstoqueControllerTest {
     @Test
     @DisplayName("Deve lidar com exceção ao obter o estoque")
     void getEstoque_deveLidarComExcecao() {
-        when(estoqueService.getEstoque()).thenThrow(new RuntimeException("Erro ao acessar o banco de dados"));
-        Exception exception = assertThrows(RuntimeException.class, () -> {
-            estoqueController.getEstoque();
-        });
+        Pageable pageable = PageRequest.of(0, 20);
+
+        when(estoqueService.listarPaginado(pageable, null)).thenThrow(new RuntimeException("Erro ao acessar o banco de dados"));
+
+        Exception exception = assertThrows(RuntimeException.class, () -> estoqueController.getEstoque(pageable, null));
 
         assertEquals("Erro ao acessar o banco de dados", exception.getMessage());
-        verify(estoqueService, times(1)).getEstoque();
+        verify(estoqueService, times(1)).listarPaginado(pageable, null);
     }
 
     @Test
@@ -128,6 +139,7 @@ class EstoqueControllerTest {
         ResponseEntity<DetalhesMaterialOutput> material = estoqueController.getEstoqueByNome(nomeMaterial);
 
         assertEquals(HttpStatus.NOT_FOUND, material.getStatusCode());
+        assertNull(material.getBody());
         verify(estoqueService, times(1)).getEstoqueByNome(nomeMaterial);
     }
 
@@ -150,9 +162,9 @@ class EstoqueControllerTest {
         when(estoqueService.getEstoqueByNome(nomeMaterial))
                 .thenThrow(new RuntimeException("Erro ao acessar o banco de dados"));
 
-        Exception exception = assertThrows(RuntimeException.class, () -> {
-            estoqueController.getEstoqueByNome(nomeMaterial);
-        });
+        Exception exception = assertThrows(RuntimeException.class, () ->
+            estoqueController.getEstoqueByNome(nomeMaterial)
+        );
 
         assertEquals("Erro ao acessar o banco de dados", exception.getMessage());
         verify(estoqueService, times(1)).getEstoqueByNome(nomeMaterial);
@@ -197,9 +209,9 @@ class EstoqueControllerTest {
         when(estoqueService.postEstoque(input))
                 .thenThrow(new RuntimeException("Erro ao acessar o banco de dados"));
 
-        Exception exception = assertThrows(RuntimeException.class, () -> {
-            estoqueController.postEstoque(input);
-        });
+        Exception exception = assertThrows(RuntimeException.class, () ->
+            estoqueController.postEstoque(input)
+        );
 
         assertEquals("Erro ao acessar o banco de dados", exception.getMessage());
         verify(estoqueService, times(1)).postEstoque(input);
@@ -223,6 +235,7 @@ class EstoqueControllerTest {
         ResponseEntity<DetalhesMaterialOutput> response = estoqueController.atualizarQuantidadeById(id, novaQuantidade);
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertNotNull(response.getBody());
         assertEquals(75.0, response.getBody().quantidade());
         assertEquals("Tinta Preta", response.getBody().nome());
         verify(estoqueService, times(1)).atualizarQuantidadeById(id, novaQuantidade);
@@ -237,9 +250,9 @@ class EstoqueControllerTest {
         when(estoqueService.atualizarQuantidadeById(id, novaQuantidade))
                 .thenThrow(new RuntimeException("Erro ao acessar o banco de dados"));
 
-        Exception exception = assertThrows(RuntimeException.class, () -> {
-            estoqueController.atualizarQuantidadeById(id, novaQuantidade);
-        });
+        Exception exception = assertThrows(RuntimeException.class, () ->
+            estoqueController.atualizarQuantidadeById(id, novaQuantidade)
+        );
 
         assertEquals("Erro ao acessar o banco de dados", exception.getMessage());
         verify(estoqueService, times(1)).atualizarQuantidadeById(id, novaQuantidade);
@@ -254,9 +267,9 @@ class EstoqueControllerTest {
         when(estoqueService.atualizarQuantidadeById(id, novaQuantidade))
                 .thenThrow(new DependenciaNaoEncontradaException("Material não encontrado"));
 
-        Exception exception = assertThrows(DependenciaNaoEncontradaException.class, () -> {
-            estoqueController.atualizarQuantidadeById(id, novaQuantidade);
-        });
+        Exception exception = assertThrows(DependenciaNaoEncontradaException.class, () ->
+            estoqueController.atualizarQuantidadeById(id, novaQuantidade)
+        );
 
         assertEquals("Material não encontrado não encontrado(a) no sistema", exception.getMessage());
         verify(estoqueService, times(1)).atualizarQuantidadeById(id, novaQuantidade);
@@ -284,9 +297,9 @@ class EstoqueControllerTest {
         doThrow(new RuntimeException("Erro ao acessar o banco de dados"))
                 .when(estoqueService).deleteEstoqueById(id);
 
-        Exception exception = assertThrows(RuntimeException.class, () -> {
-            estoqueController.deleteEstoqueById(id);
-        });
+        Exception exception = assertThrows(RuntimeException.class, () ->
+            estoqueController.deleteEstoqueById(id)
+        );
 
         assertEquals("Erro ao acessar o banco de dados", exception.getMessage());
         verify(estoqueService, times(1)).deleteEstoqueById(id);
@@ -300,9 +313,9 @@ class EstoqueControllerTest {
         doThrow(new DependenciaNaoEncontradaException("Material não encontrado"))
                 .when(estoqueService).deleteEstoqueById(id);
 
-        Exception exception = assertThrows(DependenciaNaoEncontradaException.class, () -> {
-            estoqueController.deleteEstoqueById(id);
-        });
+        Exception exception = assertThrows(DependenciaNaoEncontradaException.class, () ->
+            estoqueController.deleteEstoqueById(id)
+        );
 
         assertEquals("Material não encontrado não encontrado(a) no sistema", exception.getMessage());
         verify(estoqueService, times(1)).deleteEstoqueById(id);
@@ -355,9 +368,9 @@ class EstoqueControllerTest {
         when(estoqueService.putEstoqueById(id, input))
                 .thenThrow(new RuntimeException("Erro ao acessar o banco de dados"));
 
-        Exception exception = assertThrows(RuntimeException.class, () -> {
-            estoqueController.putEstoqueById(id, input);
-        });
+        Exception exception = assertThrows(RuntimeException.class, () ->
+            estoqueController.putEstoqueById(id, input)
+        );
 
         assertEquals("Erro ao acessar o banco de dados", exception.getMessage());
         verify(estoqueService, times(1)).putEstoqueById(id, input);
@@ -377,9 +390,9 @@ class EstoqueControllerTest {
         when(estoqueService.putEstoqueById(id, input))
                 .thenThrow(new DependenciaNaoEncontradaException("Material Inexistente"));
 
-        Exception exception = assertThrows(DependenciaNaoEncontradaException.class, () -> {
-            estoqueController.putEstoqueById(id, input);
-        });
+        Exception exception = assertThrows(DependenciaNaoEncontradaException.class, () ->
+            estoqueController.putEstoqueById(id, input)
+        );
 
         assertEquals("Material Inexistente não encontrado(a) no sistema", exception.getMessage());
         verify(estoqueService, times(1)).putEstoqueById(id, input);
