@@ -179,12 +179,13 @@ class SecurityConfiguracaoTest {
         // Verificar se todas as origens esperadas estão configuradas
         List<String> origins = corsConfig.getAllowedOriginPatterns();
         assertNotNull(origins);
-        assertEquals(4, origins.size());
+        assertEquals(5, origins.size());
         assertTrue(origins.containsAll(List.of(
             "http://localhost:3000",
             "http://localhost:5173",
             "http://localhost:5174",
-            "http://localhost:8080"
+            "http://localhost:8080",
+                "http://18.232.200.166"
         )));
     }
 }
