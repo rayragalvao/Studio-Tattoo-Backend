@@ -56,11 +56,11 @@ class UsuarioServiceTest {
     @DisplayName("criar(CadastroUsuario) - sucesso")
     void criarCadastro_sucesso() {
         CadastroUsuario dto = new CadastroUsuario(
-                "rayra", "email@ex.com", "(11) 91234-1234", "123", new Date(), false);
+                "rayra", "email@ex.com", "(11) 91234-1234", "Senha@123", new Date(), false, null);
 
         when(repository.existsByEmail("email@ex.com")).thenReturn(false);
         when(repository.existsByTelefone("(11) 91234-1234")).thenReturn(false);
-        when(passwordEncoder.encode("123")).thenReturn("hash");
+        when(passwordEncoder.encode("Senha@123")).thenReturn("hash");
         when(repository.save(any())).thenAnswer(invocation -> {
             Usuario u = invocation.getArgument(0);
             u.setId(10L);
@@ -79,7 +79,7 @@ class UsuarioServiceTest {
     @Test
     @DisplayName("criar(CadastroUsuario) - email já cadastrado")
     void criarCadastro_emailDuplicado() {
-        CadastroUsuario dto = new CadastroUsuario("a", "x@x.com", "", "1", new Date(), false);
+        CadastroUsuario dto = new CadastroUsuario("a", "x@x.com", "", "Senha@123", new Date(), false, null);
 
         when(repository.existsByEmail("x@x.com")).thenReturn(true);
 
@@ -91,7 +91,7 @@ class UsuarioServiceTest {
     @Test
     @DisplayName("criar(CadastroUsuario) - telefone já cadastrado")
     void criarCadastro_telefoneDuplicado() {
-        CadastroUsuario dto = new CadastroUsuario("a", "x@x.com", "(11) 99999-9999", "1", new Date(), false);
+        CadastroUsuario dto = new CadastroUsuario("a", "x@x.com", "(11) 99999-9999", "Senha@123", new Date(), false, null);
 
         when(repository.existsByEmail("x@x.com")).thenReturn(false);
         when(repository.existsByTelefone("(11) 99999-9999")).thenReturn(true);
@@ -520,7 +520,7 @@ class UsuarioServiceTest {
     void criarCadastro_deveAssociarOrcamentos() {
         // Arrange
         CadastroUsuario dto = new CadastroUsuario(
-                "teste", "test@email.com", null, "123", new Date(), false);
+                "teste", "test@email.com", null, "Senha@123", new Date(), false, null);
 
         Orcamento orcamento1 = new Orcamento();
         orcamento1.setCodigoOrcamento("ORC001");
@@ -531,7 +531,7 @@ class UsuarioServiceTest {
         orcamento2.setEmail("test@email.com");
 
         when(repository.existsByEmail("test@email.com")).thenReturn(false);
-        when(passwordEncoder.encode("123")).thenReturn("hash");
+        when(passwordEncoder.encode("Senha@123")).thenReturn("hash");
         when(repository.save(any())).thenAnswer(invocation -> {
             Usuario u = invocation.getArgument(0);
             u.setId(10L);
@@ -583,11 +583,11 @@ class UsuarioServiceTest {
     void criarCadastro_telefoneNullIgnorado() {
         // Arrange
         CadastroUsuario dto = new CadastroUsuario(
-                "teste", "test@email.com", null, "123", new Date(), false);
+                "teste", "test@email.com", null, "Senha@123", new Date(), false, null);
 
         when(repository.existsByEmail("test@email.com")).thenReturn(false);
         // não deve chamar existsByTelefone quando telefone é null
-        when(passwordEncoder.encode("123")).thenReturn("hash");
+        when(passwordEncoder.encode("Senha@123")).thenReturn("hash");
         when(repository.save(any())).thenAnswer(invocation -> {
             Usuario u = invocation.getArgument(0);
             u.setId(10L);
@@ -608,11 +608,11 @@ class UsuarioServiceTest {
     void criarCadastro_telefoneVazioIgnorado() {
         // Arrange
         CadastroUsuario dto = new CadastroUsuario(
-                "teste", "test@email.com", "   ", "123", new Date(), false);
+                "teste", "test@email.com", "   ", "Senha@123", new Date(), false,null);
 
         when(repository.existsByEmail("test@email.com")).thenReturn(false);
         // não deve chamar existsByTelefone quando telefone é vazio/espaços
-        when(passwordEncoder.encode("123")).thenReturn("hash");
+        when(passwordEncoder.encode("Senha@123")).thenReturn("hash");
         when(repository.save(any())).thenAnswer(invocation -> {
             Usuario u = invocation.getArgument(0);
             u.setId(10L);
@@ -698,11 +698,11 @@ class UsuarioServiceTest {
     void criarCadastro_telefoneComEspacos() {
         // Arrange
         CadastroUsuario dto = new CadastroUsuario(
-                "teste", "espacos@email.com", "  (11) 99999-9999  ", "123", new Date(), false);
+                "teste", "espacos@email.com", "  (11) 99999-9999  ", "Senha@123", new Date(), false, null);
 
         when(repository.existsByEmail("espacos@email.com")).thenReturn(false);
         when(repository.existsByTelefone("  (11) 99999-9999  ")).thenReturn(false);
-        when(passwordEncoder.encode("123")).thenReturn("hash");
+        when(passwordEncoder.encode("Senha@123")).thenReturn("hash");
         when(repository.save(any())).thenAnswer(invocation -> {
             Usuario u = invocation.getArgument(0);
             u.setId(15L);
