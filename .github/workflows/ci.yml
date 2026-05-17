@@ -21,6 +21,7 @@ jobs:
           java-version: '21'
 
       - name: Build with Maven
+        working-directory: Backend
         run: ./mvnw -B package -DskipTests
 
   test:
@@ -37,6 +38,7 @@ jobs:
           java-version: '21'
 
       - name: Run tests
+        working-directory: Backend
         run: ./mvnw test
 
   docker:
