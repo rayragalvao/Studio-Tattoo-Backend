@@ -17,13 +17,14 @@ public record CadastroUsuario(
         @Pattern(regexp = "^$|^\\(\\d{2}\\)\\s\\d{4,5}-\\d{4}$")
         String telefone,
 
-        @NotBlank
+       // @NotBlank
         @Pattern(
             regexp = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&#^()_+\\-=\\[\\]{};':\"\\\\|,.<>\\/?]).{8,}$",
             message = "A senha deve ter no mínimo 8 caracteres, contendo letras maiúsculas, minúsculas, números e caracteres especiais."
         )
         String senha,
         Date dtNasc,
-        boolean isAdmin
+        boolean isAdmin,
+        Boolean googleLogin
 ) {
 }

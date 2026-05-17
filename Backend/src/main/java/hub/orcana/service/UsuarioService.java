@@ -60,7 +60,20 @@ public class UsuarioService {
             throw new ResponseStatusException(HttpStatusCode.valueOf(409), "Telefone de usuário já cadastrado.");
         }
 
-        String senhaCriptografada = passwordEncoder.encode(usuario.senha());
+        //String senhaCriptografada = passwordEncoder.encode(usuario.senha());
+        String senhaCriptografada;
+        if (Boolean.TRUE.equals(usuario.googleLogin())) {
+            // Senha derivada do email para Google
+            senhaCriptografada = passwordEncoder.encode("GOOGLE_" + usuario.email());
+        } else {
+            if (usuario.senha() == null || usuario.senha().isBlank()) {
+                throw new ResponseStatusException(HttpStatusCode.valueOf(400), "Senha é obrigatória.");
+            }
+            if (!usuario.senha().matches("^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&#^()_+\\-=\\[\\]{};':\"\\\\|,.<>\\/?]).{8,}$")) {
+                throw new ResponseStatusException(HttpStatusCode.valueOf(400), "Senha não atende aos requisitos mínimos.");
+            }
+            senhaCriptografada = passwordEncoder.encode(usuario.senha());
+        }
         novoUsuario.setSenha(senhaCriptografada);
 
         Usuario salvo = repository.save(novoUsuario);
