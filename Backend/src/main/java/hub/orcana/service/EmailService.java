@@ -26,17 +26,20 @@ public class EmailService implements  EstoqueObserver, OrcamentoObserver, Agenda
     private final JavaMailSender mailSender;
     private final UsuarioRepository usuarioRepository;
     private final TemplateEmailRepository templateEmailRepository;
+    private final RestTemplate restTemplate;
 
-    public EmailService(JavaMailSender mailSender, UsuarioRepository usuarioRepository, TemplateEmailRepository templateEmailRepository) {
+
+    public EmailService(JavaMailSender mailSender, UsuarioRepository usuarioRepository, TemplateEmailRepository templateEmailRepository, RestTemplate restTemplate) {
         this.mailSender = mailSender;
         this.usuarioRepository = usuarioRepository;
         this.templateEmailRepository = templateEmailRepository;
+        this.restTemplate = restTemplate;
     }
 
     // código base para envio de e-mail via microsserviço
     public void enviarTextoSimples(String destinatario, String assunto, String texto) {
         try {
-            RestTemplate restTemplate = new RestTemplate();
+          //  RestTemplate restTemplate = new RestTemplate();
 
             // Criando o objeto para enviar no body
             Map<String, String> emailRequest = Map.of(

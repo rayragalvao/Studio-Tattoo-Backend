@@ -11,17 +11,21 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.mail.SimpleMailMessage;
+import org.springframework.http.ResponseEntity;
 import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.web.client.RestTemplate;
 
 import java.sql.Time;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -36,6 +40,9 @@ class EmailServiceTest {
     @Mock
     private TemplateEmailRepository templateEmailRepository;
 
+    @Mock
+    private RestTemplate restTemplate;
+
     @InjectMocks
     private EmailService emailService;
 
@@ -47,19 +54,16 @@ class EmailServiceTest {
 
     @BeforeEach
     void setUp() {
-        // Setup Usuario
         usuario = new Usuario();
         usuario.setId(1L);
         usuario.setNome("João Silva");
         usuario.setEmail("joao@email.com");
         usuario.setTelefone("(11) 99999-9999");
 
-        // Setup Orçamento
         orcamento = new Orcamento("ORC123", "João Silva", "joao@email.com",
                 "Dragão nas costas", 20.5, "Preto e Vermelho", "Costas",
                 Arrays.asList("imagem1.jpg", "imagem2.jpg"));
 
-        // Setup Agendamento
         agendamento = new Agendamento();
         agendamento.setId(1L);
         agendamento.setDataHora(LocalDateTime.of(2026, 3, 15, 14, 30));
@@ -67,7 +71,6 @@ class EmailServiceTest {
         agendamento.setUsuario(usuario);
         agendamento.setOrcamento(orcamento);
 
-        // Setup Admins
         Usuario admin1 = new Usuario();
         admin1.setEmail("admin1@tattoo.com");
         admin1.setNome("Admin 1");
@@ -80,382 +83,263 @@ class EmailServiceTest {
         emailsAdmins = Arrays.asList("admin1@tattoo.com", "admin2@tattoo.com");
     }
 
-    // ------------------ TESTES MÉTODO enviarTextoSimples ------------------
+    // ------------------ enviarTextoSimples ------------------
 
     @Test
     @DisplayName("Deve enviar texto simples com sucesso")
     void deveEnviarTextoSimplesComSucesso() {
-        // Arrange
-        String destinatario = "teste@email.com";
-        String assunto = "Assunto Teste";
-        String texto = "Texto do email";
+        when(restTemplate.postForEntity(anyString(), any(), eq(String.class)))
+                .thenReturn(ResponseEntity.ok("ok"));
 
-        // Act
-        emailService.enviarTextoSimples(destinatario, assunto, texto);
+        emailService.enviarTextoSimples("teste@email.com", "Assunto", "Texto");
 
-        // Assert
-        ArgumentCaptor<SimpleMailMessage> messageCaptor = ArgumentCaptor.forClass(SimpleMailMessage.class);
-        verify(mailSender, times(1)).send(messageCaptor.capture());
-
-        SimpleMailMessage capturedMessage = messageCaptor.getValue();
-        assertEquals("orcanatechschool@gmail.com", capturedMessage.getFrom());
-        assertArrayEquals(new String[]{destinatario}, capturedMessage.getTo());
-        assertEquals(assunto, capturedMessage.getSubject());
-        assertEquals(texto, capturedMessage.getText());
+        verify(restTemplate, times(1)).postForEntity(
+                eq("http://localhost:8081/email/simples"), any(), eq(String.class));
     }
 
-    // ------------------ TESTES MÉTODO enviaEmailNovoOrcamento ------------------
+    @Test
+    @DisplayName("Deve lançar exceção quando RestTemplate falha")
+    void deveLancarExcecaoQuandoRestTemplateFalha() {
+        when(restTemplate.postForEntity(anyString(), any(), eq(String.class)))
+                .thenThrow(new RuntimeException("Falha no envio"));
+
+        RuntimeException exception = assertThrows(RuntimeException.class,
+                () -> emailService.enviarTextoSimples("teste@email.com", "Assunto", "Texto"));
+
+        assertTrue(exception.getMessage().contains("Falha no envio"));
+    }
+
+    // ------------------ enviaEmailNovoOrcamento ------------------
 
     @Test
     @DisplayName("Deve enviar email de novo orçamento com sucesso")
     void deveEnviarEmailNovoOrcamentoComSucesso() {
-        // Arrange
-        String emailCliente = "cliente@email.com";
-        String nomeCliente = "Cliente Teste";
-        String codigoOrcamento = "ORC456";
-
         TemplateEmail template = new TemplateEmail();
-        template.setAssunto("Novo Orçamento - ORC456");
-        template.setCorpoEmail("Olá ${nomeCliente}, seu orçamento ORC456 foi criado.");
+        template.setAssunto("Novo Orçamento");
+        template.setCorpoEmail("Olá ${nomeCliente}, seu orçamento ${codigoOrcamento} foi criado.");
 
         when(templateEmailRepository.findByNomeTemplate("orcamento_cliente"))
                 .thenReturn(Optional.of(template));
+        when(restTemplate.postForEntity(anyString(), any(), eq(String.class)))
+                .thenReturn(ResponseEntity.ok("ok"));
 
-        // Act
-        emailService.enviaEmailNovoOrcamento(emailCliente, nomeCliente, codigoOrcamento);
+        emailService.enviaEmailNovoOrcamento("cliente@email.com", "Cliente Teste", "ORC456");
 
-        // Assert
-        ArgumentCaptor<SimpleMailMessage> messageCaptor = ArgumentCaptor.forClass(SimpleMailMessage.class);
-        verify(mailSender, times(1)).send(messageCaptor.capture());
-
-        SimpleMailMessage capturedMessage = messageCaptor.getValue();
-        assertEquals("Novo Orçamento - ORC456", capturedMessage.getSubject());
-        assertNotNull(capturedMessage.getText());
-        assertTrue(capturedMessage.getText().contains("Cliente Teste"));
-        assertTrue(capturedMessage.getText().contains("ORC456"));
+        verify(restTemplate, times(1)).postForEntity(anyString(), any(), eq(String.class));
     }
 
     @Test
     @DisplayName("Deve lançar exceção quando email cliente for nulo")
     void deveLancarExcecaoQuandoEmailClienteForNulo() {
-        // Act & Assert
-        IllegalArgumentException exception = assertThrows(
-                IllegalArgumentException.class,
-                () -> emailService.enviaEmailNovoOrcamento(null, "Cliente", "ORC123")
-        );
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
+                () -> emailService.enviaEmailNovoOrcamento(null, "Cliente", "ORC123"));
 
         assertEquals("Destinatário inválido para envio de e-mail.", exception.getMessage());
-        verify(mailSender, never()).send(any(SimpleMailMessage.class));
+        verify(restTemplate, never()).postForEntity(anyString(), any(), eq(String.class));
     }
 
     @Test
     @DisplayName("Deve lançar exceção quando email cliente for vazio")
     void deveLancarExcecaoQuandoEmailClienteForVazio() {
-        // Act & Assert
-        IllegalArgumentException exception = assertThrows(
-                IllegalArgumentException.class,
-                () -> emailService.enviaEmailNovoOrcamento("", "Cliente", "ORC123")
-        );
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
+                () -> emailService.enviaEmailNovoOrcamento("", "Cliente", "ORC123"));
 
         assertEquals("Destinatário inválido para envio de e-mail.", exception.getMessage());
-        verify(mailSender, never()).send(any(SimpleMailMessage.class));
+        verify(restTemplate, never()).postForEntity(anyString(), any(), eq(String.class));
     }
 
     @Test
     @DisplayName("Deve lançar exceção quando template não for encontrado")
     void deveLancarExcecaoQuandoTemplateNaoForEncontrado() {
-        // Arrange
         when(templateEmailRepository.findByNomeTemplate("orcamento_cliente"))
                 .thenReturn(Optional.empty());
 
-        // Act & Assert
-        IllegalStateException exception = assertThrows(
-                IllegalStateException.class,
-                () -> emailService.enviaEmailNovoOrcamento("cliente@email.com", "Cliente", "ORC123")
-        );
+        IllegalStateException exception = assertThrows(IllegalStateException.class,
+                () -> emailService.enviaEmailNovoOrcamento("cliente@email.com", "Cliente", "ORC123"));
 
         assertEquals("Template 'orcamento_cliente' não encontrado", exception.getMessage());
     }
 
-    // ------------------ TESTES MÉTODO updateOrcamento ------------------
+    // ------------------ updateOrcamento ------------------
 
     @Test
-    @DisplayName("Deve processar atualização de orçamento enviando emails para cliente e tatuadores")
+    @DisplayName("Deve processar atualização de orçamento enviando emails")
     void deveProcessarAtualizacaoOrcamentoEnviandoEmails() {
-        // Arrange
         setupTemplatesMocks();
         when(usuarioRepository.getEmailByIsAdminTrue()).thenReturn(emailsAdmins);
         when(usuarioRepository.getNomeByIsAdminTrue()).thenReturn(List.of("Admin Principal"));
+        when(restTemplate.postForEntity(anyString(), any(), eq(String.class)))
+                .thenReturn(ResponseEntity.ok("ok"));
 
-        // Act
         emailService.updateOrcamento(orcamento);
 
-        // Assert
-        verify(mailSender, times(3)).send(any(SimpleMailMessage.class)); // 1 cliente + 2 admins
-        verify(templateEmailRepository, times(2)).findByNomeTemplate("orcamento_cliente");
-        verify(templateEmailRepository, times(2)).findByNomeTemplate("orcamento_tatuador");
+        verify(restTemplate, times(3)).postForEntity(anyString(), any(), eq(String.class));
     }
 
-    // ------------------ TESTES MÉTODO updateEstoque ------------------
+    // ------------------ updateEstoque ------------------
 
     @Test
     @DisplayName("Deve enviar email quando estoque estiver baixo")
     void deveEnviarEmailQuandoEstoqueEstiverBaixo() {
-        // Arrange
-        String materialNome = "Tinta Preta";
-        Double quantidadeAtual = 5.0;
-        Double minAviso = 10.0;
-
         setupEstoqueTemplate();
         when(usuarioRepository.getEmailByIsAdminTrue()).thenReturn(emailsAdmins);
+        when(restTemplate.postForEntity(anyString(), any(), eq(String.class)))
+                .thenReturn(ResponseEntity.ok("ok"));
 
-        // Act
-        emailService.updateEstoque(materialNome, quantidadeAtual, minAviso);
+        emailService.updateEstoque("Tinta Preta", 5.0, 10.0);
 
-        // Assert
-        verify(mailSender, times(2)).send(any(SimpleMailMessage.class));
-        ArgumentCaptor<SimpleMailMessage> messageCaptor = ArgumentCaptor.forClass(SimpleMailMessage.class);
-        verify(mailSender, times(2)).send(messageCaptor.capture());
-
-        List<SimpleMailMessage> capturedMessages = messageCaptor.getAllValues();
-        capturedMessages.forEach(message -> {
-            assertNotNull(message.getText());
-            assertTrue(message.getText().contains(materialNome));
-            assertTrue(message.getText().contains("5,00"));
-            assertTrue(message.getText().contains("10,00"));
-        });
+        verify(restTemplate, times(2)).postForEntity(anyString(), any(), eq(String.class));
     }
 
     @Test
     @DisplayName("Não deve enviar email quando estoque estiver adequado")
     void naoDeveEnviarEmailQuandoEstoqueEstiverAdequado() {
-        // Arrange
-        String materialNome = "Tinta Preta";
-        Double quantidadeAtual = 15.0;
-        Double minAviso = 10.0;
+        emailService.updateEstoque("Tinta Preta", 15.0, 10.0);
 
-        // Act
-        emailService.updateEstoque(materialNome, quantidadeAtual, minAviso);
-
-        // Assert
-        verify(mailSender, never()).send(any(SimpleMailMessage.class));
+        verify(restTemplate, never()).postForEntity(anyString(), any(), eq(String.class));
     }
 
     @Test
     @DisplayName("Não deve enviar email quando minAviso for null")
     void naoDeveEnviarEmailQuandoMinAvisoForNull() {
-        // Arrange
-        String materialNome = "Tinta Preta";
-        Double quantidadeAtual = 5.0;
-        Double minAviso = null;
+        emailService.updateEstoque("Tinta Preta", 5.0, null);
 
-        // Act
-        emailService.updateEstoque(materialNome, quantidadeAtual, minAviso);
-
-        // Assert
-        verify(mailSender, never()).send(any(SimpleMailMessage.class));
+        verify(restTemplate, never()).postForEntity(anyString(), any(), eq(String.class));
     }
 
-    // ------------------ TESTES MÉTODO enviaEmailOrcamentoAprovado ------------------
+    // ------------------ enviaEmailOrcamentoAprovado ------------------
 
     @Test
     @DisplayName("Deve enviar email de orçamento aprovado com sucesso")
     void deveEnviarEmailOrcamentoAprovadoComSucesso() {
-        // Arrange
-        String email = "cliente@email.com";
-        String nome = "João";
-        String codigoOrcamento = "ORC789";
-        Double valor = 350.50;
-        Time tempo = Time.valueOf("02:30:00");
-
         TemplateEmail template = new TemplateEmail();
         template.setAssunto("Orçamento Aprovado - ${codigoOrcamento}");
-        template.setCorpoEmail("Olá ${nomeCliente}, orçamento ${codigoOrcamento} aprovado por ${valor} em ${tempo}.");
+        template.setCorpoEmail("Olá ${nomeCliente}, orçamento ${codigoOrcamento} aprovado.");
 
         when(templateEmailRepository.findByNomeTemplate("orcamento_aprovado"))
                 .thenReturn(Optional.of(template));
+        when(restTemplate.postForEntity(anyString(), any(), eq(String.class)))
+                .thenReturn(ResponseEntity.ok("ok"));
 
-        // Act
-        emailService.enviaEmailOrcamentoAprovado(email, nome, codigoOrcamento, valor, tempo);
+        emailService.enviaEmailOrcamentoAprovado("cliente@email.com", "João",
+                "ORC789", 350.50, Time.valueOf("02:30:00"));
 
-        // Assert
-        ArgumentCaptor<SimpleMailMessage> messageCaptor = ArgumentCaptor.forClass(SimpleMailMessage.class);
-        verify(mailSender, times(1)).send(messageCaptor.capture());
-
-        SimpleMailMessage capturedMessage = messageCaptor.getValue();
-        assertEquals("Orçamento Aprovado - ORC789", capturedMessage.getSubject());
-        assertNotNull(capturedMessage.getText());
-        assertTrue(capturedMessage.getText().contains("João"));
-        assertTrue(capturedMessage.getText().contains("ORC789"));
-        assertTrue(capturedMessage.getText().contains("R$ 350,50"));
-        assertTrue(capturedMessage.getText().contains("02:30:00"));
+        verify(restTemplate, times(1)).postForEntity(anyString(), any(), eq(String.class));
     }
 
-    // ------------------ TESTES MÉTODO enviarEmailParaTodosAdminsEstoqueOk ------------------
+    // ------------------ enviarEmailParaTodosAdminsEstoqueOk ------------------
 
     @Test
     @DisplayName("Deve enviar email para todos admins quando estoque ok")
     void deveEnviarEmailParaTodosAdminsQuandoEstoqueOk() {
-        // Arrange
-        String nomeTemplate = "estoque_ok";
-
         TemplateEmail template = new TemplateEmail();
         template.setAssunto("Estoque Normalizado");
         template.setCorpoEmail("Todos os materiais estão com estoque adequado.");
 
-        when(templateEmailRepository.findByNomeTemplate(nomeTemplate))
+        when(templateEmailRepository.findByNomeTemplate("estoque_ok"))
                 .thenReturn(Optional.of(template));
         when(usuarioRepository.findAllByIsAdmin(true)).thenReturn(admins);
+        when(restTemplate.postForEntity(anyString(), any(), eq(String.class)))
+                .thenReturn(ResponseEntity.ok("ok"));
 
-        // Act
-        emailService.enviarEmailParaTodosAdminsEstoqueOk(nomeTemplate);
+        emailService.enviarEmailParaTodosAdminsEstoqueOk("estoque_ok");
 
-        // Assert
-        verify(mailSender, times(2)).send(any(SimpleMailMessage.class));
+        verify(restTemplate, times(2)).postForEntity(anyString(), any(), eq(String.class));
     }
 
     @Test
     @DisplayName("Deve lançar exceção quando não há administradores para estoque ok")
     void deveLancarExcecaoQuandoNaoHaAdministradoresParaEstoqueOk() {
-        // Arrange
-        String nomeTemplate = "estoque_ok";
-
         TemplateEmail template = new TemplateEmail();
         template.setAssunto("Estoque OK");
         template.setCorpoEmail("Estoque normalizado.");
 
-        when(templateEmailRepository.findByNomeTemplate(nomeTemplate))
+        when(templateEmailRepository.findByNomeTemplate("estoque_ok"))
                 .thenReturn(Optional.of(template));
         when(usuarioRepository.findAllByIsAdmin(true)).thenReturn(List.of());
 
-        // Act & Assert
-        IllegalStateException exception = assertThrows(
-                IllegalStateException.class,
-                () -> emailService.enviarEmailParaTodosAdminsEstoqueOk(nomeTemplate)
-        );
+        IllegalStateException exception = assertThrows(IllegalStateException.class,
+                () -> emailService.enviarEmailParaTodosAdminsEstoqueOk("estoque_ok"));
 
         assertEquals("Nenhum administrador encontrado para envio de email.", exception.getMessage());
     }
 
-    // ------------------ TESTES MÉTODO enviarEmailParaTodosAdminsEstoqueBaixo ------------------
+    // ------------------ enviarEmailParaTodosAdminsEstoqueBaixo ------------------
 
     @Test
     @DisplayName("Deve enviar email para todos admins quando estoque baixo")
     void deveEnviarEmailParaTodosAdminsQuandoEstoqueBaixo() {
-        // Arrange
-        String nomeTemplate = "estoque_baixo_observer";
-        String texto = "- Tinta Preta: 2ml (Mínimo: 10ml)\n- Agulha: 1 unidade (Mínimo: 5)";
-
         TemplateEmail template = new TemplateEmail();
         template.setAssunto("Alerta de Estoque Baixo");
-        template.setCorpoEmail("Olá ${nomeAdmin}, materiais com estoque baixo:\n${textoEstoque}");
+        template.setCorpoEmail("Olá ${nomeAdmin}, materiais baixos:\n${textoEstoque}");
 
-        when(templateEmailRepository.findByNomeTemplate(nomeTemplate))
+        when(templateEmailRepository.findByNomeTemplate("estoque_baixo_observer"))
                 .thenReturn(Optional.of(template));
         when(usuarioRepository.findAllByIsAdmin(true)).thenReturn(admins);
+        when(restTemplate.postForEntity(anyString(), any(), eq(String.class)))
+                .thenReturn(ResponseEntity.ok("ok"));
 
-        // Act
-        emailService.enviarEmailParaTodosAdminsEstoqueBaixo(nomeTemplate, texto);
+        emailService.enviarEmailParaTodosAdminsEstoqueBaixo("estoque_baixo_observer",
+                "- Tinta Preta: 2ml");
 
-        // Assert
-        ArgumentCaptor<SimpleMailMessage> messageCaptor = ArgumentCaptor.forClass(SimpleMailMessage.class);
-        verify(mailSender, times(2)).send(messageCaptor.capture());
-
-        List<SimpleMailMessage> capturedMessages = messageCaptor.getAllValues();
-        capturedMessages.forEach(message -> {
-            assertNotNull(message.getText());
-            assertTrue(message.getText().contains("Administrador"));
-            assertTrue(message.getText().contains("Tinta Preta"));
-            assertTrue(message.getText().contains("Agulha"));
-        });
+        verify(restTemplate, times(2)).postForEntity(anyString(), any(), eq(String.class));
     }
 
-    // ------------------ TESTES MÉTODO updateAgendamento ------------------
+    // ------------------ updateAgendamento ------------------
 
     @Test
     @DisplayName("Deve processar atualização de agendamento enviando emails")
     void deveProcessarAtualizacaoAgendamentoEnviandoEmails() {
-        // Arrange
         setupAgendamentoTemplates();
         when(usuarioRepository.getEmailByIsAdminTrue()).thenReturn(emailsAdmins);
+        when(restTemplate.postForEntity(anyString(), any(), eq(String.class)))
+                .thenReturn(ResponseEntity.ok("ok"));
 
-        // Act
         emailService.updateAgendamento(agendamento);
 
-        // Assert
-        verify(mailSender, times(3)).send(any(SimpleMailMessage.class)); // 1 cliente + 2 admins
-        verify(templateEmailRepository, times(2)).findByNomeTemplate("agendamento_cliente");
-        verify(templateEmailRepository, times(2)).findByNomeTemplate("agendamento_tatuador");
+        verify(restTemplate, times(3)).postForEntity(anyString(), any(), eq(String.class));
     }
 
     @Test
     @DisplayName("Deve lançar exceção quando email do cliente do agendamento for inválido")
     void deveLancarExcecaoQuandoEmailClienteAgendamentoForInvalido() {
-        // Arrange
         usuario.setEmail(null);
 
-        // Act & Assert
-        IllegalArgumentException exception = assertThrows(
-                IllegalArgumentException.class,
-                () -> emailService.updateAgendamento(agendamento)
-        );
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
+                () -> emailService.updateAgendamento(agendamento));
 
         assertEquals("Destinatário inválido para envio de e-mail.", exception.getMessage());
-    }
-
-    // ------------------ TESTES TRATAMENTO DE EXCEÇÕES ------------------
-
-    @Test
-    @DisplayName("Deve lançar exceção quando JavaMailSender falha")
-    void deveLancarExcecaoQuandoJavaMailSenderFalha() {
-        // Arrange
-        doThrow(new RuntimeException("Falha no envio"))
-                .when(mailSender).send(any(SimpleMailMessage.class));
-
-        // Act & Assert
-        RuntimeException exception = assertThrows(
-                RuntimeException.class,
-                () -> emailService.enviarTextoSimples("teste@email.com", "Assunto", "Texto")
-        );
-
-        assertEquals("Falha no envio", exception.getMessage());
     }
 
     @Test
     @DisplayName("Deve tratar corretamente template com campos vazios")
     void deveTratarCorretamenteTemplateComCamposVazios() {
-        // Arrange
         TemplateEmail template = new TemplateEmail();
         template.setAssunto("");
         template.setCorpoEmail("");
 
         when(templateEmailRepository.findByNomeTemplate("orcamento_cliente"))
                 .thenReturn(Optional.of(template));
+        when(restTemplate.postForEntity(anyString(), any(), eq(String.class)))
+                .thenReturn(ResponseEntity.ok("ok"));
 
-        // Act
         emailService.enviaEmailNovoOrcamento("cliente@email.com", "Cliente", "ORC123");
 
-        // Assert
-        ArgumentCaptor<SimpleMailMessage> messageCaptor = ArgumentCaptor.forClass(SimpleMailMessage.class);
-        verify(mailSender, times(1)).send(messageCaptor.capture());
-
-        SimpleMailMessage capturedMessage = messageCaptor.getValue();
-        assertEquals("", capturedMessage.getSubject());
-        assertNotNull(capturedMessage.getText());
+        verify(restTemplate, times(1)).postForEntity(anyString(), any(), eq(String.class));
     }
 
-    // ------------------ MÉTODOS AUXILIARES ------------------
+    // ------------------ Métodos auxiliares ------------------
 
     private void setupTemplatesMocks() {
-        // Template cliente
         TemplateEmail templateCliente = new TemplateEmail();
         templateCliente.setAssunto("Novo Orçamento");
         templateCliente.setCorpoEmail("Olá ${nomeCliente}, orçamento ${codigoOrcamento} criado.");
 
-        // Template tatuador
         TemplateEmail templateTatuador = new TemplateEmail();
         templateTatuador.setAssunto("Novo Orçamento - ${codigoOrcamento}");
-        templateTatuador.setCorpoEmail("${nomeAdmin}, novo orçamento ${codigoOrcamento} de ${nomeCliente}.");
+        templateTatuador.setCorpoEmail("${nomeAdmin}, novo orçamento ${codigoOrcamento} de ${nomeCliente}." +
+                " Email: ${emailCliente}. Ideia: ${ideia}. Tamanho: ${tamanho}. Cores: ${cores}." +
+                " Local: ${localCorpo}. Imagens: ${imagens}.");
 
         when(templateEmailRepository.findByNomeTemplate("orcamento_cliente"))
                 .thenReturn(Optional.of(templateCliente));
@@ -473,15 +357,14 @@ class EmailServiceTest {
     }
 
     private void setupAgendamentoTemplates() {
-        // Template cliente
         TemplateEmail templateCliente = new TemplateEmail();
         templateCliente.setAssunto("Agendamento Criado");
-        templateCliente.setCorpoEmail("${nomeCliente}, agendamento ${codigoOrcamento} em ${dataHora}");
+        templateCliente.setCorpoEmail("${nomeCliente}, agendamento ${codigoOrcamento} em ${dataHora}. Status: ${status}");
 
-        // Template tatuador
         TemplateEmail templateTatuador = new TemplateEmail();
         templateTatuador.setAssunto("Novo Agendamento - ${codigoOrcamento}");
-        templateTatuador.setCorpoEmail("Agendamento ${codigoOrcamento} de ${nomeCliente} em ${dataHora}");
+        templateTatuador.setCorpoEmail("Agendamento ${codigoOrcamento} de ${nomeCliente}" +
+                " (${emailCliente}) em ${dataHora}. Status: ${status}");
 
         when(templateEmailRepository.findByNomeTemplate("agendamento_cliente"))
                 .thenReturn(Optional.of(templateCliente));
@@ -489,16 +372,3 @@ class EmailServiceTest {
                 .thenReturn(Optional.of(templateTatuador));
     }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
