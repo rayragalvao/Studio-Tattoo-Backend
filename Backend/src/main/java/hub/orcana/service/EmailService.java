@@ -29,6 +29,9 @@ public class EmailService implements  EstoqueObserver, OrcamentoObserver, Agenda
     private final RestTemplate restTemplate;
 
 
+     @Value("${email.service.url:http://localhost:8081}")
+     private String emailServiceUrl;
+
     public EmailService(JavaMailSender mailSender, UsuarioRepository usuarioRepository, TemplateEmailRepository templateEmailRepository, RestTemplate restTemplate) {
         this.mailSender = mailSender;
         this.usuarioRepository = usuarioRepository;
@@ -54,8 +57,9 @@ public class EmailService implements  EstoqueObserver, OrcamentoObserver, Agenda
 
             HttpEntity<Map<String, String>> request = new HttpEntity<>(emailRequest, headers);
 
-            String url = "http://localhost:8081/email/simples";
-
+            //String url = "http://localhost:8081/email/simples";
+              String url = emailServiceUrl + "/email/simples";
+              
             restTemplate.postForEntity(url, request, String.class);
 
         } catch (Exception e) {
