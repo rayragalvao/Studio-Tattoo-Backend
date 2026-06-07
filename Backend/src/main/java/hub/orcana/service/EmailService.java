@@ -170,7 +170,7 @@ public class EmailService implements  EstoqueObserver, OrcamentoObserver, Agenda
         String textoFinal = textoInicial
                 .replace("${nomeCliente}", nome)
                 .replace("${codigoOrcamento}", codigoOrcamento)
-                .replace("${valor}", String.format("R$ %.2f", valor))
+                .replace("${valor}", java.text.NumberFormat.getCurrencyInstance(new java.util.Locale("pt", "BR")).format(valor))
                 .replace("${tempo}", tempo.toString());
 
         enviarTextoSimples(email, assuntoFinal, textoFinal);
