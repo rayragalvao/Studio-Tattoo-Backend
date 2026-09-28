@@ -74,10 +74,14 @@ public class SecurityConfiguracao {
                 .cors(Customizer.withDefaults())
                 .csrf(CsrfConfigurer<HttpSecurity>::disable)
                 .authorizeHttpRequests(authorizeRequests -> authorizeRequests
-                        .requestMatchers(URLS_PERMITIDAS)
-                        .permitAll()
-                        .anyRequest()
-                        .authenticated()
+                        .requestMatchers(URLS_PERMITIDAS).permitAll()
+                        .requestMatchers(HttpMethod.GET,
+                                "/flash-tattoos",
+                                "/flash-tattoos/*",
+                                "/flash-tattoos/*/foto"
+                        ).permitAll()
+                        .requestMatchers(HttpMethod.POST, "/flash-tattoos").authenticated()
+                        .anyRequest().authenticated()
                 ).exceptionHandling(handling -> handling
                         .authenticationEntryPoint(autenticacaoEntryPoint)
                         .accessDeniedHandler(accessDeniedHandler())
