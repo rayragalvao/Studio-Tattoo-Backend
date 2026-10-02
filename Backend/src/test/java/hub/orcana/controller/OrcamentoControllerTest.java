@@ -136,7 +136,9 @@ class OrcamentoControllerTest {
                 List.of("url1.jpg"),
                 null,
                 null,
-                StatusOrcamento.PENDENTE
+                StatusOrcamento.PENDENTE,
+                null,
+                null
         ));
         orcamentos.add(new DetalhesOrcamentoOutput(
                 "ORC-E5F6G7H8",
@@ -149,7 +151,9 @@ class OrcamentoControllerTest {
                 List.of("url2.jpg"),
                 null,
                 null,
-                StatusOrcamento.PENDENTE
+                StatusOrcamento.PENDENTE,
+                null,
+                null
         ));
 
         when(servico.findAllOrcamentos()).thenReturn(orcamentos);
@@ -228,11 +232,11 @@ class OrcamentoControllerTest {
         Long usuarioId = 1L;
         DetalhesOrcamentoOutput orcamento1 = new DetalhesOrcamentoOutput(
                 "ORC-123", "João Silva", "joao@email.com", "Dragão",
-                10.0, "Preto", "Braço", List.of(), 500.0, Time.valueOf("02:00:00"), StatusOrcamento.PENDENTE
+                10.0, "Preto", "Braço", List.of(), 500.0, Time.valueOf("02:00:00"), StatusOrcamento.PENDENTE, null, null
         );
         DetalhesOrcamentoOutput orcamento2 = new DetalhesOrcamentoOutput(
                 "ORC-124", "João Silva", "joao@email.com", "Rosa",
-                5.0, "Rosa", "Perna", List.of(), 300.0, Time.valueOf("01:30:00"), StatusOrcamento.APROVADO
+                5.0, "Rosa", "Perna", List.of(), 300.0, Time.valueOf("01:30:00"), StatusOrcamento.APROVADO, null, null
         );
         List<DetalhesOrcamentoOutput> orcamentos = List.of(orcamento1, orcamento2);
 
@@ -287,7 +291,7 @@ class OrcamentoControllerTest {
         String codigo = "ORC-123";
         DetalhesOrcamentoOutput orcamento = new DetalhesOrcamentoOutput(
                 codigo, "João Silva", "joao@email.com", "Dragão",
-                10.0, "Preto", "Braço", List.of(), 500.0, Time.valueOf("02:00:00"), StatusOrcamento.PENDENTE
+                10.0, "Preto", "Braço", List.of(), 500.0, Time.valueOf("02:00:00"), StatusOrcamento.PENDENTE, null, null
         );
 
         when(servico.findByCodigo(codigo)).thenReturn(orcamento);
@@ -332,7 +336,7 @@ class OrcamentoControllerTest {
         );
         DetalhesOrcamentoOutput orcamentoAtualizado = new DetalhesOrcamentoOutput(
                 codigo, "João Silva", "joao@email.com", "Dragão",
-                10.0, "Preto", "Braço", List.of(), 600.0, Time.valueOf("03:00:00"), StatusOrcamento.APROVADO
+                10.0, "Preto", "Braço", List.of(), 600.0, Time.valueOf("03:00:00"), StatusOrcamento.APROVADO, null, null
         );
 
         when(servico.atualizarOrcamento(codigo, dados)).thenReturn(orcamentoAtualizado);
@@ -500,7 +504,7 @@ class OrcamentoControllerTest {
         );
         DetalhesOrcamentoOutput orcamentoAtualizado = new DetalhesOrcamentoOutput(
                 codigo, "João Silva", "joao@email.com", "Dragão",
-                10.0, "Azul e Verde", "Braço", List.of(), 800.0, Time.valueOf("04:00:00"), StatusOrcamento.APROVADO
+                10.0, "Azul e Verde", "Braço", List.of(), 800.0, Time.valueOf("04:00:00"), StatusOrcamento.APROVADO, null, null
         );
 
         when(servico.atualizarOrcamento(codigo, dados)).thenReturn(orcamentoAtualizado);
@@ -534,7 +538,7 @@ class OrcamentoControllerTest {
         for (String codigo : codigos) {
             DetalhesOrcamentoOutput orcamento = new DetalhesOrcamentoOutput(
                     codigo, "Cliente", "email@test.com", "Tatuagem",
-                    5.0, "Preto", "Local", List.of(), 100.0, Time.valueOf("01:00:00"), StatusOrcamento.PENDENTE
+                    5.0, "Preto", "Local", List.of(), 100.0, Time.valueOf("01:00:00"), StatusOrcamento.PENDENTE, null, null
             );
             when(servico.findByCodigo(codigo)).thenReturn(orcamento);
 

@@ -56,6 +56,12 @@ public class Orcamento {
     @JsonIgnoreProperties({"hibernateLazyInitializer", "handler", "senha"})
     private Usuario usuario;
 
+    @Column(name = "preco_sugerido")
+    private Double precoSugerido;
+
+    @Column(name = "tempo_sugerido")
+    private Double tempoSugerido;
+
     public Orcamento() {}
 
     public Orcamento(String codigoOrcamento, String nome, String email, String ideia, Double tamanho, String cores, String localCorpo, List<String> imagemReferencia, Long usuarioId, StatusOrcamento status) {

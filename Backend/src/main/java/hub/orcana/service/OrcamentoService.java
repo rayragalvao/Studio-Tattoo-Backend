@@ -2,6 +2,7 @@ package hub.orcana.service;
 
 import hub.orcana.dto.orcamento.CadastroOrcamentoInput;
 import hub.orcana.dto.orcamento.DetalhesOrcamentoOutput;
+import hub.orcana.dto.predicao.PredicaoOutput;
 import hub.orcana.tables.Agendamento;
 import hub.orcana.tables.Orcamento;
 import hub.orcana.tables.StatusOrcamento;
@@ -15,6 +16,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import hub.orcana.observer.OrcamentoObserver;
 import hub.orcana.observer.OrcamentoSubject;
+import hub.orcana.service.PredicaoService;
 
 import java.sql.Time;
 import java.util.ArrayList;
@@ -33,12 +35,14 @@ public class OrcamentoService implements OrcamentoSubject {
     private final List<OrcamentoObserver> observers = new ArrayList<>();
     private final UsuarioRepository usuarioRepository;
     private final AgendamentoRepository agendamentoRepository;
+    private final PredicaoService predicaoService;
 
     public OrcamentoService(
             OrcamentoRepository repository,
             GerenciadorDeArquivosService gerenciadorService,
             EmailService emailService,
             UsuarioRepository usuarioRepository,
+            PredicaoService predicaoService,
             AgendamentoRepository agendamentoRepository
     ) {
         this.repository = repository;
@@ -47,6 +51,7 @@ public class OrcamentoService implements OrcamentoSubject {
         this.attach(emailService);
         this.usuarioRepository = usuarioRepository;
         this.agendamentoRepository = agendamentoRepository;
+        this.predicaoService = predicaoService;
     }
 
     @Override
@@ -103,6 +108,11 @@ public class OrcamentoService implements OrcamentoSubject {
                 StatusOrcamento.PENDENTE
         );
 
+        PredicaoOutput previsao = predicaoService.prever(dados);
+
+        orcamento.setPrecoSugerido(previsao.precoSugerido());
+        orcamento.setTempoSugerido(previsao.tempoSugerido());
+
         if (usuario != null) {
             orcamento.setUsuario(usuario);
         }
@@ -131,7 +141,9 @@ public class OrcamentoService implements OrcamentoSubject {
                         orcamento.getImagemReferencia(),
                         orcamento.getValor(),
                         orcamento.getTempo(),
-                        orcamento.getStatus()
+                        orcamento.getStatus(),
+                        orcamento.getPrecoSugerido(),
+                        orcamento.getTempoSugerido()
                 )
         ).toList();
     }
@@ -149,7 +161,9 @@ public class OrcamentoService implements OrcamentoSubject {
                         orcamento.getImagemReferencia(),
                         orcamento.getValor(),
                         orcamento.getTempo(),
-                        orcamento.getStatus()
+                        orcamento.getStatus(),
+                        orcamento.getPrecoSugerido(),
+                        orcamento.getTempoSugerido()
                 )
         ).toList();
     }
@@ -259,7 +273,9 @@ public class OrcamentoService implements OrcamentoSubject {
                 salvo.getImagemReferencia(),
                 salvo.getValor(),
                 salvo.getTempo(),
-                salvo.getStatus()
+                salvo.getStatus(),
+                salvo.getPrecoSugerido(),
+                salvo.getTempoSugerido()
         );
     }
 
@@ -279,7 +295,11 @@ public class OrcamentoService implements OrcamentoSubject {
                 orcamento.getImagemReferencia(),
                 orcamento.getValor(),
                 orcamento.getTempo(),
-                orcamento.getStatus()
+                orcamento.getStatus(),
+                orcamento.getPrecoSugerido(),
+                orcamento.getTempoSugerido()
         );
     }
+
+
 }

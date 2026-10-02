@@ -54,6 +54,7 @@ public class SecurityConfiguracao {
             "/swagger-ui.html",
             "/v3/api-docs.yaml",
             "/auth/**",
+            "/h2-console/**",
             "/usuario/cadastro",
             "/usuario/login",
             "/orcamento/cadastro",
@@ -65,12 +66,12 @@ public class SecurityConfiguracao {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http.headers(headers -> headers
-                .frameOptions(HeadersConfigurer.FrameOptionsConfig::deny)
+                .frameOptions(HeadersConfigurer.FrameOptionsConfig::sameOrigin)
                 .xssProtection(xss -> xss.headerValue(
                         XXssProtectionHeaderWriter.HeaderValue.ENABLED_MODE_BLOCK))
                 .contentSecurityPolicy(csp -> csp.policyDirectives(
-                        "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; " +
-                        "img-src 'self' data:; font-src 'self'; object-src 'none'; frame-ancestors 'none'")))
+                        "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; " +
+                        "img-src 'self' data:; font-src 'self'; object-src 'none'; frame-ancestors 'self'")))
                 .cors(Customizer.withDefaults())
                 .csrf(CsrfConfigurer<HttpSecurity>::disable)
                 .authorizeHttpRequests(authorizeRequests -> authorizeRequests

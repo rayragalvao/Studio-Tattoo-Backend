@@ -15,9 +15,11 @@ public record DetalhesOrcamentoOutput (
         List<String> imagemReferencia,
         Double valor,
         Time tempo,
-        StatusOrcamento status
+        StatusOrcamento status,
+        Double precoSugerido,
+        Double tempoSugerido
 ) {
-    public DetalhesOrcamentoOutput(String codigoOrcamento, String nome, String email, String ideia, Double tamanho, String cores, String localCorpo, List<String> imagemReferencia, Double valor, Time tempo, StatusOrcamento status) {
+    public DetalhesOrcamentoOutput(String codigoOrcamento, String nome, String email, String ideia, Double tamanho, String cores, String localCorpo, List<String> imagemReferencia, Double valor, Time tempo, StatusOrcamento status, Double precoSugerido, Double tempoSugerido) {
         this.codigoOrcamento = codigoOrcamento;
         this.nome = nome;
         this.email = email;
@@ -29,5 +31,7 @@ public record DetalhesOrcamentoOutput (
         this.valor = valor;
         this.tempo = tempo;
         this.status = status;
+        this.precoSugerido = precoSugerido;
+        this.tempoSugerido = tempoSugerido;
     }
 }
