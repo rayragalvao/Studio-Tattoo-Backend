@@ -106,6 +106,7 @@ public class OrcamentoService implements OrcamentoSubject {
         if (usuario != null) {
             orcamento.setUsuario(usuario);
         }
+        orcamento.setEstilo(dados.estilo());
 
         Orcamento salvo = repository.save(orcamento);
 
@@ -131,7 +132,8 @@ public class OrcamentoService implements OrcamentoSubject {
                         orcamento.getImagemReferencia(),
                         orcamento.getValor(),
                         orcamento.getTempo(),
-                        orcamento.getStatus()
+                        orcamento.getStatus(),
+                        orcamento.getEstilo()
                 )
         ).toList();
     }
@@ -149,7 +151,8 @@ public class OrcamentoService implements OrcamentoSubject {
                         orcamento.getImagemReferencia(),
                         orcamento.getValor(),
                         orcamento.getTempo(),
-                        orcamento.getStatus()
+                        orcamento.getStatus(),
+                        orcamento.getEstilo()
                 )
         ).toList();
     }
@@ -212,6 +215,7 @@ public class OrcamentoService implements OrcamentoSubject {
         if (dados.containsKey("email")) orcamento.setEmail((String) dados.get("email"));
         if (dados.containsKey("ideia")) orcamento.setIdeia((String) dados.get("ideia"));
         if (dados.containsKey("cores")) orcamento.setCores((String) dados.get("cores"));
+        if (dados.containsKey("estilo")) orcamento.setEstilo((String) dados.get("estilo"));
         if (dados.containsKey("localCorpo")) orcamento.setLocalCorpo((String) dados.get("localCorpo"));
 
         if (dados.containsKey("tamanho") && dados.get("tamanho") instanceof Number tamanho) {
@@ -259,7 +263,8 @@ public class OrcamentoService implements OrcamentoSubject {
                 salvo.getImagemReferencia(),
                 salvo.getValor(),
                 salvo.getTempo(),
-                salvo.getStatus()
+                salvo.getStatus(),
+                salvo.getEstilo()
         );
     }
 
@@ -279,7 +284,8 @@ public class OrcamentoService implements OrcamentoSubject {
                 orcamento.getImagemReferencia(),
                 orcamento.getValor(),
                 orcamento.getTempo(),
-                orcamento.getStatus()
+                orcamento.getStatus(),
+                orcamento.getEstilo()
         );
     }
 }

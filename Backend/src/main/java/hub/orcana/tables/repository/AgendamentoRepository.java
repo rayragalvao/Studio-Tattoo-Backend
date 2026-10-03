@@ -59,6 +59,25 @@ public interface AgendamentoRepository extends JpaRepository<Agendamento, Long> 
     
     List<Agendamento> findByStatus(StatusAgendamento status);
 
+    @Query("SELECT a FROM Agendamento a " +
+            "JOIN FETCH a.usuario " +
+            "JOIN FETCH a.orcamento " +
+            "WHERE a.status = :status " +
+            "ORDER BY a.dataHora DESC")
+    List<Agendamento> findByStatusComUsuarioEOrcamento(
+            @Param("status") StatusAgendamento status
+    );
+
+    @Query("SELECT a FROM Agendamento a " +
+            "JOIN FETCH a.usuario " +
+            "JOIN FETCH a.orcamento " +
+            "WHERE a.usuario.id = :usuarioId AND a.status = :status " +
+            "ORDER BY a.dataHora DESC")
+    List<Agendamento> findByUsuarioIdAndStatusComOrcamento(
+            @Param("usuarioId") Long usuarioId,
+            @Param("status") StatusAgendamento status
+    );
+
     Optional<Agendamento> findByOrcamentoCodigoOrcamento(String codigoOrcamento);
 
     @Query("SELECT a FROM Agendamento a WHERE FUNCTION('DATE', a.dataHora) = FUNCTION('DATE', :data)")
