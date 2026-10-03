@@ -112,6 +112,7 @@ public class OrcamentoService implements OrcamentoSubject {
 
         orcamento.setPrecoSugerido(previsao.precoSugerido());
         orcamento.setTempoSugerido(previsao.tempoSugerido());
+        orcamento.setEstilo(dados.estilo());
 
         if (usuario != null) {
             orcamento.setUsuario(usuario);
@@ -142,6 +143,7 @@ public class OrcamentoService implements OrcamentoSubject {
                         orcamento.getValor(),
                         orcamento.getTempo(),
                         orcamento.getStatus(),
+                        orcamento.getEstilo(),
                         orcamento.getPrecoSugerido(),
                         orcamento.getTempoSugerido()
                 )
@@ -162,6 +164,7 @@ public class OrcamentoService implements OrcamentoSubject {
                         orcamento.getValor(),
                         orcamento.getTempo(),
                         orcamento.getStatus(),
+                        orcamento.getEstilo(),
                         orcamento.getPrecoSugerido(),
                         orcamento.getTempoSugerido()
                 )
@@ -226,6 +229,7 @@ public class OrcamentoService implements OrcamentoSubject {
         if (dados.containsKey("email")) orcamento.setEmail((String) dados.get("email"));
         if (dados.containsKey("ideia")) orcamento.setIdeia((String) dados.get("ideia"));
         if (dados.containsKey("cores")) orcamento.setCores((String) dados.get("cores"));
+        if (dados.containsKey("estilo")) orcamento.setEstilo((String) dados.get("estilo"));
         if (dados.containsKey("localCorpo")) orcamento.setLocalCorpo((String) dados.get("localCorpo"));
 
         if (dados.containsKey("tamanho") && dados.get("tamanho") instanceof Number tamanho) {
@@ -274,6 +278,7 @@ public class OrcamentoService implements OrcamentoSubject {
                 salvo.getValor(),
                 salvo.getTempo(),
                 salvo.getStatus(),
+                salvo.getEstilo(),
                 salvo.getPrecoSugerido(),
                 salvo.getTempoSugerido()
         );
@@ -296,10 +301,10 @@ public class OrcamentoService implements OrcamentoSubject {
                 orcamento.getValor(),
                 orcamento.getTempo(),
                 orcamento.getStatus(),
+                orcamento.getEstilo(),
                 orcamento.getPrecoSugerido(),
                 orcamento.getTempoSugerido()
+
         );
     }
-
-
 }
