@@ -36,6 +36,7 @@ public class PredicaoService {
 
         PredicaoInput input = new PredicaoInput(
                 dados.ideia(),
+                dados.estilo(),
                 dados.tamanho(),
                 temVermelho ? 1 : 0,
                 temPreto ? 1 : 0,
