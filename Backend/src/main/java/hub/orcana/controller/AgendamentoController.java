@@ -385,4 +385,17 @@ public class AgendamentoController {
                     "Erro ao registrar materiais: " + e.getMessage());
         }
     }
+    @PostMapping("/{id}/finalizar")
+    @SecurityRequirement(name = "Bearer")
+    public ResponseEntity<DetalhesAgendamentoOutput> finalizarAgendamento(
+            @PathVariable Long id,
+            @RequestBody @Valid
+            hub.orcana.dto.agendamento.FinalizarAgendamentoInput input) {
+        try {
+            return ResponseEntity.ok(service.finalizarAgendamento(id, input));
+        } catch (IllegalArgumentException e) {
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST, e.getMessage());
+        }
+    }
 }

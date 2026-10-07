@@ -19,6 +19,7 @@ import java.nio.charset.StandardCharsets;
 import java.sql.Time;
 import java.util.List;
 import java.util.Map;
+import org.springframework.beans.factory.annotation.Value;
 
 @Service
 public class EmailService implements  EstoqueObserver, OrcamentoObserver, AgendamentoObserver {
@@ -28,6 +29,9 @@ public class EmailService implements  EstoqueObserver, OrcamentoObserver, Agenda
     private final TemplateEmailRepository templateEmailRepository;
     private final RestTemplate restTemplate;
 
+
+     @Value("${email.service.url:http://localhost:8081}")
+     private String emailServiceUrl;
 
     public EmailService(JavaMailSender mailSender, UsuarioRepository usuarioRepository, TemplateEmailRepository templateEmailRepository, RestTemplate restTemplate) {
         this.mailSender = mailSender;
@@ -54,8 +58,9 @@ public class EmailService implements  EstoqueObserver, OrcamentoObserver, Agenda
 
             HttpEntity<Map<String, String>> request = new HttpEntity<>(emailRequest, headers);
 
-            String url = "http://localhost:8081/email/simples";
-
+            //String url = "http://localhost:8081/email/simples";
+              String url = emailServiceUrl + "/email/simples";
+              
             restTemplate.postForEntity(url, request, String.class);
 
         } catch (Exception e) {
@@ -165,7 +170,7 @@ public class EmailService implements  EstoqueObserver, OrcamentoObserver, Agenda
         String textoFinal = textoInicial
                 .replace("${nomeCliente}", nome)
                 .replace("${codigoOrcamento}", codigoOrcamento)
-                .replace("${valor}", String.format("R$ %.2f", valor))
+                .replace("${valor}", java.text.NumberFormat.getCurrencyInstance(new java.util.Locale("pt", "BR")).format(valor))
                 .replace("${tempo}", tempo.toString());
 
         enviarTextoSimples(email, assuntoFinal, textoFinal);
