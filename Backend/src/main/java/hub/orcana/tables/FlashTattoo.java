@@ -28,6 +28,9 @@ public class FlashTattoo {
     @Column(nullable = false, length = 30)
     private String tipoImagem;
 
+    @Column(nullable = false, columnDefinition = "boolean default false")
+    private boolean aplicado = false;
+
     protected FlashTattoo() {}
 
     public FlashTattoo(String nome, String estilo, BigDecimal preco, String descricao,
@@ -40,6 +43,18 @@ public class FlashTattoo {
         this.tipoImagem = tipoImagem;
     }
 
+    public void atualizar(String nome, String estilo, BigDecimal preco, String descricao) {
+        this.nome = nome;
+        this.estilo = estilo;
+        this.preco = preco;
+        this.descricao = descricao;
+    }
+
+    public void atualizarFoto(String arquivoImagem, String tipoImagem) {
+        this.arquivoImagem = arquivoImagem;
+        this.tipoImagem = tipoImagem;
+    }
+
     public Long getId() { return id; }
     public String getNome() { return nome; }
     public String getEstilo() { return estilo; }
@@ -47,4 +62,6 @@ public class FlashTattoo {
     public String getDescricao() { return descricao; }
     public String getArquivoImagem() { return arquivoImagem; }
     public String getTipoImagem() { return tipoImagem; }
+    public boolean isAplicado() { return aplicado; }
+    public void setAplicado(boolean aplicado) { this.aplicado = aplicado; }
 }
