@@ -42,6 +42,7 @@ jobs:
         run: ./mvnw test
 
   docker:
+    if: ${{ false }}
     runs-on: ubuntu-latest
     needs:
       - build
