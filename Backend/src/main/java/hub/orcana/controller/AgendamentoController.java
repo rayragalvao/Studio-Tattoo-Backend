@@ -1,6 +1,7 @@
 package hub.orcana.controller;
 
 import hub.orcana.dto.agendamento.AdicionarMateriaisRequest;
+import hub.orcana.dto.agendamento.AtualizarStatusAgendamentoInput;
 import hub.orcana.dto.agendamento.DetalhesAgendamentoOutput;
 import hub.orcana.dto.agendamento.CadastroAgendamentoInput;
 import io.swagger.v3.oas.annotations.Operation;
@@ -185,6 +186,19 @@ public class AgendamentoController {
         } catch (Exception e) {
             log.error("Erro ao atualizar agendamento ID {}: {}", id, e.getMessage(), e);
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
+        }
+    }
+
+    @PatchMapping("/{id}/status")
+    @Operation(summary = "Atualizar somente o status do agendamento")
+    @SecurityRequirement(name = "Bearer")
+    public ResponseEntity<DetalhesAgendamentoOutput> atualizarStatus(
+            @PathVariable Long id,
+            @RequestBody @Valid AtualizarStatusAgendamentoInput dados) {
+        try {
+            return ResponseEntity.ok(service.atualizarStatus(id, dados.status()));
+        } catch (IllegalArgumentException e) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage());
         }
     }
 

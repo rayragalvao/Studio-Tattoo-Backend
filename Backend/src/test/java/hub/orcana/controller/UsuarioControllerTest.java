@@ -72,26 +72,26 @@ class UsuarioControllerTest {
         UsuarioToken token = mock(UsuarioToken.class);
 
         when(token.token()).thenReturn("jwt-123");
-        when(usuarioService.autenticar(any(LoginUsuario.class))).thenReturn(token);
+        when(usuarioService.autenticar(any(LoginUsuario.class), eq("mobile"))).thenReturn(token);
 
-        ResponseEntity<UsuarioToken> res = usuarioController.login(payload);
+        ResponseEntity<UsuarioToken> res = usuarioController.login(payload, "mobile");
 
         assertEquals(HttpStatus.OK, res.getStatusCode());
         assertEquals("jwt-123", res.getBody().token());
-        verify(usuarioService, times(1)).autenticar(any(LoginUsuario.class));
+        verify(usuarioService, times(1)).autenticar(any(LoginUsuario.class), eq("mobile"));
     }
 
     @Test
     @DisplayName("login - deve repassar exceção do service")
     void login_excecao() {
         LoginUsuario payload = mock(LoginUsuario.class);
-        when(usuarioService.autenticar(any(LoginUsuario.class)))
+        when(usuarioService.autenticar(any(LoginUsuario.class), eq("mobile")))
                 .thenThrow(new RuntimeException("Credenciais"));
 
-        RuntimeException ex = assertThrows(RuntimeException.class, () -> usuarioController.login(payload));
+        RuntimeException ex = assertThrows(RuntimeException.class, () -> usuarioController.login(payload, "mobile"));
 
         assertEquals("Credenciais", ex.getMessage());
-        verify(usuarioService, times(1)).autenticar(any(LoginUsuario.class));
+        verify(usuarioService, times(1)).autenticar(any(LoginUsuario.class), eq("mobile"));
     }
 
     // ---------------- GET /usuario ----------------

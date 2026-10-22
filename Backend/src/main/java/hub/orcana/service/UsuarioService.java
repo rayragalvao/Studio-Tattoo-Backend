@@ -11,6 +11,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -124,6 +125,10 @@ public class UsuarioService {
     }
 
     public UsuarioToken autenticar(LoginUsuario usuario) {
+        return autenticar(usuario, null);
+    }
+
+    public UsuarioToken autenticar(LoginUsuario usuario, String clientType) {
         final UsernamePasswordAuthenticationToken credentials = new UsernamePasswordAuthenticationToken(
                 usuario.email(),
                 usuario.senha()
@@ -132,6 +137,12 @@ public class UsuarioService {
 
         Usuario usuarioAutenticado = repository.findByEmail(usuario.email())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatusCode.valueOf(404), "Email de usuário não cadastrado"));
+
+        if ("mobile".equalsIgnoreCase(clientType == null ? "" : clientType.trim())
+                && !usuarioAutenticado.isAdmin()) {
+            throw new BadCredentialsException("Usuário ou senha inválidos");
+        }
+
         SecurityContextHolder.getContext().setAuthentication(authentication);
         final String tokenJwt = gerenciadorTokenJwt.gerarToken(authentication);
 
