@@ -29,7 +29,9 @@ public class AgendamentoService implements AgendamentoSubject {
     private final EquipamentoUsoRepository equipamentoUsoRepository;
     private final EstoqueRepository estoqueRepository;
 
+
     public AgendamentoService(
+
             AgendamentoRepository repository,
             UsuarioRepository usuarioRepository,
             OrcamentoRepository orcamentoRepository,
@@ -248,5 +250,85 @@ public class AgendamentoService implements AgendamentoSubject {
                     equipamento.getNome(), material.quantidade(), relatorio.getId(),
                     equipamento.getQuantidade());
         }
+    }
+    @jakarta.persistence.PersistenceContext
+    private jakarta.persistence.EntityManager entityManager;
+
+    @Transactional
+    public DetalhesAgendamentoOutput finalizarAgendamento(
+            Long id, FinalizarAgendamentoInput input) {
+
+        Agendamento agendamento = entityManager.find(
+                Agendamento.class, id,
+                jakarta.persistence.LockModeType.PESSIMISTIC_WRITE);
+
+        if (agendamento == null) {
+            throw new IllegalArgumentException("Agendamento não encontrado.");
+        }
+
+        // Repetir a conclusão não desconta o estoque novamente.
+        if (agendamento.getStatus() == StatusAgendamento.CONCLUIDO) {
+            return AgendamentoMapper.of(agendamento);
+        }
+
+        if (agendamento.getStatus() != StatusAgendamento.CONFIRMADO) {
+            throw new IllegalArgumentException(
+                    "Somente agendamentos confirmados podem ser concluídos.");
+        }
+
+        if (Boolean.TRUE.equals(input.pagamentoFeito())
+                && (input.formaPagamento() == null
+                || input.formaPagamento().isBlank())) {
+            throw new IllegalArgumentException("Informe a forma de pagamento.");
+        }
+
+        var relatorioExistente = relatorioRepository.findByAgendamentoId(id);
+        if (relatorioExistente.isPresent()
+                && equipamentoUsoRepository.existsByRelatorioId(
+                relatorioExistente.get().getId())) {
+            throw new IllegalArgumentException(
+                    "Esta sessão já possui materiais registrados. "
+                            + "Confira o relatório antes de concluir para evitar baixa duplicada.");
+        }
+
+        java.util.Map<Long, Integer> totais = new java.util.TreeMap<>();
+        for (MaterialUsadoRequest material : input.materiais()) {
+            totais.merge(material.materialId(), material.quantidade(), Math::addExact);
+        }
+
+        // Bloqueia os materiais em ordem de ID para proteger o saldo concorrente.
+        for (var entrada : totais.entrySet()) {
+            Estoque material = entityManager.find(
+                    Estoque.class, entrada.getKey(),
+                    jakarta.persistence.LockModeType.PESSIMISTIC_WRITE);
+
+            if (material == null) {
+                throw new IllegalArgumentException(
+                        "Material não encontrado: " + entrada.getKey());
+            }
+
+            if (material.getQuantidade() == null
+                    || material.getQuantidade() < entrada.getValue()) {
+                throw new IllegalArgumentException(
+                        "Estoque insuficiente para " + material.getNome());
+            }
+        }
+
+        var materiais = totais.entrySet().stream()
+                .map(entrada -> new MaterialUsadoRequest(
+                        entrada.getKey(), entrada.getValue()))
+                .toList();
+
+        adicionarMateriaisUsados(id, new AdicionarMateriaisRequest(materiais));
+
+        agendamento.setTempoDuracao(input.tempoDuracao());
+        agendamento.setPagamentoFeito(input.pagamentoFeito());
+        agendamento.setFormaPagamento(
+                Boolean.TRUE.equals(input.pagamentoFeito())
+                        ? input.formaPagamento().trim() : null);
+        agendamento.setStatus(StatusAgendamento.CONCLUIDO);
+
+        repository.saveAndFlush(agendamento);
+        return AgendamentoMapper.of(agendamento);
     }
 }
