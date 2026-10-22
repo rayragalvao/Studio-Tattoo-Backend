@@ -19,12 +19,13 @@ public class DotEnvConfig {
                 .load();
 
         dotenv.entries().forEach(entry -> {
+
+            // Só define se a variável de ambiente não estiver já definida
             if (System.getenv(entry.getKey()) == null && System.getProperty(entry.getKey()) == null) {
                 System.setProperty(entry.getKey(), entry.getValue());
             }
         });
     }
-
     private static Path findDotenvDirectory(Path startDirectory) {
         Path directory = startDirectory;
 
