@@ -31,5 +31,20 @@ public record CadastroOrcamentoInput(
 
         List<MultipartFile> imagemReferencia,
 
-        Long usuario_id
-) {}
+        Long usuario_id,
+
+        String estilo
+) {
+    public CadastroOrcamentoInput(
+            String nome,
+            String email,
+            String ideia,
+            Double tamanho,
+            String cores,
+            String localCorpo,
+            List<MultipartFile> imagemReferencia,
+            Long usuario_id
+    ) {
+        this(nome, email, ideia, tamanho, cores, localCorpo, imagemReferencia, usuario_id, null);
+    }
+}

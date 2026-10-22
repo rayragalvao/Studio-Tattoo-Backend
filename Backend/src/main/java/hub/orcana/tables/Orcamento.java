@@ -37,6 +37,9 @@ public class Orcamento {
     @Column(length = 500)
     private String cores;
 
+    @Column(length = 100)
+    private String estilo;
+
     private Time tempo;
 
     @Column(name = "local_corpo", length = 200)

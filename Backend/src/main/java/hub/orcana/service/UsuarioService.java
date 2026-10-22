@@ -155,6 +155,31 @@ public class UsuarioService {
                 .orElseThrow(() -> new DependenciaNaoEncontradaException("Usuário")));
     }
 
+    public ListarUsuarios buscarPerfil(String email) {
+        return UsuarioMapper.of(repository.findByEmail(email)
+                .orElseThrow(() -> new DependenciaNaoEncontradaException("Usuário")));
+    }
+
+    @Transactional
+    public void alterarSenha(String email, AlterarSenhaUsuario dados) {
+        Usuario usuario = repository.findByEmail(email)
+                .orElseThrow(() -> new DependenciaNaoEncontradaException("Usuário"));
+
+        if (!passwordEncoder.matches(dados.senhaAtual(), usuario.getSenha())) {
+            throw new ResponseStatusException(HttpStatusCode.valueOf(400), "Senha atual incorreta.");
+        }
+        if (!dados.novaSenha().equals(dados.confirmarNovaSenha())) {
+            throw new ResponseStatusException(HttpStatusCode.valueOf(400), "A confirmação da nova senha não confere.");
+        }
+        if (passwordEncoder.matches(dados.novaSenha(), usuario.getSenha())) {
+            throw new ResponseStatusException(HttpStatusCode.valueOf(400), "A nova senha deve ser diferente da senha atual.");
+        }
+
+        usuario.setSenha(passwordEncoder.encode(dados.novaSenha()));
+        repository.save(usuario);
+        log.info("Senha alterada com sucesso para o usuário ID {}", usuario.getId());
+    }
+
     public ListarUsuarios atualizarById(Long id, Usuario usuario) {
         validarIdUsuario(id);
 

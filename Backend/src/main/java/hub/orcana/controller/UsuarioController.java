@@ -15,6 +15,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
@@ -65,15 +66,33 @@ public class UsuarioController {
                             content = @Content(schema = @Schema(example = "{\"message\": \"Email de usuário não cadastrado\", \"status\": 404}")))
             })
     public ResponseEntity<UsuarioToken> login(@RequestBody @Valid LoginUsuario usuario) {
-        log.info("Tentativa de login para usuário: {}", usuario);
+        log.info("Tentativa de login para o e-mail: {}", usuario.email());
         try {
             UsuarioToken token = service.autenticar(usuario);
-            log.info("Login realizado com sucesso para usuário: {}", usuario);
+            log.info("Login realizado com sucesso para o e-mail: {}", usuario.email());
             return ResponseEntity.ok(token);
         } catch (Exception e) {
             log.warn("Falha na autenticação para usuário: {}", e.getMessage());
             throw e;
         }
+    }
+
+    @GetMapping("/me")
+    @Operation(summary = "Buscar o perfil do usuário autenticado")
+    @SecurityRequirement(name = "Bearer")
+    public ResponseEntity<ListarUsuarios> buscarMeuPerfil(Authentication authentication) {
+        return ResponseEntity.ok(service.buscarPerfil(authentication.getName()));
+    }
+
+    @PatchMapping("/me/senha")
+    @Operation(summary = "Alterar a senha do usuário autenticado")
+    @SecurityRequirement(name = "Bearer")
+    public ResponseEntity<Void> alterarMinhaSenha(
+            Authentication authentication,
+            @RequestBody @Valid hub.orcana.dto.usuario.AlterarSenhaUsuario dados
+    ) {
+        service.alterarSenha(authentication.getName(), dados);
+        return ResponseEntity.noContent().build();
     }
 
     // Lista os usuários
