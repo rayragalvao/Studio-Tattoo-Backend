@@ -65,10 +65,12 @@ public class UsuarioController {
                     @ApiResponse(responseCode = "404", description = "Usuário não encontrado",
                             content = @Content(schema = @Schema(example = "{\"message\": \"Email de usuário não cadastrado\", \"status\": 404}")))
             })
-    public ResponseEntity<UsuarioToken> login(@RequestBody @Valid LoginUsuario usuario) {
+    public ResponseEntity<UsuarioToken> login(
+            @RequestBody @Valid LoginUsuario usuario,
+            @RequestHeader(value = "X-Client-Type", required = false) String clientType) {
         log.info("Tentativa de login para o e-mail: {}", usuario.email());
         try {
-            UsuarioToken token = service.autenticar(usuario);
+            UsuarioToken token = service.autenticar(usuario, clientType);
             log.info("Login realizado com sucesso para o e-mail: {}", usuario.email());
             return ResponseEntity.ok(token);
         } catch (Exception e) {

@@ -146,6 +146,16 @@ public class AgendamentoService implements AgendamentoSubject {
         return AgendamentoMapper.of(salvo);
     }
 
+    @Transactional
+    public DetalhesAgendamentoOutput atualizarStatus(Long id, StatusAgendamento status) {
+        Agendamento existente = repository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Agendamento não encontrado."));
+
+        existente.setStatus(status);
+        Agendamento salvo = repository.save(existente);
+        return AgendamentoMapper.of(salvo);
+    }
+
     public void deleteAgendamentoById(Long id) {
         if (!repository.existsById(id)) {
             throw new IllegalArgumentException("Agendamento não encontrado.");

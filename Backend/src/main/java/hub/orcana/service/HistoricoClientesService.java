@@ -47,7 +47,7 @@ public class HistoricoClientesService {
 
         Map<Long, List<Agendamento>> sessoesPorCliente = new LinkedHashMap<>();
         for (Agendamento agendamento : concluidos) {
-            if (agendamento.getUsuario() == null || agendamento.getUsuario().isAdmin()) {
+            if (agendamento.getUsuario() == null) {
                 continue;
             }
             sessoesPorCliente
@@ -76,7 +76,6 @@ public class HistoricoClientesService {
     @Transactional(readOnly = true)
     public DetalhesHistoricoClienteOutput detalhar(Long clienteId) {
         Usuario cliente = usuarioRepository.findById(clienteId)
-                .filter(usuario -> !usuario.isAdmin())
                 .orElseThrow(() -> new DependenciaNaoEncontradaException("Cliente"));
 
         List<Agendamento> agendamentos = agendamentoRepository
