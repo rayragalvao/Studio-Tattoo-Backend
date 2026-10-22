@@ -1,6 +1,7 @@
 package hub.orcana.service;
 import hub.orcana.dto.orcamento.CadastroOrcamentoInput;
 import hub.orcana.dto.orcamento.DetalhesOrcamentoOutput;
+import hub.orcana.dto.predicao.PredicaoOutput;
 import hub.orcana.tables.Orcamento;
 import hub.orcana.tables.StatusOrcamento;
 import hub.orcana.tables.repository.AgendamentoRepository;
@@ -42,6 +43,9 @@ class OrcamentoServiceTest {
     @Mock
     private AgendamentoRepository agendamentoRepository;
 
+    @Mock
+    private PredicaoService predicaoService;
+
     @InjectMocks
     private OrcamentoService service;
 
@@ -70,6 +74,7 @@ class OrcamentoServiceTest {
         when(repository.findByCodigoOrcamento(anyString())).thenReturn(Optional.empty());
         when(repository.save(any(Orcamento.class))).thenAnswer(inv -> inv.getArgument(0));
         when(usuarioRepository.findByEmail(anyString())).thenReturn(Optional.empty());
+        when(predicaoService.prever(any(CadastroOrcamentoInput.class))).thenReturn(new PredicaoOutput(500.0, 120.0));
 
         Orcamento salvo = service.postOrcamento(entradaValidaCom(List.of(img1, img2)));
 
@@ -91,6 +96,7 @@ class OrcamentoServiceTest {
         when(repository.findByCodigoOrcamento(anyString())).thenReturn(Optional.empty());
         when(repository.save(any(Orcamento.class))).thenAnswer(inv -> inv.getArgument(0));
         when(usuarioRepository.findByEmail(anyString())).thenReturn(Optional.empty());
+        when(predicaoService.prever(any(CadastroOrcamentoInput.class))).thenReturn(new PredicaoOutput(500.0, 120.0));
 
         Orcamento salvo = service.postOrcamento(entradaValidaCom(new ArrayList<>()));
 
@@ -119,6 +125,7 @@ class OrcamentoServiceTest {
         when(repository.findByCodigoOrcamento(anyString())).thenReturn(Optional.empty());
         when(repository.save(any(Orcamento.class))).thenAnswer(inv -> inv.getArgument(0));
         when(usuarioRepository.findByEmail(anyString())).thenReturn(Optional.empty());
+        when(predicaoService.prever(any(CadastroOrcamentoInput.class))).thenReturn(new PredicaoOutput(500.0, 120.0));
 
         Orcamento salvo = service.postOrcamento(entrada);
 
@@ -141,6 +148,7 @@ class OrcamentoServiceTest {
                         : Optional.empty());
         when(repository.save(any(Orcamento.class))).thenAnswer(inv -> inv.getArgument(0));
         when(usuarioRepository.findByEmail(anyString())).thenReturn(Optional.empty());
+        when(predicaoService.prever(any(CadastroOrcamentoInput.class))).thenReturn(new PredicaoOutput(500.0, 120.0));
 
         Orcamento salvo = service.postOrcamento(entradaValidaCom(null));
 
@@ -160,6 +168,7 @@ class OrcamentoServiceTest {
         when(repository.findByCodigoOrcamento(anyString())).thenReturn(Optional.empty());
         when(repository.save(any(Orcamento.class))).thenAnswer(inv -> inv.getArgument(0));
         when(usuarioRepository.findByEmail(anyString())).thenReturn(Optional.empty());
+        when(predicaoService.prever(any(CadastroOrcamentoInput.class))).thenReturn(new PredicaoOutput(500.0, 120.0));
         doThrow(new RuntimeException("Falha e-mail")).when(emailService).updateOrcamento(any(Orcamento.class));
 
         Orcamento salvo = service.postOrcamento(entradaValidaCom(null));
@@ -213,6 +222,7 @@ class OrcamentoServiceTest {
         when(repository.findByCodigoOrcamento(anyString())).thenReturn(Optional.empty());
         when(repository.save(any(Orcamento.class))).thenAnswer(inv -> inv.getArgument(0));
         when(usuarioRepository.findByEmail(anyString())).thenReturn(Optional.empty());
+        when(predicaoService.prever(any(CadastroOrcamentoInput.class))).thenReturn(new PredicaoOutput(500.0, 120.0));
 
         service.postOrcamento(entradaValidaCom(List.of(img)));
 
@@ -230,6 +240,7 @@ class OrcamentoServiceTest {
         when(usuarioRepository.findByEmail(anyString())).thenReturn(Optional.empty());
         when(repository.findByCodigoOrcamento(anyString())).thenReturn(Optional.empty());
         when(repository.save(any(Orcamento.class))).thenAnswer(inv -> inv.getArgument(0));
+        when(predicaoService.prever(any(CadastroOrcamentoInput.class))).thenReturn(new PredicaoOutput(500.0, 120.0));
 
         // Execute
         CadastroOrcamentoInput entrada = new CadastroOrcamentoInput(
