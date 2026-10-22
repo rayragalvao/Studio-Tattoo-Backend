@@ -24,7 +24,6 @@ public class DotEnvConfig {
             }
         });
     }
-
     private static Path findDotenvDirectory(Path startDirectory) {
         Path directory = startDirectory;
 

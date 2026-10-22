@@ -58,16 +58,16 @@ class HistoricoClientesServiceTest {
     }
 
     @Test
-    void listarDeveIgnorarUsuariosAdministradores() {
+    void listarDeveIncluirUsuariosAdministradoresComSessoesConcluidas() {
         Usuario admin = usuario(1L, "Admin Estudio", true);
         when(agendamentoRepository.findByStatusComUsuarioEOrcamento(StatusAgendamento.CONCLUIDO))
                 .thenReturn(List.of(agendamento(1L, admin, LocalDateTime.now(), 100.0, 60)));
 
         HistoricoClientesOutput resultado = service.listar("");
 
-        assertEquals(0, resultado.totalClientes());
-        assertEquals(0, resultado.totalSessoes());
-        assertEquals(0.0, resultado.receitaAcumulada());
+        assertEquals(1, resultado.totalClientes());
+        assertEquals(1, resultado.totalSessoes());
+        assertEquals(100.0, resultado.receitaAcumulada());
     }
 
     @Test
