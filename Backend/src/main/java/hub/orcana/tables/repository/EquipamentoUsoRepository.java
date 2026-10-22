@@ -11,4 +11,5 @@ public interface EquipamentoUsoRepository extends JpaRepository<EquipamentoUso, 
     @Modifying
     @Query("DELETE FROM EquipamentoUso eu WHERE eu.relatorio.id = :relatorioId")
     void deleteByRelatorioId(@Param("relatorioId") Long relatorioId);
+    boolean existsByRelatorioId(Long relatorioId);
 }

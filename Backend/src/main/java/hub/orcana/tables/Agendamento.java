@@ -18,7 +18,6 @@ public class Agendamento {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @FutureOrPresent
     @NotNull
     @Setter
     @Column(name = "data_hora", nullable = false)

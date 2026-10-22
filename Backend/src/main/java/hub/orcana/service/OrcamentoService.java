@@ -108,10 +108,17 @@ public class OrcamentoService implements OrcamentoSubject {
                 StatusOrcamento.PENDENTE
         );
 
-        PredicaoOutput previsao = predicaoService.prever(dados);
+        try {
+            PredicaoOutput previsao = predicaoService.prever(dados);
 
-        orcamento.setPrecoSugerido(previsao.precoSugerido());
-        orcamento.setTempoSugerido(previsao.tempoSugerido());
+            if (previsao != null) {
+                orcamento.setPrecoSugerido(previsao.precoSugerido());
+                orcamento.setTempoSugerido(previsao.tempoSugerido());
+            }
+        } catch (org.springframework.web.client.RestClientException e) {
+            log.warn("IA indisponível. Orçamento será salvo sem previsão.", e);
+        }
+
         orcamento.setEstilo(dados.estilo());
 
         if (usuario != null) {
@@ -128,7 +135,6 @@ public class OrcamentoService implements OrcamentoSubject {
 
         return salvo;
     }
-
     public List<DetalhesOrcamentoOutput> findAllOrcamentos() {
         return repository.findAll().stream().map(
                 orcamento -> new DetalhesOrcamentoOutput(
