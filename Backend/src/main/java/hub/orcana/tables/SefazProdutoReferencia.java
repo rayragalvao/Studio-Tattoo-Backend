@@ -21,13 +21,13 @@ public class SefazProdutoReferencia {
     @Column(length = 12)
     private String ncm;
 
-    @Column(name = "quantidade_nfe", nullable = false, precision = 18, scale = 4)
+    @Column(name = "quantidade_nfe", nullable = true, precision = 18, scale = 4)
     private BigDecimal quantidadeNfe;
 
     @Column(name = "unidade_nfe", length = 20)
     private String unidadeNfe;
 
-    @Column(name = "valor_unitario_nfe", nullable = false, precision = 18, scale = 4)
+    @Column(name = "valor_unitario_nfe", nullable = true, precision = 18, scale = 4)
     private BigDecimal valorUnitarioNfe;
 
     @Column(name = "valor_total_nfe", nullable = false, precision = 18, scale = 2)
