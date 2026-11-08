@@ -281,7 +281,8 @@ public class AgendamentoService implements AgendamentoSubject {
             return AgendamentoMapper.of(agendamento);
         }
 
-        if (agendamento.getStatus() != StatusAgendamento.CONFIRMADO) {
+        if (agendamento.getStatus() != StatusAgendamento.CONFIRMADO
+                && agendamento.getStatus() != StatusAgendamento.AGENDADO) {
             throw new IllegalArgumentException(
                     "Somente agendamentos confirmados podem ser concluídos.");
         }
