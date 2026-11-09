@@ -75,6 +75,7 @@ public class SecurityConfiguracao {
                 .cors(Customizer.withDefaults())
                 .csrf(CsrfConfigurer<HttpSecurity>::disable)
                 .authorizeHttpRequests(authorizeRequests -> authorizeRequests
+                        .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                         .requestMatchers(URLS_PERMITIDAS).permitAll()
                         .requestMatchers(HttpMethod.GET,
                                 "/flash-tattoos",
@@ -160,6 +161,7 @@ public class SecurityConfiguracao {
                 "http://localhost:3000",
                 "http://localhost:5173",
                 "http://localhost:5174",
+                "http://localhost:8081",
                 "http://localhost:8080",
                 "http://18.232.200.166"
         ));
